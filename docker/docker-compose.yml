@@ -1,0 +1,13 @@
+services:
+  dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - TZ=Asia/Tokyo
+      - DISPLAY=${DISPLAY}
+    container_name: 'orbitalx_dev'
+    volumes:
+      - ../src:/var/opt/project
+    command: bash
+    tty: true
