@@ -30,6 +30,7 @@ add_executable(
     Core/Src/syscalls.c
     Core/Src/sysmem.c
     Core/Src/system_stm32f3xx.c
+    Core/Startup/startup_stm32f303k8tx.s
     Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal.c
     Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_adc.c
     Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_adc_ex.c
@@ -42,12 +43,14 @@ add_executable(
     Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_tim_ex.c
     Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_cortex.c
     Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_dma.c
-    Core/Startup/startup_stm32f303k8tx.s
+
+    Core/Src/Modules/Led/led.cpp
 )
 
 # インクルードディレクトリ
 target_include_directories(${PROJECT_NAME}.elf PRIVATE
     Core/Inc
+    Core/Src/Modules
     Drivers/STM32F3xx_HAL_Driver/Inc
     Drivers/CMSIS/Device/ST/STM32F3xx/Include
     Drivers/CMSIS/Include
@@ -62,4 +65,11 @@ target_compile_definitions(${PROJECT_NAME}.elf PRIVATE
     HAL_TIM_MODULE_ENABLED
     HAL_I2C_MODULE_ENABLED
     HAL_DMA_MODULE_ENABLED
+)
+
+set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR})
+INSTALL(
+    TARGETS
+    ${PROJECT_NAME}.elf
+    RUNTIME DESTINATION bin
 )
