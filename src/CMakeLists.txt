@@ -11,15 +11,14 @@ set(CMAKE_C_COMPILER arm-none-eabi-gcc)
 set(CMAKE_CXX_COMPILER arm-none-eabi-g++)
 set(CMAKE_ASM_COMPILER arm-none-eabi-gcc)
 
-# ビルドタイプに応じたフラグの設定
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    set(CMAKE_C_FLAGS "-mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -Og -g")
-else()
-    set(CMAKE_C_FLAGS "-mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -Os")
-endif()
-set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS}")
+# コンパイルフラグ
+set(CMAKE_C_FLAGS "-mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -Os -ffunction-sections -fdata-sections -Wall")
+set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -fno-exceptions -fno-rtti -fno-use-cxa-atexit")
 set(CMAKE_ASM_FLAGS "${CMAKE_C_FLAGS} -x assembler-with-cpp")
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_C_FLAGS} -T${CMAKE_SOURCE_DIR}/STM32F303K8TX_FLASH.ld --specs=nano.specs")
+
+# リンクフラグ
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_C_FLAGS} -T${CMAKE_SOURCE_DIR}/STM32F303K8TX_FLASH.ld  --specs=nano.specs --specs=nosys.specs -Wl,--gc-sections -static")
+
 
 # 実行可能ファイルの生成対象ファイル
 add_executable(
@@ -43,14 +42,22 @@ add_executable(
     Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_tim_ex.c
     Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_cortex.c
     Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_dma.c
+    Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_uart.c
+    Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_uart_ex.c
 
     Core/Src/Modules/Led/led.cpp
+    Core/Src/Modules/Map/map.cpp
+    Core/Src/Modules/ObjectHub/object_hub.cpp
+    Core/Src/Utils/Usart/usart.cpp
+    Core/Src/Interface/UsartInterface/usart_interface.cpp
 )
 
 # インクルードディレクトリ
 target_include_directories(${PROJECT_NAME}.elf PRIVATE
     Core/Inc
     Core/Src/Modules
+    Core/Src/Utils
+    Core/Src/Interface
     Drivers/STM32F3xx_HAL_Driver/Inc
     Drivers/CMSIS/Device/ST/STM32F3xx/Include
     Drivers/CMSIS/Include
@@ -65,6 +72,12 @@ target_compile_definitions(${PROJECT_NAME}.elf PRIVATE
     HAL_TIM_MODULE_ENABLED
     HAL_I2C_MODULE_ENABLED
     HAL_DMA_MODULE_ENABLED
+    HAL_UART_MODULE_ENABLED
+)
+
+add_custom_command(TARGET ${PROJECT_NAME}.elf POST_BUILD
+    COMMAND arm-none-eabi-size ${PROJECT_NAME}.elf
+    COMMENT "Displaying the size of the ELF file"
 )
 
 set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR})
