@@ -14,17 +14,12 @@ public:
 	};
 	ModeEnum mode;
 
-private:
-    std::weak_ptr<Usart> usartPtr;
-
 public:
 	Led(ModeEnum mode_);
 	~Led();
 	void on();
 	void off();
 	void toggle();
-
-
 };
 
 #endif /* SRC_MODULES_LED_H_ */
