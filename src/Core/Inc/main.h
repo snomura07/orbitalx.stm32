@@ -59,8 +59,16 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define USART_TX_Pin GPIO_PIN_2
-#define USART_TX_GPIO_Port GPIOA
+#define SENS1B_Pin GPIO_PIN_0
+#define SENS1B_GPIO_Port GPIOA
+#define SENS1A_Pin GPIO_PIN_1
+#define SENS1A_GPIO_Port GPIOA
+#define ENCB_Pin GPIO_PIN_2
+#define ENCB_GPIO_Port GPIOA
+#define SENS2B_Pin GPIO_PIN_3
+#define SENS2B_GPIO_Port GPIOA
+#define SENS2A_Pin GPIO_PIN_4
+#define SENS2A_GPIO_Port GPIOA
 #define ENCA_Pin GPIO_PIN_5
 #define ENCA_GPIO_Port GPIOA
 #define BATT_Pin GPIO_PIN_6
@@ -71,6 +79,10 @@ void Error_Handler(void);
 #define SENS_ON_A_GPIO_Port GPIOB
 #define LED3_Pin GPIO_PIN_8
 #define LED3_GPIO_Port GPIOA
+#define USART_TX_Pin GPIO_PIN_9
+#define USART_TX_GPIO_Port GPIOA
+#define USART_RX_Pin GPIO_PIN_10
+#define USART_RX_GPIO_Port GPIOA
 #define LED2_Pin GPIO_PIN_11
 #define LED2_GPIO_Port GPIOA
 #define LED4_Pin GPIO_PIN_12
@@ -79,8 +91,8 @@ void Error_Handler(void);
 #define SENS_ON_B_GPIO_Port GPIOA
 #define LED1_Pin GPIO_PIN_14
 #define LED1_GPIO_Port GPIOA
-#define USART_RX_Pin GPIO_PIN_15
-#define USART_RX_GPIO_Port GPIOA
+#define PWMA_Pin GPIO_PIN_15
+#define PWMA_GPIO_Port GPIOA
 #define MOTA_IN1_Pin GPIO_PIN_3
 #define MOTA_IN1_GPIO_Port GPIOB
 #define PWMB_Pin GPIO_PIN_4

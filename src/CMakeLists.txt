@@ -47,6 +47,10 @@ add_executable(
 
     Core/Src/Modules/Led/led.cpp
     Core/Src/Modules/Map/map.cpp
+    Core/Src/Modules/TactSwitch/tact_switch.cpp
+    Core/Src/Modules/WallSensor/wall_sensor.cpp
+    Core/Src/Modules/Imu/imu.cpp
+    Core/Src/Modules/Motor/motor.cpp
     Core/Src/Modules/ObjectHub/object_hub.cpp
     Core/Src/Utils/Usart/usart.cpp
     Core/Src/Interface/UsartInterface/usart_interface.cpp

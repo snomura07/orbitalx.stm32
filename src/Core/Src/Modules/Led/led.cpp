@@ -1,7 +1,6 @@
 #include "led.h"
 #include <main.h>
 #include <stm32f3xx_hal.h>
-#include <MasterDefine.h>
 
 Led::Led(ModeEnum mode_){
 	this->mode = mode_;

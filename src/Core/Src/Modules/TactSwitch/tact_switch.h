@@ -2,19 +2,13 @@
 #define TACT_SWITCH_H
 
 #include <main.h>
+#include <UsartInterface/usart_interface.h>
 
-class TactSwitch {
+class TactSwitch : public UsartInterface{
 public:
     TactSwitch();
     ~TactSwitch();
-
-    void update();
     bool isPushed();
-
-private:
-    bool currState;
-    bool preState;
-
 };
 
 #endif
