@@ -44,6 +44,8 @@ add_executable(
     Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_dma.c
     Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_uart.c
     Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_uart_ex.c
+    Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_flash.c
+    Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_flash_ex.c
 
     Core/Src/Modules/Led/led.cpp
     Core/Src/Modules/Map/map.cpp
@@ -53,6 +55,7 @@ add_executable(
     Core/Src/Modules/Motor/motor.cpp
     Core/Src/Modules/ObjectHub/object_hub.cpp
     Core/Src/Utils/Usart/usart.cpp
+    Core/Src/Utils/DataFlash/data_flash.cpp
     Core/Src/Interface/UsartInterface/usart_interface.cpp
 )
 

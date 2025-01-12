@@ -30,9 +30,3 @@ void Usart::sendUint32t(uint32_t value){
     sprintf(buffer, "%lu", value);
     this->sendString(buffer);
 }
-
-void Usart::sendFloat(float value, uint8_t precision) {
-    char buffer[20];
-    sprintf(buffer, "%.*f", precision, value);
-    this->sendString(buffer);
-}

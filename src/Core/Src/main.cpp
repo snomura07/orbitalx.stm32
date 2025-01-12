@@ -27,6 +27,7 @@
 #include <Imu/imu.h>
 #include <Imu/icm_20648.h>
 #include <Usart/usart.h>
+#include <DataFlash/data_flash.h>
 
 /* USER CODE END Includes */
 
@@ -127,9 +128,22 @@ int main(void)
     objHub.usartPtr->sendString("WhoAmI : ");
     objHub.usartPtr->sendUint16t(res);
     objHub.usartPtr->sendString("\r\n");
-    HAL_Delay(500);
+    HAL_Delay(100);
   }
   objHub.imuPtr->init();
+
+  // DataFlash flash;
+  // uint16_t writeData[8] = {1234, 5678, 910, 1112, 1314, 1516, 1718, 1920};
+  // flash.writeData(writeData, 8);
+  // HAL_Delay(100);
+  // uint16_t readData[8] = {};
+  // if (flash.readData(readData, 8)) {
+  //   for (size_t i = 0; i < 8; ++i) {
+  //     objHub.usartPtr->sendInt16t(readData[i]);
+  //     objHub.usartPtr->sendString("\r\n");
+  //   }
+  // }
+
 
   // timet start
   HAL_TIM_Base_Start_IT(&htim15);
