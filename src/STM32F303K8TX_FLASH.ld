@@ -47,7 +47,8 @@ MEMORY
 {
   CCMRAM    (xrw)    : ORIGIN = 0x10000000,   LENGTH = 4K
   RAM    (xrw)    : ORIGIN = 0x20000000,   LENGTH = 12K
-  FLASH    (rx)    : ORIGIN = 0x8000000,   LENGTH = 64K
+  FLASH    (rx)    : ORIGIN = 0x8000000,   LENGTH = 59K /* Program code and constants */
+  FLASH_USER_DATA (rx) : ORIGIN = 0x800F400, LENGTH = 5K /* Non-volatile data storage */
 }
 
 /* Sections */
@@ -193,6 +194,14 @@ SECTIONS
     . = . + _Min_Stack_Size;
     . = ALIGN(8);
   } >RAM
+
+  /* Non-volatile user data section */
+  .user_data :
+  {
+    . = ALIGN(4);
+    *(.user_data*)
+    . = ALIGN(4);
+  } >FLASH_USER_DATA
 
   /* Remove information from the compiler libraries */
   /DISCARD/ :
