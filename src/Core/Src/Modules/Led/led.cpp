@@ -16,10 +16,10 @@ void Led::on(){
 	else if(this->mode == ModeEnum::BLUE_BACK){
 	  HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_RESET);
 	}
-	else if(this->mode == ModeEnum::GREEN){
+	else if(this->mode == ModeEnum::ORANGE){
 	  HAL_GPIO_WritePin(LED3_GPIO_Port, LED3_Pin, GPIO_PIN_RESET);
 	}
-	else if(this->mode == ModeEnum::RED){
+	else if(this->mode == ModeEnum::GREEN){
 	  HAL_GPIO_WritePin(LED4_GPIO_Port, LED4_Pin, GPIO_PIN_RESET);
 	}
 }
@@ -31,10 +31,10 @@ void Led::off(){
 	else if(this->mode == ModeEnum::BLUE_BACK){
 	  HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_SET);
 	}
-	else if(this->mode == ModeEnum::GREEN){
+	else if(this->mode == ModeEnum::ORANGE){
 	  HAL_GPIO_WritePin(LED3_GPIO_Port, LED3_Pin, GPIO_PIN_SET);
 	}
-	else if(this->mode == ModeEnum::RED){
+	else if(this->mode == ModeEnum::GREEN){
 	  HAL_GPIO_WritePin(LED4_GPIO_Port, LED4_Pin, GPIO_PIN_SET);
 	}
 }
@@ -46,10 +46,10 @@ void Led::toggle(){
 	else if(this->mode == ModeEnum::BLUE_BACK){
       HAL_GPIO_TogglePin(LED2_GPIO_Port, LED2_Pin);
 	}
-	else if(this->mode == ModeEnum::GREEN){
+	else if(this->mode == ModeEnum::ORANGE){
       HAL_GPIO_TogglePin(LED3_GPIO_Port, LED3_Pin);
 	}
-	else if(this->mode == ModeEnum::RED){
+	else if(this->mode == ModeEnum::GREEN){
       HAL_GPIO_TogglePin(LED4_GPIO_Port, LED4_Pin);
 	}
 }

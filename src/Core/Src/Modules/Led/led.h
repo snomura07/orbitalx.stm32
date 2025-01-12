@@ -7,7 +7,7 @@
 class Led : public UsartInterface{
 public:
 	enum ModeEnum{
-		RED,
+		ORANGE,
 		GREEN,
 		BLUE_FRONT,
 		BLUE_BACK,

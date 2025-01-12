@@ -24,6 +24,8 @@
 #include <ObjectHub/object_hub.h>
 #include <Led/led.h>
 #include <Map/map.h>
+#include <Imu/imu.h>
+#include <Imu/icm_20648.h>
 #include <Usart/usart.h>
 
 /* USER CODE END Includes */
@@ -93,12 +95,13 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-  objHub.ledBlue1Ptr = std::make_shared<Led>(Led::ModeEnum::BLUE_FRONT);
-  objHub.ledBlue2Ptr = std::make_shared<Led>(Led::ModeEnum::BLUE_BACK);
-  objHub.ledGreenPtr = std::make_shared<Led>(Led::ModeEnum::GREEN);
-  objHub.ledRedPtr   = std::make_shared<Led>(Led::ModeEnum::RED);
-  objHub.mapPtr      = std::make_shared<Map>();
-  objHub.usartPtr    = std::make_shared<Usart>(huart1);
+  objHub.ledBlue1Ptr  = std::make_shared<Led>(Led::ModeEnum::BLUE_FRONT);
+  objHub.ledBlue2Ptr  = std::make_shared<Led>(Led::ModeEnum::BLUE_BACK);
+  objHub.ledOrangePtr = std::make_shared<Led>(Led::ModeEnum::ORANGE);
+  objHub.ledGreenPtr  = std::make_shared<Led>(Led::ModeEnum::GREEN);
+  objHub.imuPtr       = std::make_shared<Imu>(hi2c1);
+  objHub.mapPtr       = std::make_shared<Map>();
+  objHub.usartPtr     = std::make_shared<Usart>(huart1);
   objHub.initDependencies();
 
   /* USER CODE END Init */
@@ -119,6 +122,16 @@ int main(void)
   MX_TIM15_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
+  for(int i=0; i<4; i++){
+    auto res = objHub.imuPtr->whoAmI();
+    objHub.usartPtr->sendString("WhoAmI : ");
+    objHub.usartPtr->sendUint16t(res);
+    objHub.usartPtr->sendString("\r\n");
+    HAL_Delay(500);
+  }
+  objHub.imuPtr->init();
+
+  // timet start
   HAL_TIM_Base_Start_IT(&htim15);
   /* USER CODE END 2 */
 
@@ -126,7 +139,13 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    objHub.usartPtr->sendString("||||| \r\n");
+    objHub.ledBlue1Ptr->off();
+    objHub.ledBlue2Ptr->on();
+
+    float ax, ay, az;
+    auto res = objHub.imuPtr->readAccel(ax, ay, az);
+    HAL_Delay(10);
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -547,6 +566,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
     if (htim->Instance == TIM15) {
       objHub.ledGreenPtr->toggle();
 
+      auto res = objHub.imuPtr->whoAmI();
+      objHub.usartPtr->sendString("WhoAmI : ");
+      objHub.usartPtr->sendUint16t(res);
+      objHub.usartPtr->sendString("\r\n");
     }
 }
 

@@ -7,7 +7,8 @@ ObjectHub::~ObjectHub() = default;
 void ObjectHub::initDependencies(){
     ledBlue1Ptr->setUsart(usartPtr);
     ledBlue2Ptr->setUsart(usartPtr);
+    ledOrangePtr->setUsart(usartPtr);
     ledGreenPtr->setUsart(usartPtr);
-    ledRedPtr->setUsart(usartPtr);
+    imuPtr->setUsart(usartPtr);
     mapPtr->setUsart(usartPtr);
 }
