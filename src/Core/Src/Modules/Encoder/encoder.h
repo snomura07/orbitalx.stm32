@@ -13,11 +13,13 @@ private:
 
 private:
     ADC_HandleTypeDef *hadc2;
-    static constexpr uint8_t WINDOW_SIZE = 10;
-    uint16_t encWindow[WINDOW_SIZE];
-    uint32_t ave;
     uint32_t counter;
-    bool inMotion;
+    uint16_t currVal;
+    uint16_t preVal;
+
+private:
+    static constexpr uint16_t THRE_UP   = 3845;
+    static constexpr uint16_t THRE_DOWN = 3835;
 };
 
 #endif

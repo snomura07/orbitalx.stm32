@@ -55,6 +55,7 @@ I2C_HandleTypeDef hi2c1;
 
 TIM_HandleTypeDef htim2;
 TIM_HandleTypeDef htim3;
+TIM_HandleTypeDef htim6;
 TIM_HandleTypeDef htim15;
 
 UART_HandleTypeDef huart1;
@@ -74,6 +75,7 @@ static void MX_TIM3_Init(void);
 static void MX_TIM15_Init(void);
 static void MX_USART1_UART_Init(void);
 static void MX_TIM2_Init(void);
+static void MX_TIM6_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -105,7 +107,7 @@ int main(void)
   objHub.ledGreenPtr  = std::make_shared<Led>(Led::ModeEnum::GREEN);
   objHub.imuPtr       = std::make_shared<Imu>(hi2c1);
   objHub.encPtr       = std::make_shared<Encoder>(hadc2);
-  objHub.motorPtr     = std::make_shared<Motor>(htim3);
+  objHub.motorPtr     = std::make_shared<Motor>(htim2);
   objHub.mapPtr       = std::make_shared<Map>();
   objHub.usartPtr     = std::make_shared<Usart>(huart1);
   objHub.initDependencies();
@@ -128,6 +130,7 @@ int main(void)
   MX_TIM15_Init();
   MX_USART1_UART_Init();
   MX_TIM2_Init();
+  MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
   for(int i=0; i<4; i++){
     auto res = objHub.imuPtr->whoAmI();
@@ -152,6 +155,7 @@ int main(void)
 
 
   // timet start
+  HAL_TIM_Base_Start_IT(&htim6);
   HAL_TIM_Base_Start_IT(&htim15);
   /* USER CODE END 2 */
 
@@ -473,7 +477,7 @@ static void MX_TIM3_Init(void)
 
   /* USER CODE END TIM3_Init 1 */
   htim3.Instance = TIM3;
-  htim3.Init.Prescaler = 59;
+  htim3.Init.Prescaler = 63;
   htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim3.Init.Period = 999;
   htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
@@ -504,6 +508,44 @@ static void MX_TIM3_Init(void)
 }
 
 /**
+  * @brief TIM6 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM6_Init(void)
+{
+
+  /* USER CODE BEGIN TIM6_Init 0 */
+
+  /* USER CODE END TIM6_Init 0 */
+
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+  /* USER CODE BEGIN TIM6_Init 1 */
+
+  /* USER CODE END TIM6_Init 1 */
+  htim6.Instance = TIM6;
+  htim6.Init.Prescaler = 5999;
+  htim6.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim6.Init.Period = 99;
+  htim6.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim6) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim6, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM6_Init 2 */
+
+  /* USER CODE END TIM6_Init 2 */
+
+}
+
+/**
   * @brief TIM15 Initialization Function
   * @param None
   * @retval None
@@ -522,7 +564,7 @@ static void MX_TIM15_Init(void)
 
   /* USER CODE END TIM15_Init 1 */
   htim15.Instance = TIM15;
-  htim15.Init.Prescaler = 5999;
+  htim15.Init.Prescaler = 59999;
   htim15.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim15.Init.Period = 999;
   htim15.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
@@ -636,8 +678,15 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
-    // TIM15 callback -> 1call/ms
+    // TIM15 callback -> 1call/s
     if (htim->Instance == TIM15) {
+      objHub.ledGreenPtr->toggle();
+      objHub.usartPtr->sendString("TIM15 callback -> 1s \r\n");
+    }
+
+    if (htim->Instance == TIM6) {
+        objHub.ledOrangePtr->toggle();
+        objHub.encPtr->execAdc();
     }
 }
 
