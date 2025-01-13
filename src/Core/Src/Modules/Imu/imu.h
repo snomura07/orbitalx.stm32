@@ -19,7 +19,7 @@ private:
     bool readRegister(uint8_t reg, uint8_t* data, uint16_t size);
 
 private:
-    I2C_HandleTypeDef* hi2c;
+    I2C_HandleTypeDef *hi2c;
     uint8_t devAddr;
 };
 

@@ -5,6 +5,8 @@
 #include <Led/led.h>
 #include <Map/map.h>
 #include <Imu/imu.h>
+#include <Motor/motor.h>
+#include <Encoder/encoder.h>
 #include <Usart/usart.h>
 
 class ObjectHub {
@@ -20,6 +22,8 @@ public:
     std::shared_ptr<Led> ledOrangePtr;
     std::shared_ptr<Led> ledGreenPtr;
     std::shared_ptr<Imu> imuPtr;
+    std::shared_ptr<Encoder> encPtr;
+    std::shared_ptr<Motor> motorPtr;
     std::shared_ptr<Map> mapPtr;
     std::shared_ptr<Usart> usartPtr;
 };

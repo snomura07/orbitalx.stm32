@@ -4,8 +4,13 @@
 
 class Motor : public UsartInterface{
 public:
-    Motor();
+    Motor(TIM_HandleTypeDef &htim2_);
     ~Motor();
+    void start();
+    void stop();
+    void setDuty(uint16_t duty);
+private:
+    TIM_HandleTypeDef *htim2;
 };
 
 #endif

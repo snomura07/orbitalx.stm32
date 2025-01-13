@@ -10,5 +10,7 @@ void ObjectHub::initDependencies(){
     ledOrangePtr->setUsart(usartPtr);
     ledGreenPtr->setUsart(usartPtr);
     imuPtr->setUsart(usartPtr);
+    encPtr->setUsart(usartPtr);
+    motorPtr->setUsart(usartPtr);
     mapPtr->setUsart(usartPtr);
 }

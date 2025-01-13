@@ -54,6 +54,7 @@ add_executable(
     Core/Src/Modules/Imu/imu.cpp
     Core/Src/Modules/Motor/motor.cpp
     Core/Src/Modules/ObjectHub/object_hub.cpp
+    Core/Src/Modules/Encoder/encoder.cpp
     Core/Src/Utils/Usart/usart.cpp
     Core/Src/Utils/DataFlash/data_flash.cpp
     Core/Src/Interface/UsartInterface/usart_interface.cpp
