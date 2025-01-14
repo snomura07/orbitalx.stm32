@@ -1,4 +1,5 @@
 #include "usart.h"
+#include <math.h>
 
 Usart::Usart(UART_HandleTypeDef &huart_){
     this->huart = &huart_;
@@ -28,5 +29,17 @@ void Usart::sendInt32t(int32_t value){
 void Usart::sendUint32t(uint32_t value){
     char buffer[11];
     sprintf(buffer, "%lu", value);
+    this->sendString(buffer);
+}
+void Usart::sendFloat(float value){
+    int integerPart    = (int)value; // 整数部分
+    int fractionalPart = (int)((fabs(value) - abs(integerPart)) * 1000); // 小数点以下3桁
+
+    char buffer[20];
+    if (value < 0) {
+        sprintf(buffer, "-%d.%03d", abs(integerPart), fractionalPart);
+    } else {
+        sprintf(buffer, "%d.%03d", integerPart, fractionalPart);
+    }
     this->sendString(buffer);
 }

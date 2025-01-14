@@ -25,3 +25,9 @@ void UsartInterface::sendLong(int32_t value) {
         usart->sendInt32t(value);
     }
 }
+
+void UsartInterface::sendFloat(float value) {
+    if (auto usart = usartPtr.lock()) {
+        usart->sendFloat(value);
+    }
+}

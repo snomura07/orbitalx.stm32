@@ -166,14 +166,11 @@ int main(void)
     objHub.ledBlue1Ptr->off();
     objHub.ledBlue2Ptr->on();
 
-    float ax, ay, az;
-    auto res = objHub.imuPtr->readAccel(ax, ay, az);
+    objHub.imuPtr->out();
     HAL_Delay(10);
 
-    objHub.encPtr->out();
-    HAL_Delay(10);
-
-
+    // objHub.encPtr->out();
+    // HAL_Delay(10);
 
     /* USER CODE END WHILE */
 
@@ -681,12 +678,13 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
     // TIM15 callback -> 1call/s
     if (htim->Instance == TIM15) {
       objHub.ledGreenPtr->toggle();
-      objHub.usartPtr->sendString("TIM15 callback -> 1s \r\n");
     }
 
+    // TIM6 callback -> 1call per 10ms
     if (htim->Instance == TIM6) {
         objHub.ledOrangePtr->toggle();
         objHub.encPtr->execAdc();
+        objHub.imuPtr->readAll();
     }
 }
 

@@ -18,6 +18,7 @@ protected:
     void sendMessage(const char* msg);
     void sendInt(int16_t value);
     void sendLong(int32_t value);
+    void sendFloat(float value);
 };
 
 #endif

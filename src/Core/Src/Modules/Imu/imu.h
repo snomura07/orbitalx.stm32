@@ -7,16 +7,34 @@
 
 class Imu : public UsartInterface{
 public:
+    struct AxisInt16t
+    {
+        int16_t x;
+        int16_t y;
+        int16_t z;
+    };
+    struct AxisFloat
+    {
+        int16_t x;
+        int16_t y;
+        int16_t z;
+    };
+    AxisInt16t accelI;
+    AxisInt16t gyroI;
+    AxisFloat  accelF;
+    AxisFloat  gyroF;
+
+public:
     Imu(I2C_HandleTypeDef &hi2c_, uint8_t deviceAddress = ICM20648::DEFAULT_ADDRESS);
     ~Imu();
     bool init();
     uint8_t whoAmI();
-    bool readAccel(float& ax, float& ay, float& az);
-    bool readGyro(float& gx, float& gy, float& gz);
+    void readAll();
+    void out();
 
 private:
-    bool writeRegister(uint8_t reg, uint8_t data);
-    bool readRegister(uint8_t reg, uint8_t* data, uint16_t size);
+    bool writeRegister(uint8_t reg, uint8_t* data, uint16_t size);
+    bool readRegister (uint8_t reg, uint8_t* data, uint16_t size);
 
 private:
     I2C_HandleTypeDef *hi2c;
