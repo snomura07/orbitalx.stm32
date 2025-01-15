@@ -7,22 +7,14 @@
 
 class Imu : public UsartInterface{
 public:
-    struct AxisInt16t
+    struct Axis
     {
         int16_t x;
         int16_t y;
         int16_t z;
     };
-    struct AxisFloat
-    {
-        int16_t x;
-        int16_t y;
-        int16_t z;
-    };
-    AxisInt16t accelI;
-    AxisInt16t gyroI;
-    AxisFloat  accelF;
-    AxisFloat  gyroF;
+    Axis accel;
+    Axis gyro;
 
 public:
     Imu(I2C_HandleTypeDef &hi2c_, uint8_t deviceAddress = ICM20648::DEFAULT_ADDRESS);
