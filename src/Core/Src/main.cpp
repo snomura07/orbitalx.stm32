@@ -64,7 +64,7 @@ UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN PV */
 ObjectHub objHub;
-Dbug::Menu debugMenu;
+Debug::Menu debugMenu;
 
 /* USER CODE END PV */
 

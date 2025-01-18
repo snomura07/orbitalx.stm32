@@ -4,7 +4,7 @@
 #include <memory>
 #include <UsartInterface/usart_interface.h>
 
-namespace Dbug {
+namespace Debug {
 class Menu : public UsartInterface{
 public:
     Menu();

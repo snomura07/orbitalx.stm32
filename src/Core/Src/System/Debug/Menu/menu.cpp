@@ -1,6 +1,6 @@
 #include "menu.h"
 
-namespace Dbug {
+namespace Debug {
 Menu::Menu():
     menuIndex(0)
 {}
