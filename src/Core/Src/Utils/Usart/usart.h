@@ -19,6 +19,8 @@ public:
     void sendUint32t(uint32_t value);
     void sendFloat(float value);
 
+    char receiveChar();
+
 private:
     UART_HandleTypeDef *huart;
 };

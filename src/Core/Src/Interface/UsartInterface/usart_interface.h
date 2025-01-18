@@ -19,6 +19,7 @@ protected:
     void sendInt(int16_t value);
     void sendLong(int32_t value);
     void sendFloat(float value);
+    char receiveChar();
 };
 
 #endif

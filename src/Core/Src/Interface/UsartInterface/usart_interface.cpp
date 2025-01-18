@@ -31,3 +31,11 @@ void UsartInterface::sendFloat(float value) {
         usart->sendFloat(value);
     }
 }
+
+char UsartInterface::receiveChar() {
+    char data;
+    if (auto usart = usartPtr.lock()) {
+        data = usart->receiveChar();
+    }
+    return data;
+}

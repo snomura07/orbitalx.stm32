@@ -56,6 +56,7 @@ add_executable(
     Core/Src/Modules/Battery/battery.cpp
     Core/Src/Modules/ObjectHub/object_hub.cpp
     Core/Src/Modules/Encoder/encoder.cpp
+    Core/Src/System/Debug/Menu/menu.cpp
     Core/Src/Utils/Usart/usart.cpp
     Core/Src/Utils/DataFlash/data_flash.cpp
     Core/Src/Interface/UsartInterface/usart_interface.cpp
@@ -67,6 +68,7 @@ target_include_directories(${PROJECT_NAME}.elf PRIVATE
     Core/Src/Modules
     Core/Src/Utils
     Core/Src/Interface
+    Core/Src/System
     Drivers/STM32F3xx_HAL_Driver/Inc
     Drivers/CMSIS/Device/ST/STM32F3xx/Include
     Drivers/CMSIS/Include

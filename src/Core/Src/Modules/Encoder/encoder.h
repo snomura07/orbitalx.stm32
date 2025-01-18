@@ -18,9 +18,17 @@ private:
     uint16_t currRaw;
     uint16_t preRaw;
 
+    uint16_t uCnt;
+    uint16_t max;
+    uint16_t min;
+    uint16_t currThreUP;
+    uint16_t currThreDown;
+
 private:
-    static constexpr uint16_t THRE_UP   = 3845;
-    static constexpr uint16_t THRE_DOWN = 3835;
+    // static constexpr uint16_t THRE_UP   = 3845;
+    // static constexpr uint16_t THRE_DOWN = 3835;
+    uint16_t THRE_UP;
+    uint16_t THRE_DOWN;
 };
 
 #endif

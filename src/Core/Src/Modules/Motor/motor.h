@@ -4,13 +4,20 @@
 
 class Motor : public UsartInterface{
 public:
-    Motor(TIM_HandleTypeDef &htim2_);
+	enum ModeEnum{
+		RIGHT,
+		LEFT,
+	};
+
+public:
+    Motor(TIM_HandleTypeDef &htim_, ModeEnum mode_);
     ~Motor();
     void start();
     void stop();
     void setDuty(uint16_t duty);
 private:
-    TIM_HandleTypeDef *htim2;
+    TIM_HandleTypeDef *htim;
+	ModeEnum mode;
 };
 
 #endif

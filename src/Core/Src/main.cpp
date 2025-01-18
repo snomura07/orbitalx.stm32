@@ -30,6 +30,7 @@
 #include <Battery/battery.h>
 #include <Usart/usart.h>
 #include <DataFlash/data_flash.h>
+#include <Debug/Menu/menu.h>
 
 /* USER CODE END Includes */
 
@@ -63,6 +64,7 @@ UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN PV */
 ObjectHub objHub;
+Dbug::Menu debugMenu;
 
 /* USER CODE END PV */
 
@@ -108,11 +110,14 @@ int main(void)
   objHub.ledGreenPtr  = std::make_shared<Led>(Led::ModeEnum::GREEN);
   objHub.imuPtr       = std::make_shared<Imu>(hi2c1);
   objHub.encPtr       = std::make_shared<Encoder>(hadc2);
-  objHub.motorPtr     = std::make_shared<Motor>(htim3);
+  objHub.rMotPtr      = std::make_shared<Motor>(htim2, Motor::ModeEnum::RIGHT);
+  objHub.lMotPtr      = std::make_shared<Motor>(htim3, Motor::ModeEnum::LEFT);
   objHub.battPtr      = std::make_shared<Battery>(hadc2);
   objHub.mapPtr       = std::make_shared<Map>();
   objHub.usartPtr     = std::make_shared<Usart>(huart1);
   objHub.initDependencies();
+
+  debugMenu.setUsart(objHub.usartPtr);
 
   /* USER CODE END Init */
 
@@ -143,6 +148,8 @@ int main(void)
   }
   objHub.imuPtr->init();
 
+  debugMenu.showMain();
+
   // DataFlash flash;
   // uint16_t writeData[8] = {1234, 5678, 910, 1112, 1314, 1516, 1718, 1920};
   // flash.writeData(writeData, 8);
@@ -155,12 +162,10 @@ int main(void)
   //   }
   // }
 
-
-    // objHub.motorPtr->stop();
-    // HAL_Delay(10);
-    // objHub.motorPtr->setDuty(16999);
-    // HAL_Delay(10);
-    // objHub.motorPtr->start();
+  // objHub.rMotPtr->start();
+  // objHub.lMotPtr->start();
+  // objHub.rMotPtr->setDuty(79*4);
+  // objHub.lMotPtr->setDuty(79*4);
 
 
   // timet start
@@ -175,9 +180,28 @@ int main(void)
     objHub.ledBlue1Ptr->off();
     objHub.ledBlue2Ptr->on();
 
-    objHub.battPtr->dump();
+
+
+    // char received = objHub.usartPtr->receiveChar();
+    // if (received == '\x1B') { // ESC sequence start (arrow keys)
+    //     char seq1 = objHub.usartPtr->receiveChar();
+    //     char seq2 = objHub.usartPtr->receiveChar();
+    //     if (seq1 == '[') {
+    //         switch (seq2) {
+    //             case 'A': objHub.usartPtr->sendString("\r\n[Up Arrow]\r\n"); break;
+    //             case 'B': objHub.usartPtr->sendString("\r\n[Down Arrow]\r\n"); break;
+    //             case 'C': objHub.usartPtr->sendString("\r\n[Right Arrow]\r\n"); break;
+    //             case 'D': objHub.usartPtr->sendString("\r\n[Left Arrow]\r\n"); break;
+    //             default: objHub.usartPtr->sendString("\r\n[Unknown ESC Sequence]\r\n"); break;
+    //         }
+    //     }
+    // } else {
+    //     objHub.usartPtr->sendString(&received);
+    // }
+
+    // objHub.battPtr->dump();
     // objHub.imuPtr->dump();
-    // objHub.encPtr->dump();
+    objHub.encPtr->dump();
 
     HAL_Delay(10);
 
@@ -427,14 +451,17 @@ static void MX_TIM2_Init(void)
   TIM_OC_InitTypeDef sConfigOC = {0};
 
   /* USER CODE BEGIN TIM2_Init 1 */
+  // 100,000=(71,500,000/1)/715
+  // Prescaler：1-1=0
+  // Counter Reriod：715-1=714
 
   /* USER CODE END TIM2_Init 1 */
   htim2.Instance = TIM2;
-  htim2.Init.Prescaler = 59;
+  htim2.Init.Prescaler = 0;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim2.Init.Period = 999;
+  htim2.Init.Period = 714;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-  htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
   if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
   {
     Error_Handler();
@@ -481,6 +508,7 @@ static void MX_TIM3_Init(void)
 
   /* USER CODE END TIM3_Init 0 */
 
+  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
   TIM_MasterConfigTypeDef sMasterConfig = {0};
   TIM_OC_InitTypeDef sConfigOC = {0};
 
@@ -488,11 +516,20 @@ static void MX_TIM3_Init(void)
 
   /* USER CODE END TIM3_Init 1 */
   htim3.Instance = TIM3;
-  htim3.Init.Prescaler = 63;
+  htim3.Init.Prescaler = 0;
   htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim3.Init.Period = 999;
+  htim3.Init.Period = 794;
   htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-  htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
+  if (HAL_TIM_Base_Init(&htim3) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+  if (HAL_TIM_ConfigClockSource(&htim3, &sClockSourceConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
   if (HAL_TIM_PWM_Init(&htim3) != HAL_OK)
   {
     Error_Handler();

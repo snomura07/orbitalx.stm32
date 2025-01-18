@@ -43,3 +43,9 @@ void Usart::sendFloat(float value){
     }
     this->sendString(buffer);
 }
+
+char Usart::receiveChar(){
+    uint8_t received;
+    HAL_UART_Receive(this->huart, &received, 1, HAL_MAX_DELAY);
+    return (char)received;
+}
