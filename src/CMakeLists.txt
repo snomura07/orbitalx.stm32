@@ -53,6 +53,7 @@ add_executable(
     Core/Src/Modules/WallSensor/wall_sensor.cpp
     Core/Src/Modules/Imu/imu.cpp
     Core/Src/Modules/Motor/motor.cpp
+    Core/Src/Modules/Battery/battery.cpp
     Core/Src/Modules/ObjectHub/object_hub.cpp
     Core/Src/Modules/Encoder/encoder.cpp
     Core/Src/Utils/Usart/usart.cpp

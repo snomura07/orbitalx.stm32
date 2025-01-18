@@ -32,15 +32,19 @@ uint8_t Imu::whoAmI() {
     return whoAmI;
 }
 
+void Imu::update() {
+    readAll();
+}
+
 void Imu::readAll() {
     uint8_t rawData[12] = {0};
     readRegister(ICM20648::ACCEL_XOUT_H, rawData, 12);
-    accel.x = (int16_t)((rawData[0]  << 8) | rawData[1]);
-    accel.y = (int16_t)((rawData[2]  << 8) | rawData[3]);
-    accel.z = (int16_t)((rawData[4]  << 8) | rawData[5]);
-    gyro.x  = (int16_t)((rawData[6]  << 8) | rawData[7]);
-    gyro.y  = (int16_t)((rawData[8]  << 8) | rawData[9]);
-    gyro.z  = (int16_t)((rawData[10] << 8) | rawData[11]);
+    accelRaw.x = (int16_t)((rawData[0]  << 8) | rawData[1]);
+    accelRaw.y = (int16_t)((rawData[2]  << 8) | rawData[3]);
+    accelRaw.z = (int16_t)((rawData[4]  << 8) | rawData[5]);
+    gyroRaw.x  = (int16_t)((rawData[6]  << 8) | rawData[7]);
+    gyroRaw.y  = (int16_t)((rawData[8]  << 8) | rawData[9]);
+    gyroRaw.z  = (int16_t)((rawData[10] << 8) | rawData[11]);
 }
 
 bool Imu::writeRegister(uint8_t reg, uint8_t* data, uint16_t size) {
@@ -51,20 +55,20 @@ bool Imu::readRegister(uint8_t reg, uint8_t* data, uint16_t size) {
     return HAL_I2C_Mem_Read(hi2c, devAddr, reg, I2C_MEMADD_SIZE_8BIT, data, size, HAL_MAX_DELAY) == HAL_OK;
 }
 
-void Imu::out(){
+void Imu::dump(){
     sendMessage("accel[LSB]: ");
-    sendInt(accel.x);
+    sendInt(accelRaw.x);
     sendMessage(", ");
-    sendInt(accel.y);
+    sendInt(accelRaw.y);
     sendMessage(", ");
-    sendInt(accel.z);
+    sendInt(accelRaw.z);
     sendMessage(", ");
 
     sendMessage("gyro[LSB] : ");
-    sendInt(gyro.x);
+    sendInt(gyroRaw.x);
     sendMessage(", ");
-    sendInt(gyro.y);
+    sendInt(gyroRaw.y);
     sendMessage(", ");
-    sendInt(gyro.z);
+    sendInt(gyroRaw.z);
     sendMessage("\r\n");
 }

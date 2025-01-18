@@ -13,18 +13,19 @@ public:
         int16_t y;
         int16_t z;
     };
-    Axis accel;
-    Axis gyro;
+    Axis accelRaw;
+    Axis gyroRaw;
 
 public:
     Imu(I2C_HandleTypeDef &hi2c_, uint8_t deviceAddress = ICM20648::DEFAULT_ADDRESS);
     ~Imu();
     bool init();
     uint8_t whoAmI();
-    void readAll();
-    void out();
+    void update();
+    void dump();
 
 private:
+    void readAll();
     bool writeRegister(uint8_t reg, uint8_t* data, uint16_t size);
     bool readRegister (uint8_t reg, uint8_t* data, uint16_t size);
 

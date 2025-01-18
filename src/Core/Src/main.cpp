@@ -27,6 +27,7 @@
 #include <Imu/imu.h>
 #include <Encoder/encoder.h>
 #include <Motor/motor.h>
+#include <Battery/battery.h>
 #include <Usart/usart.h>
 #include <DataFlash/data_flash.h>
 
@@ -107,7 +108,8 @@ int main(void)
   objHub.ledGreenPtr  = std::make_shared<Led>(Led::ModeEnum::GREEN);
   objHub.imuPtr       = std::make_shared<Imu>(hi2c1);
   objHub.encPtr       = std::make_shared<Encoder>(hadc2);
-  objHub.motorPtr     = std::make_shared<Motor>(htim2);
+  objHub.motorPtr     = std::make_shared<Motor>(htim3);
+  objHub.battPtr      = std::make_shared<Battery>(hadc2);
   objHub.mapPtr       = std::make_shared<Map>();
   objHub.usartPtr     = std::make_shared<Usart>(huart1);
   objHub.initDependencies();
@@ -154,6 +156,13 @@ int main(void)
   // }
 
 
+    // objHub.motorPtr->stop();
+    // HAL_Delay(10);
+    // objHub.motorPtr->setDuty(16999);
+    // HAL_Delay(10);
+    // objHub.motorPtr->start();
+
+
   // timet start
   HAL_TIM_Base_Start_IT(&htim6);
   HAL_TIM_Base_Start_IT(&htim15);
@@ -166,11 +175,11 @@ int main(void)
     objHub.ledBlue1Ptr->off();
     objHub.ledBlue2Ptr->on();
 
-    objHub.imuPtr->out();
-    HAL_Delay(10);
+    objHub.battPtr->dump();
+    // objHub.imuPtr->dump();
+    // objHub.encPtr->dump();
 
-    // objHub.encPtr->out();
-    // HAL_Delay(10);
+    HAL_Delay(10);
 
     /* USER CODE END WHILE */
 
@@ -192,12 +201,13 @@ void SystemClock_Config(void)
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+  RCC_OscInitStruct.HSEPredivValue = RCC_HSE_PREDIV_DIV4;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
-  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
-  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL15;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL11;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
     Error_Handler();
@@ -223,6 +233,10 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+
+  /** Enables the Clock Security System
+  */
+  HAL_RCC_EnableCSS();
 }
 
 /**
@@ -364,7 +378,7 @@ static void MX_I2C1_Init(void)
 
   /* USER CODE END I2C1_Init 1 */
   hi2c1.Instance = I2C1;
-  hi2c1.Init.Timing = 0x107075B0;
+  hi2c1.Init.Timing = 0x10808CD2;
   hi2c1.Init.OwnAddress1 = 0;
   hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
   hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
@@ -522,7 +536,7 @@ static void MX_TIM6_Init(void)
 
   /* USER CODE END TIM6_Init 1 */
   htim6.Instance = TIM6;
-  htim6.Init.Prescaler = 5999;
+  htim6.Init.Prescaler = 7149;
   htim6.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim6.Init.Period = 99;
   htim6.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
@@ -561,9 +575,9 @@ static void MX_TIM15_Init(void)
 
   /* USER CODE END TIM15_Init 1 */
   htim15.Instance = TIM15;
-  htim15.Init.Prescaler = 59999;
+  htim15.Init.Prescaler = 7149;
   htim15.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim15.Init.Period = 999;
+  htim15.Init.Period = 9999;
   htim15.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim15.Init.RepetitionCounter = 0;
   htim15.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
@@ -635,6 +649,7 @@ static void MX_GPIO_Init(void)
 /* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOF_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
@@ -683,8 +698,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
     // TIM6 callback -> 1call per 10ms
     if (htim->Instance == TIM6) {
         objHub.ledOrangePtr->toggle();
-        objHub.encPtr->execAdc();
-        objHub.imuPtr->readAll();
+        objHub.encPtr ->update();
+        objHub.imuPtr ->update();
+        objHub.battPtr->update();
     }
 }
 

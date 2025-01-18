@@ -6,16 +6,17 @@ class Encoder : public UsartInterface{
 public:
     Encoder(ADC_HandleTypeDef &hadc2_);
     ~Encoder();
-    void execAdc();
-    void out();
+    void update();
+    void dump();
 private:
+    void execAdc();
     void countUp();
 
 private:
     ADC_HandleTypeDef *hadc2;
     uint32_t counter;
-    uint16_t currVal;
-    uint16_t preVal;
+    uint16_t currRaw;
+    uint16_t preRaw;
 
 private:
     static constexpr uint16_t THRE_UP   = 3845;

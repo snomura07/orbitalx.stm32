@@ -3,11 +3,15 @@
 Encoder::Encoder(ADC_HandleTypeDef &hadc2_):
     hadc2(&hadc2_),
     counter(0),
-    currVal(0),
-    preVal(0)
+    currRaw(0),
+    preRaw(0)
 {
 }
 Encoder::~Encoder(){}
+
+void Encoder::update(){
+    execAdc();
+}
 
 void Encoder::execAdc(){
     ADC_ChannelConfTypeDef sConfig = {0};
@@ -19,22 +23,22 @@ void Encoder::execAdc(){
 
     HAL_ADC_Start(hadc2);
     HAL_ADC_PollForConversion(hadc2, HAL_MAX_DELAY); // 変換完了待ち
-    uint16_t value = HAL_ADC_GetValue(hadc2);
+    uint16_t raw = HAL_ADC_GetValue(hadc2);
     HAL_ADC_Stop(hadc2);
 
-    preVal  = currVal;
-    currVal = value;
-    if (currVal > THRE_UP && preVal <= THRE_UP) {
+    preRaw  = currRaw;
+    currRaw = raw;
+    if (currRaw > THRE_UP && preRaw <= THRE_UP) {
         counter++;
     }
-    else if (currVal < THRE_DOWN && preVal >= THRE_DOWN) {
+    else if (currRaw < THRE_DOWN && preRaw >= THRE_DOWN) {
         counter++;
     }
 }
 
-void Encoder::out(){
+void Encoder::dump(){
     sendMessage("enc:");
-    sendLong(currVal);
+    sendLong(currRaw);
     sendMessage(", ");
     sendMessage("cnt:");
     sendLong(counter);
