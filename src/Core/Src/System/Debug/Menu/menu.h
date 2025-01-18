@@ -12,7 +12,9 @@ public:
     void showMain();
 
 private:
+    void init();
     void showTitle();
+    void showItems();
     void processArrowKey();
     void processEnterKey();
     void processEscapeKey();
@@ -24,6 +26,8 @@ private:
     uint8_t currentMenuLevel;
     uint8_t currentSelection;
     int8_t menuIndex;
+    int8_t menuSize;
+    char *menuItem[10];
 };
 };
 #endif

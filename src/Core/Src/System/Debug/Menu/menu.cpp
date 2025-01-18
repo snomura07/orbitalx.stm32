@@ -1,14 +1,25 @@
 #include "menu.h"
-
+#include "MasterDefine.h"
 namespace Debug {
 Menu::Menu():
     menuIndex(0)
-{}
+{
+    init();
+}
 
 Menu::~Menu(){}
 
+void Menu::init(){
+    strcpy(menuItem[0], "LED");
+    strcpy(menuItem[1], "DEBUG");
+    strcpy(menuItem[2], "TEST");
+    strcpy(menuItem[3], "Param");
+    menuSize = 4;
+}
+
 void Menu::showMain(){
     showTitle();
+    showItems();
 
     while(1){
         char received = receiveChar();
@@ -22,8 +33,24 @@ void Menu::showMain(){
     }
 }
 
+void Menu::showItems(){
+    for(int i=0; i<menuSize; i++){
+        if(i == menuIndex){
+            sendMessage("-->");
+        }
+        else{
+            sendMessage("   ");
+        }
+        sendMessage(menuItem[i]);
+    }
+}
+
 void Menu::showTitle(){
-    sendMessage("\r\n===== STM32 =====\r\n");
+    sendMessage("\r\n===== ");
+    sendMessage(NAME);
+    sendMessage(" ver.");
+    sendMessage(VERSION);
+    sendMessage(" =====\r\n");
 }
 
 void Menu::processArrowKey(){

@@ -33,7 +33,7 @@ void UsartInterface::sendFloat(float value) {
 }
 
 char UsartInterface::receiveChar() {
-    char data;
+    char data = 0;
     if (auto usart = usartPtr.lock()) {
         data = usart->receiveChar();
     }
