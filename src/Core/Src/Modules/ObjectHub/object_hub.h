@@ -18,6 +18,7 @@ public:
     void initDependencies();
 
 public:
+    int sample;
     std::shared_ptr<Led> ledBlue1Ptr;
     std::shared_ptr<Led> ledBlue2Ptr;
     std::shared_ptr<Led> ledOrangePtr;

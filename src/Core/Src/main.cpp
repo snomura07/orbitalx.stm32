@@ -31,6 +31,7 @@
 #include <Usart/usart.h>
 #include <DataFlash/data_flash.h>
 #include <Debug/Menu/menu.h>
+#include <Startup/startup.h>
 
 /* USER CODE END Includes */
 
@@ -172,7 +173,10 @@ int main(void)
 
   objHub.ledBlue1Ptr->off();
   objHub.ledBlue2Ptr->on();
-  debugMenu.controller();
+  // debugMenu.controller();
+
+  Startup startup(objHub);
+  startup.test();
 
   /* USER CODE END 2 */
 
