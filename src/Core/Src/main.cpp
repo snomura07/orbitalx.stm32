@@ -117,6 +117,7 @@ int main(void)
   objHub.usartPtr     = std::make_shared<Usart>(huart1);
   objHub.initDependencies();
 
+  debugMenu.init();
   debugMenu.setUsart(objHub.usartPtr);
 
   /* USER CODE END Init */
@@ -148,8 +149,6 @@ int main(void)
   }
   objHub.imuPtr->init();
 
-  debugMenu.showMain();
-
   // DataFlash flash;
   // uint16_t writeData[8] = {1234, 5678, 910, 1112, 1314, 1516, 1718, 1920};
   // flash.writeData(writeData, 8);
@@ -167,21 +166,20 @@ int main(void)
   // objHub.rMotPtr->setDuty(79*4);
   // objHub.lMotPtr->setDuty(79*4);
 
-
   // timet start
   HAL_TIM_Base_Start_IT(&htim6);
   HAL_TIM_Base_Start_IT(&htim15);
+
+  objHub.ledBlue1Ptr->off();
+  objHub.ledBlue2Ptr->on();
+  debugMenu.controller();
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    objHub.ledBlue1Ptr->off();
-    objHub.ledBlue2Ptr->on();
-
-
-
     // char received = objHub.usartPtr->receiveChar();
     // if (received == '\x1B') { // ESC sequence start (arrow keys)
     //     char seq1 = objHub.usartPtr->receiveChar();
@@ -199,9 +197,10 @@ int main(void)
     //     objHub.usartPtr->sendString(&received);
     // }
 
-    // objHub.battPtr->dump();
+    objHub.ledBlue1Ptr->on();
+    objHub.battPtr->dump();
     // objHub.imuPtr->dump();
-    objHub.encPtr->dump();
+    // objHub.encPtr->dump();
 
     HAL_Delay(10);
 

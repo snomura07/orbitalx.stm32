@@ -2,7 +2,7 @@
 #define INC_MASTERDEFINE_H_
 
 #define VERSION "0.1.0"
-#define NAME "Orbital X"
+#define NAME "OrbitalX"
 
 #define LED_ON  0
 #define LED_OFF 1

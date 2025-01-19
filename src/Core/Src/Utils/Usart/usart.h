@@ -20,6 +20,7 @@ public:
     void sendFloat(float value);
 
     char receiveChar();
+    char receiveCharNonBlocking();
 
 private:
     UART_HandleTypeDef *huart;

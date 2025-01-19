@@ -9,25 +9,27 @@ class Menu : public UsartInterface{
 public:
     Menu();
     ~Menu();
-    void showMain();
+    void init();
+    void controller();
 
 private:
-    void init();
     void showTitle();
     void showItems();
-    void processArrowKey();
+    void showMain();
+    void processArrowKey(char received);
     void processEnterKey();
-    void processEscapeKey();
 
-    bool isEscKey(char received);
+    bool isArrowKey(char received);
     bool isEnterKey(char received);
+    bool isQuitKey(char received);
+    void clearDisplay();
 
 private:
     uint8_t currentMenuLevel;
     uint8_t currentSelection;
     int8_t menuIndex;
     int8_t menuSize;
-    char *menuItem[10];
+    char menuItems[20][20];
 };
 };
 #endif

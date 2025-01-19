@@ -3,45 +3,55 @@
 namespace Debug {
 Menu::Menu():
     menuIndex(0)
-{
-    init();
-}
+{}
 
 Menu::~Menu(){}
 
 void Menu::init(){
-    strcpy(menuItem[0], "LED");
-    strcpy(menuItem[1], "DEBUG");
-    strcpy(menuItem[2], "TEST");
-    strcpy(menuItem[3], "Param");
-    menuSize = 4;
+    memset(menuItems, 0, sizeof(menuItems));
+    strcpy(menuItems[0], "Battery Check");
+    strcpy(menuItems[1], "DEBUG");
+    strcpy(menuItems[2], "TEST");
+    menuSize = 3;
 }
 
-void Menu::showMain(){
-    showTitle();
-    showItems();
+void Menu::controller(){
+    showMain();
 
     while(1){
         char received = receiveChar();
-        if(isEscKey(received)){
-            processArrowKey();
+        if(isArrowKey(received)){
+            processArrowKey(received);
         }
+        showMain();
 
         if(isEnterKey(received)){
-
+            processEnterKey();
+            sendMessage("pushed Enter");
         }
+
+        if(isQuitKey(received)){
+            sendMessage("\r\nexit debug mode");
+            HAL_Delay(1000);
+            clearDisplay();
+            return;
+        }
+        HAL_Delay(10);
     }
 }
 
 void Menu::showItems(){
     for(int i=0; i<menuSize; i++){
         if(i == menuIndex){
-            sendMessage("-->");
+            sendMessage("--> ");
         }
         else{
-            sendMessage("   ");
+            sendMessage("    ");
         }
-        sendMessage(menuItem[i]);
+        sendInt(i+1);
+        sendMessage(". ");
+        sendMessage(menuItems[i]);
+        sendMessage("\r\n");
     }
 }
 
@@ -53,37 +63,53 @@ void Menu::showTitle(){
     sendMessage(" =====\r\n");
 }
 
-void Menu::processArrowKey(){
-    char received = receiveChar();
-    if (isEscKey(received)) {
-        char seq1 = receiveChar();
-        char seq2 = receiveChar();
-        if (seq1 == '[') {
-            switch (seq2) {
-                // ↑
-                case 'A':
-                    if(menuIndex > 0){
-                        menuIndex--;
-                    }
-                    break;
+void Menu::showMain(){
+    clearDisplay();
+    showTitle();
+    showItems();
+    sendMessage("\r\n w:↑  s:↓  q:exit  Enter:exec  \r\n\r\n");
+}
 
-                // ↓
-                case 'B':
-                    if(menuIndex < 5){
-                        menuIndex++;
-                    }
-                    break;
+void Menu::processArrowKey(char received){
+    switch (received) {
+        // ↑
+        case 'w':
+            if(menuIndex > 0){
+                menuIndex--;
             }
-        }
+            break;
+
+        // ↓
+        case 's':
+            if(menuIndex < menuSize-1){
+                menuIndex++;
+            }
+            break;
     }
 }
 
-bool Menu::isEscKey(char received){
-    return received == '\x1B';
+void Menu::processEnterKey(){
+    switch (menuIndex) {
+        case '0':  break;
+        case '1':  break;
+        case '2':  break;
+    }
+}
+
+bool Menu::isArrowKey(char received){
+    return (received == 'w' || received == 's');
 }
 
 bool Menu::isEnterKey(char received){
     return received == '\r';
+}
+
+bool Menu::isQuitKey(char received){
+    return received == 'q';
+}
+
+void Menu::clearDisplay(){
+    sendMessage("\033[2J\033[H");
 }
 
 };

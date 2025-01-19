@@ -39,3 +39,11 @@ char UsartInterface::receiveChar() {
     }
     return data;
 }
+
+char UsartInterface::receiveCharNonBlocking(){
+    char data = 0;
+    if (auto usart = usartPtr.lock()) {
+        data = usart->receiveCharNonBlocking();
+    }
+    return data;
+}
