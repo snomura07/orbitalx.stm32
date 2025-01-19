@@ -32,6 +32,7 @@
 #include <DataFlash/data_flash.h>
 #include <Debug/Menu/menu.h>
 #include <Startup/startup.h>
+#include <TimerController/timer_controller.h>
 
 /* USER CODE END Includes */
 
@@ -65,6 +66,9 @@ UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN PV */
 ObjectHub objHub;
+Startup startup;
+TimerController timer15(htim15);
+TimerController timer6(htim6);
 Debug::Menu debugMenu;
 
 /* USER CODE END PV */
@@ -105,21 +109,25 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-  objHub.ledBlue1Ptr  = std::make_shared<Led>(Led::ModeEnum::BLUE_FRONT);
-  objHub.ledBlue2Ptr  = std::make_shared<Led>(Led::ModeEnum::BLUE_BACK);
-  objHub.ledOrangePtr = std::make_shared<Led>(Led::ModeEnum::ORANGE);
-  objHub.ledGreenPtr  = std::make_shared<Led>(Led::ModeEnum::GREEN);
-  objHub.imuPtr       = std::make_shared<Imu>(hi2c1);
-  objHub.encPtr       = std::make_shared<Encoder>(hadc2);
-  objHub.rMotPtr      = std::make_shared<Motor>(htim2, Motor::ModeEnum::RIGHT);
-  objHub.lMotPtr      = std::make_shared<Motor>(htim3, Motor::ModeEnum::LEFT);
-  objHub.battPtr      = std::make_shared<Battery>(hadc2);
-  objHub.mapPtr       = std::make_shared<Map>();
-  objHub.usartPtr     = std::make_shared<Usart>(huart1);
+  objHub.ledBlueFrontPtr = new Led(Led::ModeEnum::BLUE_FRONT);
+  objHub.ledBlueBackPtr  = new Led(Led::ModeEnum::BLUE_BACK);
+  objHub.ledOrangePtr    = new Led(Led::ModeEnum::ORANGE);
+  objHub.ledGreenPtr     = new Led(Led::ModeEnum::GREEN);
+  objHub.imuPtr          = new Imu(hi2c1);
+  objHub.encPtr          = new Encoder(hadc2);
+  objHub.rMotPtr         = new Motor(htim2, Motor::ModeEnum::RIGHT);
+  objHub.lMotPtr         = new Motor(htim3, Motor::ModeEnum::LEFT);
+  objHub.battPtr         = new Battery(hadc2);
+  objHub.mapPtr          = new Map();
+  objHub.usartPtr        = new Usart(huart1);
   objHub.initDependencies();
+  startup.objHub  = &objHub;
+  startup.timer15 = &timer15;
+  startup.timer6  = &timer6;
+  startup.setUsart(objHub.usartPtr);
 
-  debugMenu.init();
-  debugMenu.setUsart(objHub.usartPtr);
+  // debugMenu.init();
+  // debugMenu.setUsart(objHub.usartPtr);
 
   /* USER CODE END Init */
 
@@ -140,14 +148,8 @@ int main(void)
   MX_USART1_UART_Init();
   MX_TIM2_Init();
   MX_TIM6_Init();
+
   /* USER CODE BEGIN 2 */
-  for(int i=0; i<4; i++){
-    auto res = objHub.imuPtr->whoAmI();
-    objHub.usartPtr->sendString("WhoAmI : ");
-    objHub.usartPtr->sendUint16t(res);
-    objHub.usartPtr->sendString("\r\n");
-    HAL_Delay(100);
-  }
   objHub.imuPtr->init();
 
   // DataFlash flash;
@@ -168,15 +170,15 @@ int main(void)
   // objHub.lMotPtr->setDuty(79*4);
 
   // timet start
-  HAL_TIM_Base_Start_IT(&htim6);
-  HAL_TIM_Base_Start_IT(&htim15);
+  // HAL_TIM_Base_Start_IT(&htim6);
+  // HAL_TIM_Base_Start_IT(&htim15);
+  timer15.start();
+  timer6.start();
 
-  objHub.ledBlue1Ptr->off();
-  objHub.ledBlue2Ptr->on();
+  objHub.ledBlueFrontPtr->off();
+  objHub.ledBlueBackPtr->on();
   // debugMenu.controller();
-
-  Startup startup(objHub);
-  startup.test();
+  startup.run();
 
   /* USER CODE END 2 */
 
@@ -184,25 +186,8 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    // char received = objHub.usartPtr->receiveChar();
-    // if (received == '\x1B') { // ESC sequence start (arrow keys)
-    //     char seq1 = objHub.usartPtr->receiveChar();
-    //     char seq2 = objHub.usartPtr->receiveChar();
-    //     if (seq1 == '[') {
-    //         switch (seq2) {
-    //             case 'A': objHub.usartPtr->sendString("\r\n[Up Arrow]\r\n"); break;
-    //             case 'B': objHub.usartPtr->sendString("\r\n[Down Arrow]\r\n"); break;
-    //             case 'C': objHub.usartPtr->sendString("\r\n[Right Arrow]\r\n"); break;
-    //             case 'D': objHub.usartPtr->sendString("\r\n[Left Arrow]\r\n"); break;
-    //             default: objHub.usartPtr->sendString("\r\n[Unknown ESC Sequence]\r\n"); break;
-    //         }
-    //     }
-    // } else {
-    //     objHub.usartPtr->sendString(&received);
-    // }
-
-    objHub.ledBlue1Ptr->on();
-    objHub.battPtr->dump();
+    objHub.ledBlueFrontPtr->on();
+    // objHub.battPtr->dump();
     // objHub.imuPtr->dump();
     // objHub.encPtr->dump();
 

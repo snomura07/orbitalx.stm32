@@ -72,3 +72,7 @@ void Imu::dump(){
     sendInt(gyroRaw.z);
     sendMessage("\r\n");
 }
+
+char* Imu::getChipName() {
+    return ICM20648::CHIP_NAME;
+}

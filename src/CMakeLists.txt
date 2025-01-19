@@ -58,6 +58,7 @@ add_executable(
     Core/Src/Modules/Encoder/encoder.cpp
     Core/Src/System/Debug/Menu/menu.cpp
     Core/Src/System/Startup/startup.cpp
+    Core/Src/System/TimerController/timer_controller.cpp
     Core/Src/Utils/Usart/usart.cpp
     Core/Src/Utils/DataFlash/data_flash.cpp
     Core/Src/Interface/UsartInterface/usart_interface.cpp

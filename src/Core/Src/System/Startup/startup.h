@@ -3,15 +3,26 @@
 
 #include <memory>
 #include <ObjectHub/object_hub.h>
+#include <UsartInterface/usart_interface.h>
+#include <TimerController/timer_controller.h>
 
-class Startup{
+class Startup : public UsartInterface{
 public:
-    Startup(ObjectHub &objHub_);
+    Startup();
     ~Startup();
-    void test();
+    void run();
 
 private:
-    ObjectHub &objHub;
+    void checkMe();
+    void checkBattery();
+    void checkImu();
+    void checkEncoder();
+    void checkTimer();
+
+public:
+    ObjectHub *objHub;
+    TimerController *timer15;
+    TimerController *timer6;
 };
 
 #endif

@@ -23,6 +23,7 @@ public:
     uint8_t whoAmI();
     void update();
     void dump();
+    char* getChipName();
 
 private:
     void readAll();

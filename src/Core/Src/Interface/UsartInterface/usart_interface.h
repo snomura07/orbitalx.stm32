@@ -6,13 +6,13 @@
 
 class UsartInterface {
 protected:
-    std::weak_ptr<Usart> usartPtr;
+    Usart *usartPtr;
 
 public:
     UsartInterface();
     virtual ~UsartInterface();
 
-    virtual void setUsart(std::shared_ptr<Usart> usart);
+    virtual void setUsart(Usart *usart);
 
 protected:
     void sendMessage(const char* msg);

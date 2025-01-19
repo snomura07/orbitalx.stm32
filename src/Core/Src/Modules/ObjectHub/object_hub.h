@@ -18,18 +18,17 @@ public:
     void initDependencies();
 
 public:
-    int sample;
-    std::shared_ptr<Led> ledBlue1Ptr;
-    std::shared_ptr<Led> ledBlue2Ptr;
-    std::shared_ptr<Led> ledOrangePtr;
-    std::shared_ptr<Led> ledGreenPtr;
-    std::shared_ptr<Imu> imuPtr;
-    std::shared_ptr<Encoder> encPtr;
-    std::shared_ptr<Motor> rMotPtr;
-    std::shared_ptr<Motor> lMotPtr;
-    std::shared_ptr<Battery> battPtr;
-    std::shared_ptr<Map> mapPtr;
-    std::shared_ptr<Usart> usartPtr;
+    Led *ledBlueFrontPtr;
+    Led *ledBlueBackPtr;
+    Led *ledOrangePtr;
+    Led *ledGreenPtr;
+    Imu *imuPtr;
+    Encoder *encPtr;
+    Motor *rMotPtr;
+    Motor *lMotPtr;
+    Battery *battPtr;
+    Map *mapPtr;
+    Usart *usartPtr;
 };
 
 #endif

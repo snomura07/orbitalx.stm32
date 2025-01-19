@@ -8,15 +8,15 @@ public:
     ~Encoder();
     void update();
     void dump();
+
 private:
     void execAdc();
     void countUp();
 
 private:
     ADC_HandleTypeDef *hadc2;
-    uint32_t counter;
-    uint16_t currRaw;
-    uint16_t preRaw;
+    uint16_t THRE_UP;
+    uint16_t THRE_DOWN;
 
     uint16_t uCnt;
     uint16_t max;
@@ -24,11 +24,10 @@ private:
     uint16_t currThreUP;
     uint16_t currThreDown;
 
-private:
-    // static constexpr uint16_t THRE_UP   = 3845;
-    // static constexpr uint16_t THRE_DOWN = 3835;
-    uint16_t THRE_UP;
-    uint16_t THRE_DOWN;
+public:
+    uint32_t counter;
+    uint16_t currRaw;
+    uint16_t preRaw;
 };
 
 #endif

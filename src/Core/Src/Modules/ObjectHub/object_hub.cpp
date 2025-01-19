@@ -1,15 +1,11 @@
 #include "object_hub.h"
-#include <Led/led.h>
 
-ObjectHub::ObjectHub():
-    sample(0)
-{}
+ObjectHub::ObjectHub(){}
 ObjectHub::~ObjectHub(){}
 
 void ObjectHub::initDependencies(){
-    sample = 100;
-    ledBlue1Ptr->setUsart(usartPtr);
-    ledBlue2Ptr->setUsart(usartPtr);
+    ledBlueFrontPtr->setUsart(usartPtr);
+    ledBlueBackPtr->setUsart(usartPtr);
     ledOrangePtr->setUsart(usartPtr);
     ledGreenPtr->setUsart(usartPtr);
     imuPtr->setUsart(usartPtr);

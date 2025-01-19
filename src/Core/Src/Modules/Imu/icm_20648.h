@@ -4,6 +4,7 @@
 #include <cstdint>
 
 namespace ICM20648 {
+    static constexpr char* CHIP_NAME = "ICM-20648";
     static constexpr uint8_t DEFAULT_ADDRESS = 0x68;
 
     // USER BANK 0 レジスタ

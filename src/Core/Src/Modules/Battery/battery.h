@@ -12,10 +12,12 @@ public:
 private:
     void execAdc();
 
+public:
+    float volt;
+
 private:
     ADC_HandleTypeDef *hadc2;
     uint16_t raw;
-    float volt;
 };
 
 #endif
