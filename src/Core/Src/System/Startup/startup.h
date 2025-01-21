@@ -23,6 +23,7 @@ public:
     ObjectHub *objHub;
     TimerController *timer15;
     TimerController *timer6;
+    TimerController *timer7;
 };
 
 #endif

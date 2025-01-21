@@ -33,6 +33,7 @@
 #include <Debug/Menu/menu.h>
 #include <Startup/startup.h>
 #include <TimerController/timer_controller.h>
+#include <FailSafe/fail_safe.h>
 
 /* USER CODE END Includes */
 
@@ -60,6 +61,7 @@ I2C_HandleTypeDef hi2c1;
 TIM_HandleTypeDef htim2;
 TIM_HandleTypeDef htim3;
 TIM_HandleTypeDef htim6;
+TIM_HandleTypeDef htim7;
 TIM_HandleTypeDef htim15;
 
 UART_HandleTypeDef huart1;
@@ -67,8 +69,10 @@ UART_HandleTypeDef huart1;
 /* USER CODE BEGIN PV */
 ObjectHub objHub;
 Startup startup;
-TimerController timer15(htim15);
-TimerController timer6(htim6);
+TimerController timer15(htim15); // 1call/s
+TimerController timer6(htim6);   // 1call/10ms for objHub update
+TimerController timer7(htim7);   // 1call/10ms for fail safe
+FailSafe failSafe;
 Debug::Menu debugMenu;
 
 /* USER CODE END PV */
@@ -84,6 +88,7 @@ static void MX_TIM15_Init(void);
 static void MX_USART1_UART_Init(void);
 static void MX_TIM2_Init(void);
 static void MX_TIM6_Init(void);
+static void MX_TIM7_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -124,7 +129,11 @@ int main(void)
   startup.objHub  = &objHub;
   startup.timer15 = &timer15;
   startup.timer6  = &timer6;
+  startup.timer7  = &timer7;
   startup.setUsart(objHub.usartPtr);
+  failSafe.objHub  = &objHub;
+  failSafe.timer15 = &timer15;
+  failSafe.timer6  = &timer6;
 
   // debugMenu.init();
   // debugMenu.setUsart(objHub.usartPtr);
@@ -148,7 +157,7 @@ int main(void)
   MX_USART1_UART_Init();
   MX_TIM2_Init();
   MX_TIM6_Init();
-
+  MX_TIM7_Init();
   /* USER CODE BEGIN 2 */
   objHub.imuPtr->init();
 
@@ -174,6 +183,7 @@ int main(void)
   // HAL_TIM_Base_Start_IT(&htim15);
   timer15.start();
   timer6.start();
+  timer7.start();
 
   objHub.ledBlueFrontPtr->off();
   objHub.ledBlueBackPtr->on();
@@ -191,6 +201,8 @@ int main(void)
     // objHub.imuPtr->dump();
     // objHub.encPtr->dump();
 
+
+    failSafe.emStopCheck();
     HAL_Delay(10);
 
     /* USER CODE END WHILE */
@@ -440,8 +452,8 @@ static void MX_TIM2_Init(void)
 
   /* USER CODE BEGIN TIM2_Init 1 */
   // 100,000=(71,500,000/1)/715
-  // Prescaler：1-1=0
-  // Counter Reriod：715-1=714
+  // Prescaler?�?1-1=0
+  // Counter Reriod?�?715-1=714
 
   /* USER CODE END TIM2_Init 1 */
   htim2.Instance = TIM2;
@@ -506,7 +518,7 @@ static void MX_TIM3_Init(void)
   htim3.Instance = TIM3;
   htim3.Init.Prescaler = 0;
   htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim3.Init.Period = 794;
+  htim3.Init.Period = 714;
   htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
   if (HAL_TIM_Base_Init(&htim3) != HAL_OK)
@@ -578,6 +590,44 @@ static void MX_TIM6_Init(void)
   /* USER CODE BEGIN TIM6_Init 2 */
 
   /* USER CODE END TIM6_Init 2 */
+
+}
+
+/**
+  * @brief TIM7 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM7_Init(void)
+{
+
+  /* USER CODE BEGIN TIM7_Init 0 */
+
+  /* USER CODE END TIM7_Init 0 */
+
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+  /* USER CODE BEGIN TIM7_Init 1 */
+
+  /* USER CODE END TIM7_Init 1 */
+  htim7.Instance = TIM7;
+  htim7.Init.Prescaler = 7149;
+  htim7.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim7.Init.Period = 99;
+  htim7.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim7) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim7, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM7_Init 2 */
+
+  /* USER CODE END TIM7_Init 2 */
 
 }
 
@@ -726,6 +776,11 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
         objHub.encPtr ->update();
         objHub.imuPtr ->update();
         objHub.battPtr->update();
+    }
+
+    // TIM7 callback -> 1call per 10ms
+    if (htim->Instance == TIM7) {
+      failSafe.update();
     }
 }
 
