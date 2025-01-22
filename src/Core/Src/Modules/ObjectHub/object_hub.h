@@ -9,6 +9,7 @@
 #include <Encoder/encoder.h>
 #include <Battery/battery.h>
 #include <WallSensor/wall_sensor.h>
+#include <TimerCount/timer_count.h>
 #include <Usart/usart.h>
 
 class ObjectHub {
@@ -30,6 +31,7 @@ public:
     Battery *battPtr;
     WallSensor *wallSensPtr;
     Map *mapPtr;
+    TimerCount *timerCntPtr;
     Usart *usartPtr;
 };
 

@@ -50,6 +50,9 @@ void Startup::checkEncoder(){
 
 void Startup::checkTimer(){
     sendMessage("▼Timer \r\n");
+    sendMessage("timer1[1call/1ms]  : ");
+    sendMessage(timer1->isStarted()==true?"started":"stoped");
+    sendMessage("\r\n");
     sendMessage("timer15[1call/s]   : ");
     sendMessage(timer15->isStarted()==true?"started":"stoped");
     sendMessage("\r\n");

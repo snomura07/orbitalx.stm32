@@ -56,6 +56,7 @@ add_executable(
     Core/Src/Modules/Battery/battery.cpp
     Core/Src/Modules/ObjectHub/object_hub.cpp
     Core/Src/Modules/Encoder/encoder.cpp
+    Core/Src/Modules/TimerCount/timer_count.cpp
     Core/Src/System/Debug/Menu/menu.cpp
     Core/Src/System/Startup/startup.cpp
     Core/Src/System/TimerController/timer_controller.cpp

@@ -29,6 +29,7 @@
 #include <Motor/motor.h>
 #include <Battery/battery.h>
 #include <WallSensor/wall_sensor.h>
+#include <TimerCount/timer_count.h>
 #include <Usart/usart.h>
 #include <DataFlash/data_flash.h>
 #include <Debug/Menu/menu.h>
@@ -129,9 +130,11 @@ int main(void)
   objHub.battPtr         = new Battery(hadc2);
   objHub.wallSensPtr     = new WallSensor(hadc1, hadc2);
   objHub.mapPtr          = new Map();
+  objHub.timerCntPtr     = new TimerCount();
   objHub.usartPtr        = new Usart(huart1);
   objHub.initDependencies();
   startup.objHub  = &objHub;
+  startup.timer1  = &timer1;
   startup.timer15 = &timer15;
   startup.timer6  = &timer6;
   startup.timer7  = &timer7;
@@ -207,9 +210,9 @@ int main(void)
     // objHub.battPtr->dump();
     // objHub.imuPtr->dump();
     // objHub.encPtr->dump();
-
-    objHub.wallSensPtr->update();
-    objHub.wallSensPtr->dump();
+    // objHub.wallSensPtr->update();
+    // objHub.wallSensPtr->dump();
+    objHub.timerCntPtr->dump();
 
     failSafe.emStopCheck();
     HAL_Delay(10);
@@ -825,7 +828,7 @@ static void MX_GPIO_Init(void)
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
     // TIM1 callback -> 1call per 1ms
     if (htim->Instance == TIM1) {
-
+      objHub.timerCntPtr->update();
     }
 
     // TIM15 callback -> 1call/s
