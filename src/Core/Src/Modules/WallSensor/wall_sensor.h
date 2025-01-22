@@ -4,13 +4,20 @@
 
 class WallSensor : public UsartInterface{
 public:
-    WallSensor();
+    WallSensor(ADC_HandleTypeDef &hadc1_, ADC_HandleTypeDef &hadc2_);
     ~WallSensor();
-    void execAdc();
+    void update();
+    void dump();
 
 private:
     void turnOnIled();
     void turnOffIled();
+
+private:
+    ADC_HandleTypeDef *hadc1;
+    ADC_HandleTypeDef *hadc2;
+    uint16_t sensor1;
+    uint16_t sensor2;
 };
 
 #endif

@@ -13,5 +13,6 @@ void ObjectHub::initDependencies(){
     rMotPtr->setUsart(usartPtr);
     lMotPtr->setUsart(usartPtr);
     battPtr->setUsart(usartPtr);
+    wallSensPtr->setUsart(usartPtr);
     mapPtr->setUsart(usartPtr);
 }

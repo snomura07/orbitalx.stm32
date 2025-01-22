@@ -28,6 +28,7 @@
 #include <Encoder/encoder.h>
 #include <Motor/motor.h>
 #include <Battery/battery.h>
+#include <WallSensor/wall_sensor.h>
 #include <Usart/usart.h>
 #include <DataFlash/data_flash.h>
 #include <Debug/Menu/menu.h>
@@ -58,6 +59,7 @@ ADC_HandleTypeDef hadc2;
 
 I2C_HandleTypeDef hi2c1;
 
+TIM_HandleTypeDef htim1;
 TIM_HandleTypeDef htim2;
 TIM_HandleTypeDef htim3;
 TIM_HandleTypeDef htim6;
@@ -69,6 +71,7 @@ UART_HandleTypeDef huart1;
 /* USER CODE BEGIN PV */
 ObjectHub objHub;
 Startup startup;
+TimerController timer1(htim1);   // 1call/1ms for count
 TimerController timer15(htim15); // 1call/s
 TimerController timer6(htim6);   // 1call/10ms for objHub update
 TimerController timer7(htim7);   // 1call/10ms for fail safe
@@ -89,6 +92,7 @@ static void MX_USART1_UART_Init(void);
 static void MX_TIM2_Init(void);
 static void MX_TIM6_Init(void);
 static void MX_TIM7_Init(void);
+static void MX_TIM1_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -123,6 +127,7 @@ int main(void)
   objHub.rMotPtr         = new Motor(htim2, Motor::ModeEnum::RIGHT);
   objHub.lMotPtr         = new Motor(htim3, Motor::ModeEnum::LEFT);
   objHub.battPtr         = new Battery(hadc2);
+  objHub.wallSensPtr     = new WallSensor(hadc1, hadc2);
   objHub.mapPtr          = new Map();
   objHub.usartPtr        = new Usart(huart1);
   objHub.initDependencies();
@@ -158,6 +163,7 @@ int main(void)
   MX_TIM2_Init();
   MX_TIM6_Init();
   MX_TIM7_Init();
+  MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
   objHub.imuPtr->init();
 
@@ -181,6 +187,7 @@ int main(void)
   // timet start
   // HAL_TIM_Base_Start_IT(&htim6);
   // HAL_TIM_Base_Start_IT(&htim15);
+  timer1.start();
   timer15.start();
   timer6.start();
   timer7.start();
@@ -201,6 +208,8 @@ int main(void)
     // objHub.imuPtr->dump();
     // objHub.encPtr->dump();
 
+    objHub.wallSensPtr->update();
+    objHub.wallSensPtr->dump();
 
     failSafe.emStopCheck();
     HAL_Delay(10);
@@ -250,9 +259,11 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART1|RCC_PERIPHCLK_I2C1;
+  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART1|RCC_PERIPHCLK_I2C1
+                              |RCC_PERIPHCLK_TIM1;
   PeriphClkInit.Usart1ClockSelection = RCC_USART1CLKSOURCE_PCLK1;
   PeriphClkInit.I2c1ClockSelection = RCC_I2C1CLKSOURCE_SYSCLK;
+  PeriphClkInit.Tim1ClockSelection = RCC_TIM1CLK_HCLK;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
   {
     Error_Handler();
@@ -435,6 +446,53 @@ static void MX_I2C1_Init(void)
 }
 
 /**
+  * @brief TIM1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM1_Init(void)
+{
+
+  /* USER CODE BEGIN TIM1_Init 0 */
+
+  /* USER CODE END TIM1_Init 0 */
+
+  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+  /* USER CODE BEGIN TIM1_Init 1 */
+
+  /* USER CODE END TIM1_Init 1 */
+  htim1.Instance = TIM1;
+  htim1.Init.Prescaler = 71;
+  htim1.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim1.Init.Period = 999;
+  htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim1.Init.RepetitionCounter = 0;
+  htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+  if (HAL_TIM_ConfigClockSource(&htim1, &sClockSourceConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterOutputTrigger2 = TIM_TRGO2_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim1, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM1_Init 2 */
+
+  /* USER CODE END TIM1_Init 2 */
+
+}
+
+/**
   * @brief TIM2 Initialization Function
   * @param None
   * @retval None
@@ -452,8 +510,8 @@ static void MX_TIM2_Init(void)
 
   /* USER CODE BEGIN TIM2_Init 1 */
   // 100,000=(71,500,000/1)/715
-  // Prescaler?�?1-1=0
-  // Counter Reriod?�?715-1=714
+  // Prescaler??��?1-1=0
+  // Counter Reriod??��?715-1=714
 
   /* USER CODE END TIM2_Init 1 */
   htim2.Instance = TIM2;
@@ -765,6 +823,11 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
+    // TIM1 callback -> 1call per 1ms
+    if (htim->Instance == TIM1) {
+
+    }
+
     // TIM15 callback -> 1call/s
     if (htim->Instance == TIM15) {
       objHub.ledGreenPtr->toggle();
@@ -776,6 +839,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
         objHub.encPtr ->update();
         objHub.imuPtr ->update();
         objHub.battPtr->update();
+        // objHub.wallSensPtr->update();
     }
 
     // TIM7 callback -> 1call per 10ms

@@ -8,6 +8,7 @@
 #include <Motor/motor.h>
 #include <Encoder/encoder.h>
 #include <Battery/battery.h>
+#include <WallSensor/wall_sensor.h>
 #include <Usart/usart.h>
 
 class ObjectHub {
@@ -27,6 +28,7 @@ public:
     Motor *rMotPtr;
     Motor *lMotPtr;
     Battery *battPtr;
+    WallSensor *wallSensPtr;
     Map *mapPtr;
     Usart *usartPtr;
 };
