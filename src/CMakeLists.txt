@@ -63,6 +63,7 @@ add_executable(
     Core/Src/System/FailSafe/fail_safe.cpp
     Core/Src/Utils/Usart/usart.cpp
     Core/Src/Utils/DataFlash/data_flash.cpp
+    Core/Src/Utils/Logger/logger.cpp
     Core/Src/Interface/UsartInterface/usart_interface.cpp
 )
 
