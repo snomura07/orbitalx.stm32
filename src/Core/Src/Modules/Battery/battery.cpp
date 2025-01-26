@@ -3,15 +3,27 @@
 Battery::Battery(ADC_HandleTypeDef &hadc2_):
     hadc2(&hadc2_),
     raw(0),
-    volt(0.0)
+    volt(0.0),
+    mVolt(0)
 {
+    memset(mVoltBuff, 3800, sizeof(mVoltBuff));
 }
 Battery::~Battery(){}
 
 void Battery::update(){
     execAdc();
     float ref = 3.0;
-    volt = (float)raw/4095.0 * 2.109 * ref; // Adjusted voltage divider ratio from 2.0 to 2.109 to account for measurement errors.
+    volt  = (float)raw/4095.0 * 2.109 * ref; // Adjusted voltage divider ratio from 2.0 to 2.109 to account for measurement errors.
+
+    // calc mV using ring buffer
+    mVolt = 0;
+    for(int i=0; i<BUFF_SIZE-1; i++){
+        mVoltBuff[i] = mVoltBuff[i+1];
+        mVolt += mVoltBuff[i];
+    }
+    mVoltBuff[BUFF_SIZE-1] = (uint16_t)(volt * 1000.0);
+    mVolt += mVoltBuff[BUFF_SIZE-1];
+    mVolt /= BUFF_SIZE;
 }
 
 void Battery::execAdc(){
@@ -29,10 +41,13 @@ void Battery::execAdc(){
 }
 
 void Battery::dump(){
-    sendMessage("batt raw:");
+    sendMessage("raw :");
     sendInt(raw);
     sendMessage(", ");
-    sendMessage("batt volt:");
+    sendMessage("batt[V] :");
     sendFloat(volt);
+    sendMessage(", ");
+    sendMessage("batt[mV] :");
+    sendInt(mVolt);
     sendMessage("\r\n");
 }

@@ -21,10 +21,14 @@ void Startup::checkMe(){
 }
 
 void Startup::checkBattery(){
+    HAL_Delay(200);
     sendMessage("▼battery \r\n");
     sendMessage("voltage: ");
     sendFloat(objHub->battPtr->volt);
     sendMessage("[V] \r\n");
+    sendMessage("voltage: ");
+    sendInt(objHub->battPtr->mVolt);
+    sendMessage("[mV] \r\n");
     sendMessage("\r\n");
 }
 

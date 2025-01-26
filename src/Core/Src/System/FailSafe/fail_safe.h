@@ -20,7 +20,7 @@ public:
     TimerController *timer6;
 
 private:
-    static constexpr float BATTERY_THRE = 3.68;
+    static constexpr float BATTERY_THRE = 3.58;
     bool emStopFlag;
 };
 

@@ -1,15 +1,18 @@
 #include "log.h"
+#include <cstring>
 
 Log::Log():
     isFull(false),
     index(0)
-{}
+{
+    memset(data, 0, sizeof(data));
+}
 
 Log::~Log(){}
 
-void Log::set(int16_t val) {
+bool Log::set(int16_t val) {
     if(isFull){
-        return;
+        return false;
     }
 
     data[index] = val;
@@ -17,5 +20,15 @@ void Log::set(int16_t val) {
 
     if(index == MAX_SIZE){
         isFull = true;
+    }
+    return true;
+}
+
+int16_t Log::getData(uint16_t pickNo) {
+    if(pickNo < MAX_SIZE && pickNo >= 0){
+        return data[pickNo];
+    }
+    else {
+        return -1;
     }
 }

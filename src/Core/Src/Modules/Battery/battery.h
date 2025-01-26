@@ -14,10 +14,14 @@ private:
 
 public:
     float volt;
+    uint16_t mVolt;
 
 private:
     ADC_HandleTypeDef *hadc2;
     uint16_t raw;
+
+    static constexpr uint8_t BUFF_SIZE = 16;
+    uint16_t mVoltBuff[BUFF_SIZE];
 };
 
 #endif

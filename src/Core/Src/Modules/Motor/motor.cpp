@@ -13,6 +13,7 @@ void Motor::start(){
 }
 
 void Motor::stop(){
+    __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_1, 1);
     HAL_TIM_PWM_Stop(htim, TIM_CHANNEL_1);
 }
 

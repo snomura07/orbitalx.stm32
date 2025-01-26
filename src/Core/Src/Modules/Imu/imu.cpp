@@ -6,10 +6,12 @@ Imu::Imu(I2C_HandleTypeDef &hi2c_, uint8_t deviceAddress)
 Imu::~Imu(){}
 
 bool Imu::init() {
-    // スリープ解除
+    // スリープ解除 一度送信しただけじゃ解除されないので複数回送信
     uint8_t addr = 0x01;
-    writeRegister(ICM20648::PWR_MGMT_1, &addr, 1);
-    HAL_Delay(100);
+    for(int i=0; i<5; i++){
+        writeRegister(ICM20648::PWR_MGMT_1, &addr, 1);
+        HAL_Delay(100);
+    }
 
     // 加速度: ±16g
     addr = 0x18;
@@ -48,7 +50,7 @@ void Imu::readAll() {
 }
 
 bool Imu::writeRegister(uint8_t reg, uint8_t* data, uint16_t size) {
-    return HAL_I2C_Mem_Write(hi2c, devAddr, reg, I2C_MEMADD_SIZE_8BIT, data, size, 500) == HAL_OK;
+    return HAL_I2C_Mem_Write(hi2c, devAddr, reg, I2C_MEMADD_SIZE_8BIT, data, size, HAL_MAX_DELAY) == HAL_OK;
 }
 
 bool Imu::readRegister(uint8_t reg, uint8_t* data, uint16_t size) {

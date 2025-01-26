@@ -3,15 +3,17 @@
 
 #include <main.h>
 
-class Log{
+class Log {
+public:
+    static constexpr int MAX_SIZE = 1000;
+
 public:
     Log();
     ~Log();
-    void set(int16_t val);
-    void dump();
+    bool set(int16_t val);
+    int16_t getData(uint16_t pickNo);
 
 private:
-    static constexpr int MAX_SIZE = 1000;
     int16_t data[MAX_SIZE];
     bool isFull;
     uint16_t index;

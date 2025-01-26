@@ -21,6 +21,8 @@ void FailSafe::emStopCheck(){
         objHub->ledBlueBackPtr->off();
         objHub->ledOrangePtr->off();
         objHub->ledGreenPtr->off();
+        objHub->rMotPtr->stop();
+        objHub->lMotPtr->stop();
         timer15->stop();
         timer6 ->stop();
         while(1){

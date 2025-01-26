@@ -62,6 +62,7 @@ add_executable(
     Core/Src/System/Startup/startup.cpp
     Core/Src/System/TimerController/timer_controller.cpp
     Core/Src/System/FailSafe/fail_safe.cpp
+    Core/Src/System/Logger/logger.cpp
     Core/Src/Utils/Usart/usart.cpp
     Core/Src/Utils/DataFlash/data_flash.cpp
     Core/Src/Interface/UsartInterface/usart_interface.cpp

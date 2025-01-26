@@ -36,6 +36,7 @@
 #include <Startup/startup.h>
 #include <TimerController/timer_controller.h>
 #include <FailSafe/fail_safe.h>
+#include <Logger/logger.h>
 
 /* USER CODE END Includes */
 
@@ -77,6 +78,7 @@ TimerController timer15(htim15); // 1call/s
 TimerController timer6(htim6);   // 1call/10ms for objHub update
 TimerController timer7(htim7);   // 1call/10ms for fail safe
 FailSafe failSafe;
+Logger logger;
 Debug::Menu debugMenu;
 
 /* USER CODE END PV */
@@ -142,6 +144,8 @@ int main(void)
   failSafe.objHub  = &objHub;
   failSafe.timer15 = &timer15;
   failSafe.timer6  = &timer6;
+  logger.setTimerCnt(objHub.timerCntPtr);
+  logger.setUsart(objHub.usartPtr);
 
   // debugMenu.init();
   // debugMenu.setUsart(objHub.usartPtr);
@@ -184,12 +188,10 @@ int main(void)
 
   // objHub.rMotPtr->start();
   // objHub.lMotPtr->start();
-  // objHub.rMotPtr->setDuty(79*4);
-  // objHub.lMotPtr->setDuty(79*4);
+  // objHub.rMotPtr->setDuty(71*i);
+  // objHub.lMotPtr->setDuty(71*i);
 
   // timet start
-  // HAL_TIM_Base_Start_IT(&htim6);
-  // HAL_TIM_Base_Start_IT(&htim15);
   timer1.start();
   timer15.start();
   timer6.start();
@@ -199,6 +201,7 @@ int main(void)
   objHub.ledBlueBackPtr->on();
   // debugMenu.controller();
   startup.run();
+  objHub.ledBlueFrontPtr->on();
 
   /* USER CODE END 2 */
 
@@ -206,15 +209,14 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    objHub.ledBlueFrontPtr->on();
-    // objHub.battPtr->dump();
+    objHub.battPtr->dump();
     // objHub.imuPtr->dump();
     // objHub.encPtr->dump();
     // objHub.wallSensPtr->update();
     // objHub.wallSensPtr->dump();
-    objHub.timerCntPtr->dump();
+    // objHub.timerCntPtr->dump();
 
-    failSafe.emStopCheck();
+    // failSafe.emStopCheck();
     HAL_Delay(10);
 
     /* USER CODE END WHILE */
@@ -838,7 +840,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
     // TIM6 callback -> 1call per 10ms
     if (htim->Instance == TIM6) {
-        objHub.ledOrangePtr->toggle();
         objHub.encPtr ->update();
         objHub.imuPtr ->update();
         objHub.battPtr->update();
