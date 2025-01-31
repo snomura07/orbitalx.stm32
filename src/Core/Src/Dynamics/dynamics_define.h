@@ -1,0 +1,7 @@
+#ifndef DYNAMICS_DEFINE_H
+#define DYNAMICS_DEFINE_H
+
+#define CURR_VELOCITY_DELTA_T 0.01f
+
+
+#endif

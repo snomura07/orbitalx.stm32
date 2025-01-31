@@ -63,6 +63,7 @@ add_executable(
     Core/Src/System/TimerController/timer_controller.cpp
     Core/Src/System/FailSafe/fail_safe.cpp
     Core/Src/System/Logger/logger.cpp
+    Core/Src/Dynamics/CurrentVelocity/current_velocity.cpp
     Core/Src/Utils/Usart/usart.cpp
     Core/Src/Utils/DataFlash/data_flash.cpp
     Core/Src/Interface/UsartInterface/usart_interface.cpp
@@ -75,6 +76,7 @@ target_include_directories(${PROJECT_NAME}.elf PRIVATE
     Core/Src/Utils
     Core/Src/Interface
     Core/Src/System
+    Core/Src/Dynamics
     Drivers/STM32F3xx_HAL_Driver/Inc
     Drivers/CMSIS/Device/ST/STM32F3xx/Include
     Drivers/CMSIS/Include
