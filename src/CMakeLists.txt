@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(STM32F303K8_Project C CXX ASM)
+project(STM32G403K8_Project C CXX ASM)
 
 # クロスコンパイル環境の設定
 set(CMAKE_SYSTEM_NAME Generic)
@@ -28,7 +28,7 @@ add_executable(
     Core/Src/stm32g4xx_it.c
     Core/Src/syscalls.c
     Core/Src/sysmem.c
-    Core/Src/system_stm32f3xx.c
+    Core/Src/system_stm32g4xx.c
     Core/Startup/startup_stm32g431cbtx.s
     Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal.c
     Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_adc.c
@@ -36,8 +36,6 @@ add_executable(
     Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_gpio.c
     Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_rcc.c
     Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_rcc_ex.c
-    Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_i2c.c
-    Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_i2c_ex.c
     Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_spi.c
     Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_spi_ex.c
     Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_tim.c
@@ -48,27 +46,29 @@ add_executable(
     Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_uart_ex.c
     Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_flash.c
     Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_flash_ex.c
+    Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_pwr.c
+    Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_pwr_ex.c
 
-    Core/Src/Modules/Led/led.cpp
-    Core/Src/Modules/Map/map.cpp
-    Core/Src/Modules/TactSwitch/tact_switch.cpp
-    Core/Src/Modules/WallSensor/wall_sensor.cpp
-    Core/Src/Modules/Imu/imu.cpp
-    Core/Src/Modules/Motor/motor.cpp
-    Core/Src/Modules/Battery/battery.cpp
-    Core/Src/Modules/ObjectHub/object_hub.cpp
-    Core/Src/Modules/Encoder/encoder.cpp
-    Core/Src/Modules/TimerCount/timer_count.cpp
-    Core/Src/Modules/Log/log.cpp
-    Core/Src/System/Debug/Menu/menu.cpp
-    Core/Src/System/Startup/startup.cpp
-    Core/Src/System/TimerController/timer_controller.cpp
-    Core/Src/System/FailSafe/fail_safe.cpp
-    Core/Src/System/Logger/logger.cpp
-    Core/Src/Dynamics/CurrentVelocity/current_velocity.cpp
-    Core/Src/Utils/Usart/usart.cpp
-    Core/Src/Utils/DataFlash/data_flash.cpp
-    Core/Src/Interface/UsartInterface/usart_interface.cpp
+    # Core/Src/Modules/Led/led.cpp
+    # Core/Src/Modules/Map/map.cpp
+    # Core/Src/Modules/TactSwitch/tact_switch.cpp
+    # Core/Src/Modules/WallSensor/wall_sensor.cpp
+    # Core/Src/Modules/Imu/imu.cpp
+    # Core/Src/Modules/Motor/motor.cpp
+    # Core/Src/Modules/Battery/battery.cpp
+    # Core/Src/Modules/ObjectHub/object_hub.cpp
+    # Core/Src/Modules/Encoder/encoder.cpp
+    # Core/Src/Modules/TimerCount/timer_count.cpp
+    # Core/Src/Modules/Log/log.cpp
+    # Core/Src/System/Debug/Menu/menu.cpp
+    # Core/Src/System/Startup/startup.cpp
+    # Core/Src/System/TimerController/timer_controller.cpp
+    # Core/Src/System/FailSafe/fail_safe.cpp
+    # Core/Src/System/Logger/logger.cpp
+    # Core/Src/Dynamics/CurrentVelocity/current_velocity.cpp
+    # Core/Src/Utils/Usart/usart.cpp
+    # Core/Src/Utils/DataFlash/data_flash.cpp
+    # Core/Src/Interface/UsartInterface/usart_interface.cpp
 )
 
 # インクルードディレクトリ
@@ -80,18 +80,19 @@ target_include_directories(${PROJECT_NAME}.elf PRIVATE
     Core/Src/System
     Core/Src/Dynamics
     Drivers/STM32G4xx_HAL_Driver/Inc
-    Drivers/CMSIS/Device/ST/STM32F3xx/Include
+    Drivers/CMSIS/Device/ST/STM32G4xx/Include
     Drivers/CMSIS/Include
 )
 
 # 定義の設定
 target_compile_definitions(${PROJECT_NAME}.elf PRIVATE
-    STM32F303x8
+    STM32G431xx
     USE_HAL_DRIVER
+    HAL_PWR_MODULE_ENABLED
     HAL_ADC_MODULE_ENABLED
     HAL_GPIO_MODULE_ENABLED
     HAL_TIM_MODULE_ENABLED
-    HAL_I2C_MODULE_ENABLED
+    # HAL_I2C_MODULE_ENABLED
     HAL_DMA_MODULE_ENABLED
     HAL_UART_MODULE_ENABLED
 )
