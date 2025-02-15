@@ -17,35 +17,37 @@ set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -fno-exceptions -fno-rtti -fno-use-cxa-ate
 set(CMAKE_ASM_FLAGS "${CMAKE_C_FLAGS} -x assembler-with-cpp")
 
 # リンクフラグ
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_C_FLAGS} -T${CMAKE_SOURCE_DIR}/STM32F303K8TX_FLASH.ld  --specs=nano.specs --specs=nosys.specs -Wl,--gc-sections -static")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_C_FLAGS} -T${CMAKE_SOURCE_DIR}/STM32G431CBTX_FLASH.ld  --specs=nano.specs --specs=nosys.specs -Wl,--gc-sections -static")
 
 
 # 実行可能ファイルの生成対象ファイル
 add_executable(
     ${PROJECT_NAME}.elf
     Core/Src/main.cpp
-    Core/Src/stm32f3xx_hal_msp.c
-    Core/Src/stm32f3xx_it.c
+    Core/Src/stm32g4xx_hal_msp.c
+    Core/Src/stm32g4xx_it.c
     Core/Src/syscalls.c
     Core/Src/sysmem.c
     Core/Src/system_stm32f3xx.c
-    Core/Startup/startup_stm32f303k8tx.s
-    Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal.c
-    Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_adc.c
-    Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_adc_ex.c
-    Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_gpio.c
-    Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_rcc.c
-    Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_rcc_ex.c
-    Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_i2c.c
-    Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_i2c_ex.c
-    Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_tim.c
-    Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_tim_ex.c
-    Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_cortex.c
-    Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_dma.c
-    Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_uart.c
-    Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_uart_ex.c
-    Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_flash.c
-    Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_flash_ex.c
+    Core/Startup/startup_stm32g431cbtx.s
+    Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal.c
+    Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_adc.c
+    Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_adc_ex.c
+    Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_gpio.c
+    Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_rcc.c
+    Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_rcc_ex.c
+    Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_i2c.c
+    Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_i2c_ex.c
+    Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_spi.c
+    Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_spi_ex.c
+    Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_tim.c
+    Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_tim_ex.c
+    Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_cortex.c
+    Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_dma.c
+    Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_uart.c
+    Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_uart_ex.c
+    Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_flash.c
+    Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_flash_ex.c
 
     Core/Src/Modules/Led/led.cpp
     Core/Src/Modules/Map/map.cpp
@@ -77,7 +79,7 @@ target_include_directories(${PROJECT_NAME}.elf PRIVATE
     Core/Src/Interface
     Core/Src/System
     Core/Src/Dynamics
-    Drivers/STM32F3xx_HAL_Driver/Inc
+    Drivers/STM32G4xx_HAL_Driver/Inc
     Drivers/CMSIS/Device/ST/STM32F3xx/Include
     Drivers/CMSIS/Include
 )
