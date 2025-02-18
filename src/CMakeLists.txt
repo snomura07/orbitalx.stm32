@@ -60,6 +60,7 @@ add_executable(
     Core/Src/Modules/Encoder/encoder.cpp
     Core/Src/Modules/TimerCount/timer_count.cpp
     Core/Src/Modules/Log/log.cpp
+    Core/Src/Modules/Adc/adc.cpp
     Core/Src/System/Debug/Menu/menu.cpp
     Core/Src/System/Startup/startup.cpp
     Core/Src/System/TimerController/timer_controller.cpp
