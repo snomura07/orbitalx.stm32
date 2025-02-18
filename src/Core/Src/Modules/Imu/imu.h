@@ -15,6 +15,7 @@ public:
     };
     Axis accelRaw;
     Axis gyroRaw;
+    static Imu* instance;
 
 public:
     Imu(SPI_HandleTypeDef &hspi_, uint8_t deviceAddress = ICM20648::DEFAULT_ADDRESS);
@@ -24,8 +25,10 @@ public:
     void update();
     void dump();
     char* getChipName();
+    void handleDMAComplete();
 
 private:
+    void startDMATransfer();
     void readAll();
     bool writeRegister(uint8_t reg, uint8_t* data, uint16_t size);
     bool readRegister (uint8_t reg, uint8_t* data, uint16_t size);
@@ -33,6 +36,9 @@ private:
 private:
     SPI_HandleTypeDef *hspi;
     uint8_t devAddr;
+    bool dmaTransferInProgress;
+    uint8_t txBuffDma[13];  // 最大12バイト + レジスタアドレス
+    uint8_t rxBuffDma[12];  // 受信用バッファ
 };
 
 #endif
