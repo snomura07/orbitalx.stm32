@@ -8,8 +8,11 @@ void ObjectHub::initDependencies(){
     ledBlueBackPtr->setUsart(usartPtr);
     ledOrangePtr->setUsart(usartPtr);
     ledGreenPtr->setUsart(usartPtr);
+    ledRedPtr->setUsart(usartPtr);
+    ledDarkGreenPtr->setUsart(usartPtr);
     imuPtr->setUsart(usartPtr);
-    encPtr->setUsart(usartPtr);
+    rEncPtr->setUsart(usartPtr);
+    lEncPtr->setUsart(usartPtr);
     rMotPtr->setUsart(usartPtr);
     lMotPtr->setUsart(usartPtr);
     battPtr->setUsart(usartPtr);

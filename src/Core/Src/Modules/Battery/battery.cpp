@@ -29,9 +29,9 @@ void Battery::update(){
 void Battery::execAdc(){
     ADC_ChannelConfTypeDef sConfig = {0};
 
-    sConfig.Channel = ADC_CHANNEL_3;
+    sConfig.Channel = ADC_CHANNEL_15;
     sConfig.Rank = ADC_REGULAR_RANK_1;
-    sConfig.SamplingTime = ADC_SAMPLETIME_19CYCLES_5;
+    sConfig.SamplingTime = ADC_SAMPLETIME_12CYCLES_5;
     HAL_ADC_ConfigChannel(hadc2, &sConfig);
 
     HAL_ADC_Start(hadc2);

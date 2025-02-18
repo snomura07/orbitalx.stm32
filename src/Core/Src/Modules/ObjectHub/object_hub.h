@@ -24,8 +24,11 @@ public:
     Led *ledBlueBackPtr;
     Led *ledOrangePtr;
     Led *ledGreenPtr;
+    Led *ledRedPtr;
+    Led *ledDarkGreenPtr;
     Imu *imuPtr;
-    Encoder *encPtr;
+    Encoder *rEncPtr;
+    Encoder *lEncPtr;
     Motor *rMotPtr;
     Motor *lMotPtr;
     Battery *battPtr;

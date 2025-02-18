@@ -1,6 +1,6 @@
 #include "led.h"
 #include <main.h>
-#include <stm32f3xx_hal.h>
+#include <stm32g4xx_hal.h>
 
 Led::Led(ModeEnum mode_){
 	this->mode = mode_;
@@ -22,6 +22,12 @@ void Led::on(){
 	else if(this->mode == ModeEnum::GREEN){
 	  HAL_GPIO_WritePin(LED4_GPIO_Port, LED4_Pin, GPIO_PIN_RESET);
 	}
+	else if(this->mode == ModeEnum::RED){
+	  HAL_GPIO_WritePin(LED5_GPIO_Port, LED5_Pin, GPIO_PIN_RESET);
+	}
+	else if(this->mode == ModeEnum::DARK_GREEN){
+	  HAL_GPIO_WritePin(LED6_GPIO_Port, LED6_Pin, GPIO_PIN_RESET);
+	}
 }
 
 void Led::off(){
@@ -37,6 +43,12 @@ void Led::off(){
 	else if(this->mode == ModeEnum::GREEN){
 	  HAL_GPIO_WritePin(LED4_GPIO_Port, LED4_Pin, GPIO_PIN_SET);
 	}
+	else if(this->mode == ModeEnum::RED){
+	  HAL_GPIO_WritePin(LED5_GPIO_Port, LED5_Pin, GPIO_PIN_SET);
+	}
+	else if(this->mode == ModeEnum::DARK_GREEN){
+	  HAL_GPIO_WritePin(LED6_GPIO_Port, LED6_Pin, GPIO_PIN_SET);
+	}
 }
 
 void Led::toggle(){
@@ -51,5 +63,11 @@ void Led::toggle(){
 	}
 	else if(this->mode == ModeEnum::GREEN){
       HAL_GPIO_TogglePin(LED4_GPIO_Port, LED4_Pin);
+	}
+	else if(this->mode == ModeEnum::RED){
+      HAL_GPIO_TogglePin(LED5_GPIO_Port, LED5_Pin);
+	}
+	else if(this->mode == ModeEnum::DARK_GREEN){
+      HAL_GPIO_TogglePin(LED6_GPIO_Port, LED6_Pin);
 	}
 }

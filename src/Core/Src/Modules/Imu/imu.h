@@ -2,7 +2,7 @@
 #define IMU_H
 
 #include "icm_20648.h"
-#include <stm32f3xx_hal.h>
+#include <stm32g4xx_hal.h>
 #include <UsartInterface/usart_interface.h>
 
 class Imu : public UsartInterface{
@@ -17,7 +17,7 @@ public:
     Axis gyroRaw;
 
 public:
-    Imu(I2C_HandleTypeDef &hi2c_, uint8_t deviceAddress = ICM20648::DEFAULT_ADDRESS);
+    Imu(SPI_HandleTypeDef &hspi_, uint8_t deviceAddress = ICM20648::DEFAULT_ADDRESS);
     ~Imu();
     bool init();
     uint8_t whoAmI();
@@ -31,7 +31,7 @@ private:
     bool readRegister (uint8_t reg, uint8_t* data, uint16_t size);
 
 private:
-    I2C_HandleTypeDef *hi2c;
+    SPI_HandleTypeDef *hspi;
     uint8_t devAddr;
 };
 

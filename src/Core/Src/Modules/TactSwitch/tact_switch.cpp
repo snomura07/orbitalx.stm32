@@ -1,6 +1,6 @@
 #include "tact_switch.h"
 #include <main.h>
-#include <stm32f3xx_hal.h>
+#include <stm32g4xx_hal.h>
 #include <MasterDefine.h>
 
 TactSwitch::TactSwitch(){}

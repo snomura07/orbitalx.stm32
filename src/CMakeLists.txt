@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(STM32G403K8_Project C CXX ASM)
+project(STM32G431CBT6_Project C CXX ASM)
 
 # クロスコンパイル環境の設定
 set(CMAKE_SYSTEM_NAME Generic)
@@ -49,26 +49,26 @@ add_executable(
     Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_pwr.c
     Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_pwr_ex.c
 
-    # Core/Src/Modules/Led/led.cpp
-    # Core/Src/Modules/Map/map.cpp
+    Core/Src/Modules/Led/led.cpp
+    Core/Src/Modules/Map/map.cpp
     # Core/Src/Modules/TactSwitch/tact_switch.cpp
-    # Core/Src/Modules/WallSensor/wall_sensor.cpp
-    # Core/Src/Modules/Imu/imu.cpp
-    # Core/Src/Modules/Motor/motor.cpp
-    # Core/Src/Modules/Battery/battery.cpp
-    # Core/Src/Modules/ObjectHub/object_hub.cpp
-    # Core/Src/Modules/Encoder/encoder.cpp
-    # Core/Src/Modules/TimerCount/timer_count.cpp
-    # Core/Src/Modules/Log/log.cpp
-    # Core/Src/System/Debug/Menu/menu.cpp
-    # Core/Src/System/Startup/startup.cpp
-    # Core/Src/System/TimerController/timer_controller.cpp
-    # Core/Src/System/FailSafe/fail_safe.cpp
-    # Core/Src/System/Logger/logger.cpp
-    # Core/Src/Dynamics/CurrentVelocity/current_velocity.cpp
-    # Core/Src/Utils/Usart/usart.cpp
+    Core/Src/Modules/WallSensor/wall_sensor.cpp
+    Core/Src/Modules/Imu/imu.cpp
+    Core/Src/Modules/Motor/motor.cpp
+    Core/Src/Modules/Battery/battery.cpp
+    Core/Src/Modules/ObjectHub/object_hub.cpp
+    Core/Src/Modules/Encoder/encoder.cpp
+    Core/Src/Modules/TimerCount/timer_count.cpp
+    Core/Src/Modules/Log/log.cpp
+    Core/Src/System/Debug/Menu/menu.cpp
+    Core/Src/System/Startup/startup.cpp
+    Core/Src/System/TimerController/timer_controller.cpp
+    Core/Src/System/FailSafe/fail_safe.cpp
+    Core/Src/System/Logger/logger.cpp
+    Core/Src/Dynamics/CurrentVelocity/current_velocity.cpp
+    Core/Src/Utils/Usart/usart.cpp
     # Core/Src/Utils/DataFlash/data_flash.cpp
-    # Core/Src/Interface/UsartInterface/usart_interface.cpp
+    Core/Src/Interface/UsartInterface/usart_interface.cpp
 )
 
 # インクルードディレクトリ

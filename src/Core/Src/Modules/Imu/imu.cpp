@@ -1,8 +1,8 @@
 #include "imu.h"
 #include "icm_20648.h"
 
-Imu::Imu(I2C_HandleTypeDef &hi2c_, uint8_t deviceAddress)
-    : hi2c(&hi2c_), devAddr(deviceAddress << 1) {}
+Imu::Imu(SPI_HandleTypeDef &hspi_, uint8_t deviceAddress)
+    : hspi(&hspi_), devAddr(deviceAddress << 1) {}
 Imu::~Imu(){}
 
 bool Imu::init() {
@@ -50,11 +50,26 @@ void Imu::readAll() {
 }
 
 bool Imu::writeRegister(uint8_t reg, uint8_t* data, uint16_t size) {
-    return HAL_I2C_Mem_Write(hi2c, devAddr, reg, I2C_MEMADD_SIZE_8BIT, data, size, HAL_MAX_DELAY) == HAL_OK;
+    uint8_t txBuffer[size + 1];
+    txBuffer[0] = reg & 0x7F;  // 最上位ビットをクリア (書き込み)
+    memcpy(&txBuffer[1], data, size);
+
+    HAL_GPIO_WritePin(SPI_CS_GPIO_Port, SPI_CS_Pin, GPIO_PIN_RESET);
+    bool status = (HAL_SPI_Transmit(hspi, txBuffer, size + 1, HAL_MAX_DELAY) == HAL_OK);
+    HAL_GPIO_WritePin(SPI_CS_GPIO_Port, SPI_CS_Pin, GPIO_PIN_SET);
+
+    return status;
 }
 
 bool Imu::readRegister(uint8_t reg, uint8_t* data, uint16_t size) {
-    return HAL_I2C_Mem_Read(hi2c, devAddr, reg, I2C_MEMADD_SIZE_8BIT, data, size, HAL_MAX_DELAY) == HAL_OK;
+    uint8_t txBuffer = reg | 0x80;  // 最上位ビットをセット (読み込み)
+
+    HAL_GPIO_WritePin(SPI_CS_GPIO_Port, SPI_CS_Pin, GPIO_PIN_RESET);
+    bool status = (HAL_SPI_Transmit(hspi, &txBuffer, 1, HAL_MAX_DELAY) == HAL_OK &&
+                   HAL_SPI_Receive(hspi, data, size, HAL_MAX_DELAY) == HAL_OK);
+    HAL_GPIO_WritePin(SPI_CS_GPIO_Port, SPI_CS_Pin, GPIO_PIN_SET);
+
+    return status;
 }
 
 void Imu::dump(){

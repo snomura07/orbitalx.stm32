@@ -1,7 +1,8 @@
 #include "encoder.h"
 
-Encoder::Encoder(ADC_HandleTypeDef &hadc2_):
-    hadc2(&hadc2_),
+Encoder::Encoder(ADC_HandleTypeDef &hadc_, ModeEnum mode_):
+    hadc(&hadc_),
+    mode(mode_),
     counter(0),
     currRaw(0),
     preRaw(0),
@@ -23,15 +24,20 @@ void Encoder::update(){
 void Encoder::execAdc(){
     ADC_ChannelConfTypeDef sConfig = {0};
 
-    sConfig.Channel = ADC_CHANNEL_2;
+    if(mode == RIGHT){
+        sConfig.Channel = ADC_CHANNEL_1;
+    }
+    if(mode == LEFT){
+        sConfig.Channel = ADC_CHANNEL_5;
+    }
     sConfig.Rank = ADC_REGULAR_RANK_1;
-    sConfig.SamplingTime = ADC_SAMPLETIME_19CYCLES_5;
-    HAL_ADC_ConfigChannel(hadc2, &sConfig);
+    sConfig.SamplingTime = ADC_SAMPLETIME_12CYCLES_5;
+    HAL_ADC_ConfigChannel(hadc, &sConfig);
 
-    HAL_ADC_Start(hadc2);
-    HAL_ADC_PollForConversion(hadc2, HAL_MAX_DELAY); // 変換完了待ち
-    uint16_t raw = HAL_ADC_GetValue(hadc2);
-    HAL_ADC_Stop(hadc2);
+    HAL_ADC_Start(hadc);
+    HAL_ADC_PollForConversion(hadc, HAL_MAX_DELAY); // 変換完了待ち
+    uint16_t raw = HAL_ADC_GetValue(hadc);
+    HAL_ADC_Stop(hadc);
 
     preRaw  = currRaw;
     currRaw = raw;

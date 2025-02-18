@@ -1,6 +1,6 @@
 #include "wall_sensor.h"
 #include <main.h>
-#include <stm32f3xx_hal.h>
+#include <stm32g4xx_hal.h>
 
 WallSensor:: WallSensor(ADC_HandleTypeDef &hadc1_, ADC_HandleTypeDef &hadc2_):
     hadc1(&hadc1_),
@@ -18,7 +18,7 @@ void WallSensor::update(){
     ADC_ChannelConfTypeDef sConfig = {0};
     sConfig.Channel = ADC_CHANNEL_4;
     sConfig.Rank = ADC_REGULAR_RANK_1;
-    sConfig.SamplingTime = ADC_SAMPLETIME_19CYCLES_5;
+    sConfig.SamplingTime = ADC_SAMPLETIME_12CYCLES_5;
     HAL_ADC_ConfigChannel(hadc1, &sConfig);
     HAL_ADC_Start(hadc1);
     HAL_ADC_PollForConversion(hadc1, HAL_MAX_DELAY);

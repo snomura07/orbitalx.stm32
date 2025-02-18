@@ -1,6 +1,6 @@
 #include "main.h"
 #include "data_flash.h"
-#include "stm32f3xx_hal.h" // HALライブラリ
+#include "stm32g4xx_hal.h" // HALライブラリ
 
 DataFlash::DataFlash() {}
 DataFlash::~DataFlash() {}

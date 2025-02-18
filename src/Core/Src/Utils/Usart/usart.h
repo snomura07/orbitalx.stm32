@@ -2,7 +2,7 @@
 #define SRC_UTILS_USART_H_
 
 #include <main.h>
-#include <stm32f3xx_hal.h>
+#include <stm32g4xx_hal.h>
 #ifdef __cplusplus
     #include <cstring>
     #include <cstdio>

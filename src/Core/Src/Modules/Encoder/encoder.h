@@ -4,7 +4,12 @@
 
 class Encoder : public UsartInterface{
 public:
-    Encoder(ADC_HandleTypeDef &hadc2_);
+	enum ModeEnum{
+		RIGHT,
+		LEFT,
+	};
+public:
+    Encoder(ADC_HandleTypeDef &hadc_, ModeEnum mode_);
     ~Encoder();
     void update();
     void dump();
@@ -14,7 +19,8 @@ private:
     void countUp();
 
 private:
-    ADC_HandleTypeDef *hadc2;
+    ADC_HandleTypeDef *hadc;
+	ModeEnum mode;
     uint16_t THRE_UP;
     uint16_t THRE_DOWN;
 

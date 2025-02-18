@@ -45,10 +45,16 @@ void Startup::checkImu(){
 void Startup::checkEncoder(){
     sendMessage("▼Encoder \r\n");
     sendMessage("right enc raw: ");
-    sendInt(objHub->encPtr->currRaw);
+    sendInt(objHub->rEncPtr->currRaw);
     sendMessage("\r\n");
     sendMessage("right enc cnt: ");
-    sendLong(objHub->encPtr->counter);
+    sendLong(objHub->rEncPtr->counter);
+    sendMessage("\r\n");
+    sendMessage("left enc raw: ");
+    sendInt(objHub->lEncPtr->currRaw);
+    sendMessage("\r\n");
+    sendMessage("left enc cnt: ");
+    sendLong(objHub->lEncPtr->counter);
     sendMessage("\r\n\r\n");
 }
 

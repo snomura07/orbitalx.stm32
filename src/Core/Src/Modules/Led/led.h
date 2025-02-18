@@ -11,6 +11,8 @@ public:
 		GREEN,
 		BLUE_FRONT,
 		BLUE_BACK,
+		RED,
+		DARK_GREEN
 	};
 	ModeEnum mode;
 

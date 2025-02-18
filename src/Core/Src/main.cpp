@@ -21,6 +21,21 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <Led/led.h>
+#include <Map/map.h>
+#include <Imu/imu.h>
+#include <Encoder/encoder.h>
+#include <Motor/motor.h>
+#include <Battery/battery.h>
+#include <WallSensor/wall_sensor.h>
+#include <TimerCount/timer_count.h>
+#include <Usart/usart.h>
+#include <Debug/Menu/menu.h>
+#include <Startup/startup.h>
+#include <TimerController/timer_controller.h>
+#include <FailSafe/fail_safe.h>
+#include <Logger/logger.h>
+
 
 /* USER CODE END Includes */
 
@@ -53,7 +68,15 @@ TIM_HandleTypeDef htim7;
 UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN PV */
-
+ObjectHub objHub;
+Startup startup;
+TimerController timer1(htim1);   // 1call/1ms for count
+// TimerController timer15(htim15); // 1call/s
+TimerController timer6(htim6);   // 1call/10ms for objHub update
+TimerController timer7(htim7);   // 1call/10ms for fail safe
+FailSafe failSafe;
+Logger logger;
+Debug::Menu debugMenu;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -99,7 +122,34 @@ int main(void)
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
-
+  objHub.ledBlueFrontPtr = new Led(Led::ModeEnum::BLUE_FRONT);
+  objHub.ledBlueBackPtr  = new Led(Led::ModeEnum::BLUE_BACK);
+  objHub.ledOrangePtr    = new Led(Led::ModeEnum::ORANGE);
+  objHub.ledGreenPtr     = new Led(Led::ModeEnum::GREEN);
+  objHub.ledRedPtr       = new Led(Led::ModeEnum::RED);
+  objHub.ledDarkGreenPtr = new Led(Led::ModeEnum::DARK_GREEN);
+  objHub.imuPtr          = new Imu(hspi1);
+  objHub.rEncPtr         = new Encoder(hadc1, Encoder::ModeEnum::RIGHT);
+  objHub.lEncPtr         = new Encoder(hadc1, Encoder::ModeEnum::LEFT);
+  objHub.rMotPtr         = new Motor(htim3, Motor::ModeEnum::RIGHT);
+  objHub.lMotPtr         = new Motor(htim2, Motor::ModeEnum::LEFT);
+  objHub.battPtr         = new Battery(hadc1);
+  objHub.wallSensPtr     = new WallSensor(hadc1, hadc1);
+  objHub.mapPtr          = new Map();
+  objHub.timerCntPtr     = new TimerCount();
+  objHub.usartPtr        = new Usart(huart1);
+  objHub.initDependencies();
+  startup.objHub  = &objHub;
+  startup.timer1  = &timer1;
+  // startup.timer15 = &timer15;
+  startup.timer6  = &timer6;
+  startup.timer7  = &timer7;
+  startup.setUsart(objHub.usartPtr);
+  failSafe.objHub  = &objHub;
+  // failSafe.timer15 = &timer15;
+  failSafe.timer6  = &timer6;
+  logger.setTimerCnt(objHub.timerCntPtr);
+  logger.setUsart(objHub.usartPtr);
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
@@ -113,6 +163,14 @@ int main(void)
   MX_TIM6_Init();
   MX_TIM7_Init();
   /* USER CODE BEGIN 2 */
+  objHub.imuPtr->init();
+  timer1.start();
+  timer6.start();
+  timer7.start();
+
+  startup.run();
+  objHub.ledBlueFrontPtr->on();
+  objHub.ledBlueBackPtr->on();
 
   /* USER CODE END 2 */
 
@@ -120,6 +178,9 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+    objHub.lEncPtr->dump();
+    HAL_Delay(10);
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -376,13 +437,14 @@ static void MX_TIM2_Init(void)
   sConfigOC.Pulse = 0;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
-  if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
+  if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_2) != HAL_OK)
   {
     Error_Handler();
   }
   /* USER CODE BEGIN TIM2_Init 2 */
 
   /* USER CODE END TIM2_Init 2 */
+  HAL_TIM_MspPostInit(&htim2);
 
 }
 
@@ -434,13 +496,14 @@ static void MX_TIM3_Init(void)
   sConfigOC.Pulse = 0;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
-  if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
+  if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_2) != HAL_OK)
   {
     Error_Handler();
   }
   /* USER CODE BEGIN TIM3_Init 2 */
 
   /* USER CODE END TIM3_Init 2 */
+  HAL_TIM_MspPostInit(&htim3);
 
 }
 
@@ -588,13 +651,13 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(LED5_GPIO_Port, LED5_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, SENS_ONB_Pin|SPI_CS_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, SENS_ON_B_Pin|SPI_CS_Pin|MOTA_IN1_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, LED1_Pin|LED3_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, SENS_ONA_Pin|MOTA_IN1_Pin|MOTB_IN1_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, SENS_ON_A_Pin|MOTB_IN1_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOA, LED6_Pin|LED4_Pin|LED2_Pin, GPIO_PIN_SET);
@@ -606,35 +669,53 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(LED5_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : SENS_ONB_Pin SPI_CS_Pin LED6_Pin LED4_Pin
-                           LED2_Pin */
-  GPIO_InitStruct.Pin = SENS_ONB_Pin|SPI_CS_Pin|LED6_Pin|LED4_Pin
-                          |LED2_Pin;
+  /*Configure GPIO pins : SENS_ON_B_Pin SPI_CS_Pin LED6_Pin LED4_Pin
+                           LED2_Pin MOTA_IN1_Pin */
+  GPIO_InitStruct.Pin = SENS_ON_B_Pin|SPI_CS_Pin|LED6_Pin|LED4_Pin
+                          |LED2_Pin|MOTA_IN1_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : LED1_Pin SENS_ONA_Pin MOTA_IN1_Pin MOTB_IN1_Pin
-                           LED3_Pin */
-  GPIO_InitStruct.Pin = LED1_Pin|SENS_ONA_Pin|MOTA_IN1_Pin|MOTB_IN1_Pin
-                          |LED3_Pin;
+  /*Configure GPIO pins : LED1_Pin SENS_ON_A_Pin MOTB_IN1_Pin LED3_Pin */
+  GPIO_InitStruct.Pin = LED1_Pin|SENS_ON_A_Pin|MOTB_IN1_Pin|LED3_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : TACT_SW_Pin */
-  GPIO_InitStruct.Pin = TACT_SW_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(TACT_SW_GPIO_Port, &GPIO_InitStruct);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */
 }
 
 /* USER CODE BEGIN 4 */
+
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
+    // TIM1 callback -> 1call per 1ms
+    if (htim->Instance == TIM1) {
+      objHub.timerCntPtr->update();
+    }
+
+    // TIM15 callback -> 1call/s
+    if (htim->Instance == TIM15) {
+      // objHub.ledGreenPtr->toggle();
+    }
+
+    // TIM6 callback -> 1call per 10ms
+    if (htim->Instance == TIM6) {
+        objHub.rEncPtr ->update();
+        objHub.lEncPtr ->update();
+        objHub.imuPtr ->update();
+        objHub.battPtr->update();
+        // objHub.wallSensPtr->update();
+    }
+
+    // TIM7 callback -> 1call per 10ms
+    if (htim->Instance == TIM7) {
+      // failSafe.update();
+    }
+}
 
 /* USER CODE END 4 */
 
