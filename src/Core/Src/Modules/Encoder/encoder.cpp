@@ -6,8 +6,12 @@ Encoder::Encoder(Adc *adc_, ModeEnum mode_):
     counter(0),
     currRaw(0),
     preRaw(0),
-    THRE_UP(3451),
-    THRE_DOWN(2841),
+    THRE_UP(0),
+    THRE_DOWN(0),
+    THRE_UP_RIGHT(3451),
+    THRE_DOWN_RIGHT(2841),
+    THRE_UP_LEFT(2100),
+    THRE_DOWN_LEFT(1750),
     HYSTERESIS(0)
 {
     memset(buff, 0, sizeof(buff));
@@ -19,7 +23,17 @@ void Encoder::update(){
 }
 
 void Encoder::execAdc(){
-    uint16_t raw = (mode == RIGHT) ? adc->adcValues[RIGHT_ENC_CH] : adc->adcValues[LEFT_ENC_CH];
+    uint16_t raw = 0;
+    if(mode == RIGHT){
+        raw       = adc->adcValues[RIGHT_ENC_CH];
+        THRE_UP   = THRE_UP_RIGHT;
+        THRE_DOWN = THRE_DOWN_RIGHT;
+    }
+    else{
+        raw       = adc->adcValues[LEFT_ENC_CH];
+        THRE_UP   = THRE_UP_LEFT;
+        THRE_DOWN = THRE_DOWN_LEFT;
+    }
 
     preRaw  = currRaw;
     currRaw = 0;

@@ -181,8 +181,10 @@ int main(void)
   startup.run();
   objHub.ledBlueFrontPtr->on();
   objHub.ledBlueBackPtr->on();
-  // objHub.rMotPtr->start();
-  // objHub.rMotPtr->setDuty(300);
+  objHub.rMotPtr->start();
+  objHub.lMotPtr->start();
+  objHub.rMotPtr->setDuty(200);
+  objHub.lMotPtr->setDuty(300);
 
   /* USER CODE END 2 */
 
@@ -194,7 +196,17 @@ int main(void)
 
     // objHub.battPtr->dump();
     // objHub.imuPtr->dump();
-    objHub.rEncPtr->dump();
+    // objHub.lEncPtr->dump();
+
+    objHub.usartPtr->sendString("[adc]@");
+    objHub.usartPtr->sendUint16t(objHub.rEncPtr->currRaw);
+    objHub.usartPtr->sendString(",");
+    objHub.usartPtr->sendUint16t(objHub.lEncPtr->currRaw);
+    objHub.usartPtr->sendString(",");
+    objHub.usartPtr->sendUint16t(objHub.rEncPtr->counter);
+    objHub.usartPtr->sendString(",");
+    objHub.usartPtr->sendUint16t(objHub.lEncPtr->counter);
+    objHub.usartPtr->sendString("\r\n");
 
     HAL_Delay(10);
 

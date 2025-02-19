@@ -24,6 +24,10 @@ private:
 	ModeEnum mode;
     uint16_t THRE_UP;
     uint16_t THRE_DOWN;
+    uint16_t THRE_UP_RIGHT;
+    uint16_t THRE_DOWN_RIGHT;
+    uint16_t THRE_UP_LEFT;
+    uint16_t THRE_DOWN_LEFT;
     uint16_t HYSTERESIS;
     static constexpr uint8_t BUFF_SIZE = 16;
     uint16_t buff[BUFF_SIZE];
