@@ -28,6 +28,7 @@
 #include <Motor/motor.h>
 #include <Battery/battery.h>
 #include <WallSensor/wall_sensor.h>
+#include <Iled/i_led.h>
 #include <TimerCount/timer_count.h>
 #include <Usart/usart.h>
 #include <Debug/Menu/menu.h>
@@ -35,6 +36,7 @@
 #include <TimerController/timer_controller.h>
 #include <FailSafe/fail_safe.h>
 #include <Logger/logger.h>
+#include <Adc/adc.h>
 
 
 /* USER CODE END Includes */
@@ -56,6 +58,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 ADC_HandleTypeDef hadc1;
+DMA_HandleTypeDef hdma_adc1;
 
 SPI_HandleTypeDef hspi1;
 DMA_HandleTypeDef hdma_spi1_tx;
@@ -131,13 +134,15 @@ int main(void)
   objHub.ledGreenPtr     = new Led(Led::ModeEnum::GREEN);
   objHub.ledRedPtr       = new Led(Led::ModeEnum::RED);
   objHub.ledDarkGreenPtr = new Led(Led::ModeEnum::DARK_GREEN);
+  objHub.iledPtr         = new Iled();
+  objHub.adcPtr          = new Adc(hadc1, objHub.iledPtr);
+  objHub.wallSensPtr     = new WallSensor(objHub.adcPtr, objHub.iledPtr);
   objHub.imuPtr          = new Imu(hspi1);
-  objHub.rEncPtr         = new Encoder(hadc1, Encoder::ModeEnum::RIGHT);
-  objHub.lEncPtr         = new Encoder(hadc1, Encoder::ModeEnum::LEFT);
+  objHub.rEncPtr         = new Encoder(objHub.adcPtr, Encoder::ModeEnum::RIGHT);
+  objHub.lEncPtr         = new Encoder(objHub.adcPtr, Encoder::ModeEnum::LEFT);
   objHub.rMotPtr         = new Motor(htim3, Motor::ModeEnum::RIGHT);
   objHub.lMotPtr         = new Motor(htim2, Motor::ModeEnum::LEFT);
-  objHub.battPtr         = new Battery(hadc1);
-  objHub.wallSensPtr     = new WallSensor(hadc1, hadc1);
+  objHub.battPtr         = new Battery(objHub.adcPtr);
   objHub.mapPtr          = new Map();
   objHub.timerCntPtr     = new TimerCount();
   objHub.usartPtr        = new Usart(huart1);
@@ -171,10 +176,13 @@ int main(void)
   timer1.start();
   timer6.start();
   timer7.start();
+  HAL_Delay(20);
 
   startup.run();
   objHub.ledBlueFrontPtr->on();
   objHub.ledBlueBackPtr->on();
+  // objHub.rMotPtr->start();
+  // objHub.rMotPtr->setDuty(300);
 
   /* USER CODE END 2 */
 
@@ -182,8 +190,12 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    objHub.imuPtr->dump();
-    // objHub.lEncPtr->dump();
+    // objHub.wallSensPtr->dump();
+
+    // objHub.battPtr->dump();
+    // objHub.imuPtr->dump();
+    objHub.rEncPtr->dump();
+
     HAL_Delay(10);
 
     /* USER CODE END WHILE */
@@ -255,7 +267,6 @@ static void MX_ADC1_Init(void)
   ADC_ChannelConfTypeDef sConfig = {0};
 
   /* USER CODE BEGIN ADC1_Init 1 */
-
   /* USER CODE END ADC1_Init 1 */
 
   /** Common config
@@ -265,15 +276,15 @@ static void MX_ADC1_Init(void)
   hadc1.Init.Resolution = ADC_RESOLUTION_12B;
   hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
   hadc1.Init.GainCompensation = 0;
-  hadc1.Init.ScanConvMode = ADC_SCAN_DISABLE;
-  hadc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
+  hadc1.Init.ScanConvMode = ADC_SCAN_ENABLE;
+  hadc1.Init.EOCSelection = ADC_EOC_SEQ_CONV;
   hadc1.Init.LowPowerAutoWait = DISABLE;
   hadc1.Init.ContinuousConvMode = DISABLE;
-  hadc1.Init.NbrOfConversion = 1;
+  hadc1.Init.NbrOfConversion = 7;
   hadc1.Init.DiscontinuousConvMode = DISABLE;
   hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
   hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
-  hadc1.Init.DMAContinuousRequests = DISABLE;
+  hadc1.Init.DMAContinuousRequests = ENABLE;
   hadc1.Init.Overrun = ADC_OVR_DATA_PRESERVED;
   hadc1.Init.OversamplingMode = DISABLE;
   if (HAL_ADC_Init(&hadc1) != HAL_OK)
@@ -291,9 +302,9 @@ static void MX_ADC1_Init(void)
 
   /** Configure Regular Channel
   */
-  sConfig.Channel = ADC_CHANNEL_2;
+  sConfig.Channel = ADC_CHANNEL_1;
   sConfig.Rank = ADC_REGULAR_RANK_1;
-  sConfig.SamplingTime = ADC_SAMPLETIME_2CYCLES_5;
+  sConfig.SamplingTime = ADC_SAMPLETIME_47CYCLES_5;
   sConfig.SingleDiff = ADC_SINGLE_ENDED;
   sConfig.OffsetNumber = ADC_OFFSET_NONE;
   sConfig.Offset = 0;
@@ -301,8 +312,61 @@ static void MX_ADC1_Init(void)
   {
     Error_Handler();
   }
-  /* USER CODE BEGIN ADC1_Init 2 */
 
+  /** Configure Regular Channel
+  */
+  sConfig.Channel = ADC_CHANNEL_2;
+  sConfig.Rank = ADC_REGULAR_RANK_2;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Configure Regular Channel
+  */
+  sConfig.Channel = ADC_CHANNEL_3;
+  sConfig.Rank = ADC_REGULAR_RANK_3;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Configure Regular Channel
+  */
+  sConfig.Channel = ADC_CHANNEL_5;
+  sConfig.Rank = ADC_REGULAR_RANK_4;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Configure Regular Channel
+  */
+  sConfig.Channel = ADC_CHANNEL_11;
+  sConfig.Rank = ADC_REGULAR_RANK_5;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Configure Regular Channel
+  */
+  sConfig.Channel = ADC_CHANNEL_14;
+  sConfig.Rank = ADC_REGULAR_RANK_6;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Configure Regular Channel
+  */
+  sConfig.Channel = ADC_CHANNEL_15;
+  sConfig.Rank = ADC_REGULAR_RANK_7;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN ADC1_Init 2 */
   /* USER CODE END ADC1_Init 2 */
 
 }
@@ -653,6 +717,9 @@ static void MX_DMA_Init(void)
   /* DMA1_Channel2_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(DMA1_Channel2_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(DMA1_Channel2_IRQn);
+  /* DMA1_Channel3_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Channel3_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Channel3_IRQn);
 
 }
 
@@ -720,6 +787,11 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
     // TIM1 callback -> 1call per 1ms
     if (htim->Instance == TIM1) {
       objHub.timerCntPtr->update();
+      objHub.adcPtr->startDMA();
+      objHub.wallSensPtr->update();
+      objHub.rEncPtr ->update();
+      objHub.lEncPtr ->update();
+      objHub.battPtr->update();
     }
 
     // TIM15 callback -> 1call/s
@@ -729,9 +801,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
     // TIM6 callback -> 1call per 10ms
     if (htim->Instance == TIM6) {
-        objHub.rEncPtr ->update();
-        objHub.lEncPtr ->update();
-        objHub.battPtr->update();
+        // objHub.rEncPtr ->update();
+        // objHub.lEncPtr ->update();
         // objHub.wallSensPtr->update();
     }
 

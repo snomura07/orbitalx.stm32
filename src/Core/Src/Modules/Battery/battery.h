@@ -1,10 +1,11 @@
 #ifndef BATTERY_H
 #define BATTERY_H
 #include <UsartInterface/usart_interface.h>
+#include <Adc/adc.h>
 
 class Battery : public UsartInterface{
 public:
-    Battery(ADC_HandleTypeDef &hadc2_);
+    Battery(Adc *adc_);
     ~Battery();
     void update();
     void dump();
@@ -17,7 +18,7 @@ public:
     uint16_t mVolt;
 
 private:
-    ADC_HandleTypeDef *hadc2;
+    Adc *adc;
     uint16_t raw;
 
     static constexpr uint8_t BUFF_SIZE = 16;

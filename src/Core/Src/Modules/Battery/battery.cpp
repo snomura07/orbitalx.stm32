@@ -1,7 +1,7 @@
 #include "battery.h"
 
-Battery::Battery(ADC_HandleTypeDef &hadc2_):
-    hadc2(&hadc2_),
+Battery::Battery(Adc *adc_):
+    adc(adc_),
     raw(0),
     volt(0.0),
     mVolt(0)
@@ -13,7 +13,7 @@ Battery::~Battery(){}
 void Battery::update(){
     execAdc();
     float ref = 3.0;
-    volt  = (float)raw/4095.0 * 2.109 * ref; // Adjusted voltage divider ratio from 2.0 to 2.109 to account for measurement errors.
+    volt  = (float)raw/4095.0 * 2.109 * ref;
 
     // calc mV using ring buffer
     mVolt = 0;
@@ -27,17 +27,7 @@ void Battery::update(){
 }
 
 void Battery::execAdc(){
-    ADC_ChannelConfTypeDef sConfig = {0};
-
-    sConfig.Channel = ADC_CHANNEL_15;
-    sConfig.Rank = ADC_REGULAR_RANK_1;
-    sConfig.SamplingTime = ADC_SAMPLETIME_12CYCLES_5;
-    HAL_ADC_ConfigChannel(hadc2, &sConfig);
-
-    HAL_ADC_Start(hadc2);
-    HAL_ADC_PollForConversion(hadc2, HAL_MAX_DELAY); // 変換完了待ち
-    raw = HAL_ADC_GetValue(hadc2);
-    HAL_ADC_Stop(hadc2);
+    raw = adc->adcValues[BATTERY_CH];
 }
 
 void Battery::dump(){

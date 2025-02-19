@@ -1,6 +1,7 @@
 #ifndef ENCODER_H
 #define ENCODER_H
 #include <UsartInterface/usart_interface.h>
+#include <Adc/adc.h>
 
 class Encoder : public UsartInterface{
 public:
@@ -9,7 +10,7 @@ public:
 		LEFT,
 	};
 public:
-    Encoder(ADC_HandleTypeDef &hadc_, ModeEnum mode_);
+    Encoder(Adc *adc_, ModeEnum mode_);
     ~Encoder();
     void update();
     void dump();
@@ -19,16 +20,13 @@ private:
     void countUp();
 
 private:
-    ADC_HandleTypeDef *hadc;
+    Adc *adc;
 	ModeEnum mode;
     uint16_t THRE_UP;
     uint16_t THRE_DOWN;
-
-    uint16_t uCnt;
-    uint16_t max;
-    uint16_t min;
-    uint16_t currThreUP;
-    uint16_t currThreDown;
+    uint16_t HYSTERESIS;
+    static constexpr uint8_t BUFF_SIZE = 16;
+    uint16_t buff[BUFF_SIZE];
 
 public:
     uint32_t counter;

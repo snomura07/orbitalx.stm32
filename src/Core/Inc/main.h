@@ -111,7 +111,14 @@ void Error_Handler(void);
 #define LED3_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
-
+// DMA ADC CH
+#define RIGHT_ENC_CH 0
+#define RIGHT_FRONT_WSENS_CH 1
+#define LEFT_SIDE_WSENS_CH 2
+#define LEFT_ENC_CH 3
+#define LEFT_FRONT_WSENS_CH 4
+#define RIGHT_SIDE_WSENS_CH 5
+#define BATTERY_CH 6
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

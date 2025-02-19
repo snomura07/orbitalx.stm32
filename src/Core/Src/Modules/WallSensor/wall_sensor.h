@@ -1,23 +1,33 @@
 #ifndef WALL_SENSOR_H
 #define WALL_SENSOR_H
 #include <UsartInterface/usart_interface.h>
+#include <Iled/i_led.h>
+#include <Adc/adc.h>
 
 class WallSensor : public UsartInterface{
 public:
-    WallSensor(ADC_HandleTypeDef &hadc1_, ADC_HandleTypeDef &hadc2_);
+    struct WallSensInfo
+    {
+        uint16_t on;
+        uint16_t off;
+        uint16_t filtered;
+    };
+
+
+public:
+    WallSensor(Adc *adc_, Iled *ied_);
     ~WallSensor();
     void update();
     void dump();
 
 private:
-    void turnOnIled();
-    void turnOffIled();
-
-private:
-    ADC_HandleTypeDef *hadc1;
-    ADC_HandleTypeDef *hadc2;
-    uint16_t sensor1;
-    uint16_t sensor2;
+    Adc *adc;
+    Iled *iled;
+    WallSensInfo rFront;
+    WallSensInfo rSide;
+    WallSensInfo lFront;
+    WallSensInfo lSide;
+    bool isIledOn;
 };
 
 #endif

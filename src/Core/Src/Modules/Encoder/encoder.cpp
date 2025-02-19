@@ -1,19 +1,16 @@
 #include "encoder.h"
 
-Encoder::Encoder(ADC_HandleTypeDef &hadc_, ModeEnum mode_):
-    hadc(&hadc_),
+Encoder::Encoder(Adc *adc_, ModeEnum mode_):
+    adc(adc_),
     mode(mode_),
     counter(0),
     currRaw(0),
     preRaw(0),
-    uCnt(0),
-    max(0),
-    min(9999),
-    currThreUP(0),
-    currThreDown(0),
-    THRE_UP(3845),
-    THRE_DOWN(3835)
+    THRE_UP(3451),
+    THRE_DOWN(2841),
+    HYSTERESIS(0)
 {
+    memset(buff, 0, sizeof(buff));
 }
 Encoder::~Encoder(){}
 
@@ -22,60 +19,33 @@ void Encoder::update(){
 }
 
 void Encoder::execAdc(){
-    ADC_ChannelConfTypeDef sConfig = {0};
-
-    if(mode == RIGHT){
-        sConfig.Channel = ADC_CHANNEL_1;
-    }
-    if(mode == LEFT){
-        sConfig.Channel = ADC_CHANNEL_5;
-    }
-    sConfig.Rank = ADC_REGULAR_RANK_1;
-    sConfig.SamplingTime = ADC_SAMPLETIME_12CYCLES_5;
-    HAL_ADC_ConfigChannel(hadc, &sConfig);
-
-    HAL_ADC_Start(hadc);
-    HAL_ADC_PollForConversion(hadc, HAL_MAX_DELAY); // 変換完了待ち
-    uint16_t raw = HAL_ADC_GetValue(hadc);
-    HAL_ADC_Stop(hadc);
+    uint16_t raw = (mode == RIGHT) ? adc->adcValues[RIGHT_ENC_CH] : adc->adcValues[LEFT_ENC_CH];
 
     preRaw  = currRaw;
-    currRaw = raw;
-    // ↑↓
-    if (currRaw > THRE_UP && preRaw <= THRE_UP) {
+    currRaw = 0;
+    for(int i=0; i<BUFF_SIZE-1; i++){
+        buff[i]  = buff[i+1];
+        currRaw += buff[i];
+    }
+    buff[BUFF_SIZE-1] = raw;
+    currRaw += buff[BUFF_SIZE-1];
+    currRaw /= BUFF_SIZE;
+
+    // ** THRE_UP を超えた時 **
+    if (preRaw <= THRE_UP - HYSTERESIS && currRaw > THRE_UP) {
         counter++;
     }
-    else if (currRaw <= THRE_UP && preRaw > THRE_UP) {
+    // ** THRE_UP を下回った時 **
+    else if (preRaw >= THRE_UP + HYSTERESIS && currRaw < THRE_UP) {
         counter++;
     }
-
-    // ↓↑
-    else if (currRaw < THRE_DOWN && preRaw >= THRE_DOWN) {
+    // ** THRE_DOWN を下回った時 **
+    else if (preRaw >= THRE_DOWN + HYSTERESIS && currRaw < THRE_DOWN) {
         counter++;
     }
-    else if (currRaw >= THRE_DOWN && preRaw < THRE_DOWN) {
+    // ** THRE_DOWN を超えた時 **
+    else if (preRaw <= THRE_DOWN - HYSTERESIS && currRaw > THRE_DOWN) {
         counter++;
-    }
-
-
-    if(currRaw > max){
-        max = currRaw;
-    }
-    if(currRaw < min){
-        min = currRaw;
-    }
-
-    uCnt++;
-    if(uCnt == 100){
-        if((max-min) > 10){
-            currThreUP   = max - 5;
-            currThreDown = min + 10;
-            THRE_UP = currThreUP;
-            THRE_DOWN = currThreDown;
-            max  = 0;
-            min  = 9999;
-        }
-        uCnt = 0;
     }
 }
 
@@ -86,16 +56,10 @@ void Encoder::dump(){
     sendMessage("cnt:");
     sendLong(counter);
     sendMessage(", ");
-    sendMessage("max:");
-    sendLong(max);
-    sendMessage(", ");
-    sendMessage("min:");
-    sendLong(min);
-    sendMessage(",");
     sendMessage("ThreUP:");
-    sendLong(currThreUP);
+    sendLong(THRE_UP);
     sendMessage(", ");
     sendMessage("ThreDown:");
-    sendLong(currThreDown);
+    sendLong(THRE_DOWN);
     sendMessage("\r\n");
 }
