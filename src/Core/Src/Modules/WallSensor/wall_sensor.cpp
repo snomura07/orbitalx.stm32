@@ -10,10 +10,10 @@ WallSensor:: WallSensor(Adc *adc_, Iled *iled_):
 WallSensor::~WallSensor(){}
 
 void WallSensor::update(){
-    rFront.on = adc->adcValues[RIGHT_FRONT_WSENS_CH];
-    rSide.on  = adc->adcValues[RIGHT_SIDE_WSENS_CH];
-    lFront.on = adc->adcValues[LEFT_FRONT_WSENS_CH];
-    lSide.on  = adc->adcValues[LEFT_SIDE_WSENS_CH];
+    rFront.on = adc->adcBuff[RIGHT_FRONT_WSENS_CH];
+    rSide.on  = adc->adcBuff[RIGHT_SIDE_WSENS_CH];
+    lFront.on = adc->adcBuff[LEFT_FRONT_WSENS_CH];
+    lSide.on  = adc->adcBuff[LEFT_SIDE_WSENS_CH];
 
     rFront.filtered = rFront.on;
     rSide.filtered  = rSide.on ;

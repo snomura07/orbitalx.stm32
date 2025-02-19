@@ -28,7 +28,6 @@ private:
     uint16_t THRE_DOWN_RIGHT;
     uint16_t THRE_UP_LEFT;
     uint16_t THRE_DOWN_LEFT;
-    uint16_t HYSTERESIS;
     static constexpr uint8_t BUFF_SIZE = 16;
     uint16_t buff[BUFF_SIZE];
 

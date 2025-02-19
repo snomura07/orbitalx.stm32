@@ -172,7 +172,11 @@ int main(void)
   MX_TIM6_Init();
   MX_TIM7_Init();
   /* USER CODE BEGIN 2 */
+  // DMA SPI start
   objHub.imuPtr->init();
+
+  // DMA ADC start
+  objHub.adcPtr->startDMA();
   timer1.start();
   timer6.start();
   timer7.start();
@@ -181,10 +185,10 @@ int main(void)
   startup.run();
   objHub.ledBlueFrontPtr->on();
   objHub.ledBlueBackPtr->on();
-  objHub.rMotPtr->start();
-  objHub.lMotPtr->start();
-  objHub.rMotPtr->setDuty(200);
-  objHub.lMotPtr->setDuty(300);
+  // objHub.rMotPtr->start();
+  // objHub.lMotPtr->start();
+  // objHub.rMotPtr->setDuty(100);
+  // objHub.lMotPtr->setDuty(300);
 
   /* USER CODE END 2 */
 
@@ -196,7 +200,7 @@ int main(void)
 
     // objHub.battPtr->dump();
     // objHub.imuPtr->dump();
-    // objHub.lEncPtr->dump();
+    // objHub.rEncPtr->dump();
 
     objHub.usartPtr->sendString("[adc]@");
     objHub.usartPtr->sendUint16t(objHub.rEncPtr->currRaw);
@@ -291,13 +295,13 @@ static void MX_ADC1_Init(void)
   hadc1.Init.ScanConvMode = ADC_SCAN_ENABLE;
   hadc1.Init.EOCSelection = ADC_EOC_SEQ_CONV;
   hadc1.Init.LowPowerAutoWait = DISABLE;
-  hadc1.Init.ContinuousConvMode = DISABLE;
+  hadc1.Init.ContinuousConvMode = ENABLE;
   hadc1.Init.NbrOfConversion = 7;
   hadc1.Init.DiscontinuousConvMode = DISABLE;
   hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
   hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
   hadc1.Init.DMAContinuousRequests = ENABLE;
-  hadc1.Init.Overrun = ADC_OVR_DATA_PRESERVED;
+  hadc1.Init.Overrun = ADC_OVR_DATA_OVERWRITTEN;
   hadc1.Init.OversamplingMode = DISABLE;
   if (HAL_ADC_Init(&hadc1) != HAL_OK)
   {
@@ -799,7 +803,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
     // TIM1 callback -> 1call per 1ms
     if (htim->Instance == TIM1) {
       objHub.timerCntPtr->update();
-      objHub.adcPtr->startDMA();
       objHub.wallSensPtr->update();
       objHub.rEncPtr ->update();
       objHub.lEncPtr ->update();

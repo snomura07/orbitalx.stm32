@@ -27,7 +27,7 @@ void Battery::update(){
 }
 
 void Battery::execAdc(){
-    raw = adc->adcValues[BATTERY_CH];
+    raw = adc->adcBuff[BATTERY_CH];
 }
 
 void Battery::dump(){
