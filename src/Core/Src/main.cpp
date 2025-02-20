@@ -197,7 +197,7 @@ int main(void)
     // objHub.wallSensPtr->dump();
 
     // objHub.battPtr->dump();
-    // objHub.imuPtr->dump();
+    objHub.imuPtr->dump();
     // objHub.rEncPtr->dump();
 
     // objHub.usartPtr->sendString("[adc]@");
@@ -413,10 +413,10 @@ static void MX_SPI1_Init(void)
   hspi1.Init.Mode = SPI_MODE_MASTER;
   hspi1.Init.Direction = SPI_DIRECTION_2LINES;
   hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
-  hspi1.Init.CLKPolarity = SPI_POLARITY_HIGH;
-  hspi1.Init.CLKPhase = SPI_PHASE_2EDGE;
+  hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
+  hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
   hspi1.Init.NSS = SPI_NSS_SOFT;
-  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_16;
+  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_32;
   hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
   hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
@@ -830,15 +830,15 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
     // TIM7 callback -> 1call per 10ms
     if (htim->Instance == TIM7) {
-      objHub.usartPtr->sendString("[adc]@");
-      objHub.usartPtr->sendUint16t(objHub.rEncPtr->currRaw);
-      objHub.usartPtr->sendString(",");
-      objHub.usartPtr->sendUint16t(objHub.lEncPtr->currRaw);
-      objHub.usartPtr->sendString(",");
-      objHub.usartPtr->sendUint16t(objHub.rEncPtr->counter);
-      objHub.usartPtr->sendString(",");
-      objHub.usartPtr->sendUint16t(objHub.lEncPtr->counter);
-      objHub.usartPtr->sendString("\r\n");
+      // objHub.usartPtr->sendString("[adc]@");
+      // objHub.usartPtr->sendUint16t(objHub.rEncPtr->currRaw);
+      // objHub.usartPtr->sendString(",");
+      // objHub.usartPtr->sendUint16t(objHub.lEncPtr->currRaw);
+      // objHub.usartPtr->sendString(",");
+      // objHub.usartPtr->sendUint16t(objHub.rEncPtr->counter);
+      // objHub.usartPtr->sendString(",");
+      // objHub.usartPtr->sendUint16t(objHub.lEncPtr->counter);
+      // objHub.usartPtr->sendString("\r\n");
       // failSafe.update();
     }
 }

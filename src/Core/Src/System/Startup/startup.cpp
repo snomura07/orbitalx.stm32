@@ -38,7 +38,7 @@ void Startup::checkImu(){
     sendMessage(objHub->imuPtr->getChipName());
     sendMessage("\r\n");
     sendMessage("WHO_AM_I: ");
-    sendInt(objHub->imuPtr->whoAmI());
+    sendInt(objHub->imuPtr->whoAmI);
     sendMessage("\r\n\r\n");
 }
 

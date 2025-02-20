@@ -15,13 +15,13 @@ public:
     };
     Axis accelRaw;
     Axis gyroRaw;
+    uint8_t whoAmI;
     static Imu* instance;
 
 public:
     Imu(SPI_HandleTypeDef &hspi_, uint8_t deviceAddress = ICM20648::DEFAULT_ADDRESS);
     ~Imu();
     bool init();
-    uint8_t whoAmI();
     void update();
     void dump();
     char* getChipName();
@@ -36,9 +36,8 @@ private:
 private:
     SPI_HandleTypeDef *hspi;
     uint8_t devAddr;
-    bool dmaTransferInProgress;
     uint8_t txBuffDma[13];  // 最大12バイト + レジスタアドレス
-    uint8_t rxBuffDma[12];  // 受信用バッファ
+    uint8_t rxBuffDma[13];  // 受信用バッファ
 };
 
 #endif
