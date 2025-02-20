@@ -9,8 +9,10 @@
 #include <Encoder/encoder.h>
 #include <Battery/battery.h>
 #include <WallSensor/wall_sensor.h>
+#include <Iled/i_led.h>
 #include <TimerCount/timer_count.h>
 #include <Usart/usart.h>
+#include <Adc/adc.h>
 
 class ObjectHub {
 public:
@@ -33,9 +35,11 @@ public:
     Motor *lMotPtr;
     Battery *battPtr;
     WallSensor *wallSensPtr;
+    Iled *iledPtr;
     Map *mapPtr;
     TimerCount *timerCntPtr;
     Usart *usartPtr;
+    Adc *adcPtr;
 };
 
 #endif

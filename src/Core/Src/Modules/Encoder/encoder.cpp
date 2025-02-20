@@ -1,19 +1,28 @@
 #include "encoder.h"
 
-Encoder::Encoder(ADC_HandleTypeDef &hadc_, ModeEnum mode_):
-    hadc(&hadc_),
+Encoder::Encoder(Adc *adc_, ModeEnum mode_):
+    adc(adc_),
     mode(mode_),
     counter(0),
     currRaw(0),
     preRaw(0),
-    uCnt(0),
-    max(0),
-    min(9999),
-    currThreUP(0),
-    currThreDown(0),
-    THRE_UP(3845),
-    THRE_DOWN(3835)
+    upTriggered(false),
+    downTriggered(false),
+    staticCounter(0),
+    lastCheckedValue(0),
+    staticThreshold(0)
 {
+    memset(buff, 0, sizeof(buff));
+    if(mode == RIGHT){
+        THRE_UP   = 3600;
+        THRE_DOWN = 3200;
+        staticThreshold = 50;
+    }
+    else {
+        THRE_UP   = 1400;
+        THRE_DOWN = 1050;
+        staticThreshold = 50;
+    }
 }
 Encoder::~Encoder(){}
 
@@ -22,60 +31,50 @@ void Encoder::update(){
 }
 
 void Encoder::execAdc(){
-    ADC_ChannelConfTypeDef sConfig = {0};
+    uint16_t* encBuff   = (mode == RIGHT) ? adc->rightEncBuff : adc->leftEncBuff;
+    int dataCount       = (mode == RIGHT) ? adc->rightEncDataCount : adc->leftEncDataCount;
 
-    if(mode == RIGHT){
-        sConfig.Channel = ADC_CHANNEL_1;
-    }
-    if(mode == LEFT){
-        sConfig.Channel = ADC_CHANNEL_5;
-    }
-    sConfig.Rank = ADC_REGULAR_RANK_1;
-    sConfig.SamplingTime = ADC_SAMPLETIME_12CYCLES_5;
-    HAL_ADC_ConfigChannel(hadc, &sConfig);
+    // **バッファの最新値を取得**
+    int latestIndex = (dataCount > 0) ? dataCount - 1 : 0;
+    uint16_t latestValue = encBuff[latestIndex];
 
-    HAL_ADC_Start(hadc);
-    HAL_ADC_PollForConversion(hadc, HAL_MAX_DELAY); // 変換完了待ち
-    uint16_t raw = HAL_ADC_GetValue(hadc);
-    HAL_ADC_Stop(hadc);
-
-    preRaw  = currRaw;
-    currRaw = raw;
-    // ↑↓
-    if (currRaw > THRE_UP && preRaw <= THRE_UP) {
-        counter++;
-    }
-    else if (currRaw <= THRE_UP && preRaw > THRE_UP) {
-        counter++;
+    // **一定回数前の値と比較**
+    if (abs(latestValue - lastCheckedValue) < staticThreshold) {
+        staticCounter++;
+    } else {
+        staticCounter = 0;
     }
 
-    // ↓↑
-    else if (currRaw < THRE_DOWN && preRaw >= THRE_DOWN) {
-        counter++;
-    }
-    else if (currRaw >= THRE_DOWN && preRaw < THRE_DOWN) {
-        counter++;
+    lastCheckedValue = latestValue;
+
+    // **50回（約50ms）以上ほぼ同じなら静止と判断**
+    if (staticCounter >= 50){
+        return;
     }
 
+    for (int i = 0; i < dataCount; i++) {
+        preRaw  = currRaw;
+        currRaw = encBuff[i];
 
-    if(currRaw > max){
-        max = currRaw;
-    }
-    if(currRaw < min){
-        min = currRaw;
-    }
-
-    uCnt++;
-    if(uCnt == 100){
-        if((max-min) > 10){
-            currThreUP   = max - 5;
-            currThreDown = min + 10;
-            THRE_UP = currThreUP;
-            THRE_DOWN = currThreDown;
-            max  = 0;
-            min  = 9999;
+        // **通常のカウント処理**
+        if (!upTriggered && preRaw <= THRE_UP && currRaw > THRE_UP) {
+            counter++;
+            upTriggered = true;
+            downTriggered = false;
         }
-        uCnt = 0;
+        else if (!downTriggered && preRaw >= THRE_DOWN && currRaw < THRE_DOWN) {
+            counter++;
+            downTriggered = true;
+            upTriggered = false;
+        }
+
+        // **リセット処理**
+        if (upTriggered && currRaw < THRE_DOWN - 100) {
+            upTriggered = false;
+        }
+        if (downTriggered && currRaw > THRE_UP + 100) {
+            downTriggered = false;
+        }
     }
 }
 
@@ -86,16 +85,10 @@ void Encoder::dump(){
     sendMessage("cnt:");
     sendLong(counter);
     sendMessage(", ");
-    sendMessage("max:");
-    sendLong(max);
-    sendMessage(", ");
-    sendMessage("min:");
-    sendLong(min);
-    sendMessage(",");
     sendMessage("ThreUP:");
-    sendLong(currThreUP);
+    sendLong(THRE_UP);
     sendMessage(", ");
     sendMessage("ThreDown:");
-    sendLong(currThreDown);
+    sendLong(THRE_DOWN);
     sendMessage("\r\n");
 }

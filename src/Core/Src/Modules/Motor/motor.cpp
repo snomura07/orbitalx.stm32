@@ -19,7 +19,7 @@ void Motor::stop(){
 
 void Motor::setDuty(uint16_t duty){
     if(mode == LEFT){
-	  HAL_GPIO_WritePin(MOTA_IN1_GPIO_Port, MOTA_IN1_Pin, GPIO_PIN_SET);
+	  HAL_GPIO_WritePin(MOTA_IN1_GPIO_Port, MOTA_IN1_Pin, GPIO_PIN_RESET);
     }
     if(mode == RIGHT){
 	  HAL_GPIO_WritePin(MOTB_IN1_GPIO_Port, MOTB_IN1_Pin, GPIO_PIN_SET);
