@@ -185,10 +185,8 @@ int main(void)
   startup.run();
   objHub.ledBlueFrontPtr->on();
   objHub.ledBlueBackPtr->on();
-  // objHub.rMotPtr->start();
-  // objHub.lMotPtr->start();
-  // objHub.rMotPtr->setDuty(100);
-  // objHub.lMotPtr->setDuty(300);
+  objHub.rMotPtr->start();
+  objHub.lMotPtr->start();
 
   /* USER CODE END 2 */
 
@@ -202,16 +200,24 @@ int main(void)
     // objHub.imuPtr->dump();
     // objHub.rEncPtr->dump();
 
-    objHub.usartPtr->sendString("[adc]@");
-    objHub.usartPtr->sendUint16t(objHub.rEncPtr->currRaw);
-    objHub.usartPtr->sendString(",");
-    objHub.usartPtr->sendUint16t(objHub.lEncPtr->currRaw);
-    objHub.usartPtr->sendString(",");
-    objHub.usartPtr->sendUint16t(objHub.rEncPtr->counter);
-    objHub.usartPtr->sendString(",");
-    objHub.usartPtr->sendUint16t(objHub.lEncPtr->counter);
-    objHub.usartPtr->sendString("\r\n");
+    // objHub.usartPtr->sendString("[adc]@");
+    // objHub.usartPtr->sendUint16t(objHub.rEncPtr->currRaw);
+    // objHub.usartPtr->sendString(",");
+    // objHub.usartPtr->sendUint16t(objHub.lEncPtr->currRaw);
+    // objHub.usartPtr->sendString(",");
+    // objHub.usartPtr->sendUint16t(objHub.rEncPtr->counter);
+    // objHub.usartPtr->sendString(",");
+    // objHub.usartPtr->sendUint16t(objHub.lEncPtr->counter);
+    // objHub.usartPtr->sendString("\r\n");
 
+    // objHub.lMotPtr->setDuty(0);
+    // objHub.lEncPtr->counter = 0;
+    // HAL_Delay(2000);
+    // objHub.lMotPtr->setDuty(300);
+    // HAL_Delay(2000);
+    // objHub.lMotPtr->setDuty(0);
+    // objHub.lEncPtr->counter = 0;
+    // HAL_Delay(2000);
     HAL_Delay(10);
 
     /* USER CODE END WHILE */
@@ -804,9 +810,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
     if (htim->Instance == TIM1) {
       objHub.timerCntPtr->update();
       objHub.wallSensPtr->update();
-      objHub.rEncPtr ->update();
-      objHub.lEncPtr ->update();
-      objHub.battPtr->update();
+      objHub.rEncPtr    ->update();
+      objHub.lEncPtr    ->update();
+      objHub.adcPtr     ->resetEncDataCount();
+      objHub.battPtr    ->update();
     }
 
     // TIM15 callback -> 1call/s
@@ -823,6 +830,15 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
     // TIM7 callback -> 1call per 10ms
     if (htim->Instance == TIM7) {
+      objHub.usartPtr->sendString("[adc]@");
+      objHub.usartPtr->sendUint16t(objHub.rEncPtr->currRaw);
+      objHub.usartPtr->sendString(",");
+      objHub.usartPtr->sendUint16t(objHub.lEncPtr->currRaw);
+      objHub.usartPtr->sendString(",");
+      objHub.usartPtr->sendUint16t(objHub.rEncPtr->counter);
+      objHub.usartPtr->sendString(",");
+      objHub.usartPtr->sendUint16t(objHub.lEncPtr->counter);
+      objHub.usartPtr->sendString("\r\n");
       // failSafe.update();
     }
 }

@@ -6,14 +6,23 @@ Encoder::Encoder(Adc *adc_, ModeEnum mode_):
     counter(0),
     currRaw(0),
     preRaw(0),
-    THRE_UP(0),
-    THRE_DOWN(0),
-    THRE_UP_RIGHT(3451),
-    THRE_DOWN_RIGHT(2841),
-    THRE_UP_LEFT(2100),
-    THRE_DOWN_LEFT(1750)
+    upTriggered(false),
+    downTriggered(false),
+    staticCounter(0),
+    lastCheckedValue(0),
+    staticThreshold(0)
 {
     memset(buff, 0, sizeof(buff));
+    if(mode == RIGHT){
+        THRE_UP   = 3600;
+        THRE_DOWN = 3200;
+        staticThreshold = 50;
+    }
+    else {
+        THRE_UP   = 1400;
+        THRE_DOWN = 1050;
+        staticThreshold = 50;
+    }
 }
 Encoder::~Encoder(){}
 
@@ -22,40 +31,51 @@ void Encoder::update(){
 }
 
 void Encoder::execAdc(){
-    for (int i = 0; i < adc->encDataCount; i++) {
-        uint16_t raw = 0;
-        if(mode == RIGHT){
-            raw       = adc->encBuff[i][0];
-            THRE_UP   = THRE_UP_RIGHT;
-            THRE_DOWN = THRE_DOWN_RIGHT;
-        }
-        else{
-            raw       = adc->encBuff[i][1];
-            THRE_UP   = THRE_UP_LEFT;
-            THRE_DOWN = THRE_DOWN_LEFT;
-        }
+    uint16_t* encBuff   = (mode == RIGHT) ? adc->rightEncBuff : adc->leftEncBuff;
+    int dataCount       = (mode == RIGHT) ? adc->rightEncDataCount : adc->leftEncDataCount;
 
+    // **バッファの最新値を取得**
+    int latestIndex = (dataCount > 0) ? dataCount - 1 : 0;
+    uint16_t latestValue = encBuff[latestIndex];
+
+    // **一定回数前の値と比較**
+    if (abs(latestValue - lastCheckedValue) < staticThreshold) {
+        staticCounter++;
+    } else {
+        staticCounter = 0;
+    }
+
+    lastCheckedValue = latestValue;
+
+    // **50回（約50ms）以上ほぼ同じなら静止と判断**
+    if (staticCounter >= 50){
+        return;
+    }
+
+    for (int i = 0; i < dataCount; i++) {
         preRaw  = currRaw;
-        currRaw = raw;
+        currRaw = encBuff[i];
 
-        // ** THRE_UP を超えた時 **
-        if (preRaw <= THRE_UP && currRaw > THRE_UP) {
+        // **通常のカウント処理**
+        if (!upTriggered && preRaw <= THRE_UP && currRaw > THRE_UP) {
             counter++;
+            upTriggered = true;
+            downTriggered = false;
         }
-        // ** THRE_UP を下回った時 **
-        else if (preRaw >= THRE_UP && currRaw < THRE_UP) {
+        else if (!downTriggered && preRaw >= THRE_DOWN && currRaw < THRE_DOWN) {
             counter++;
+            downTriggered = true;
+            upTriggered = false;
         }
-        // ** THRE_DOWN を下回った時 **
-        else if (preRaw >= THRE_DOWN && currRaw < THRE_DOWN) {
-            counter++;
+
+        // **リセット処理**
+        if (upTriggered && currRaw < THRE_DOWN - 100) {
+            upTriggered = false;
         }
-        // ** THRE_DOWN を超えた時 **
-        else if (preRaw <= THRE_DOWN && currRaw > THRE_DOWN) {
-            counter++;
+        if (downTriggered && currRaw > THRE_UP + 100) {
+            downTriggered = false;
         }
     }
-    adc->resetEncDataCount();
 }
 
 void Encoder::dump(){

@@ -7,11 +7,13 @@ class Adc {
 public:
     static Adc* instance;
     static constexpr uint8_t BUFF_SIZE    = 200;
-    static constexpr uint8_t ENC_CHANNELS = 2;
     uint16_t adcBuff[7];
-    uint16_t encBuff[BUFF_SIZE][ENC_CHANNELS];
-    int encWriteIndex;
-    int encDataCount;
+    uint16_t rightEncBuff[BUFF_SIZE];
+    uint16_t leftEncBuff[BUFF_SIZE];
+    int rightEncWriteIndex;
+    int rightEncDataCount;
+    int leftEncWriteIndex;
+    int leftEncDataCount;
 public:
     Adc(ADC_HandleTypeDef &hadc_, Iled *iled_);
     ~Adc();

@@ -24,12 +24,13 @@ private:
 	ModeEnum mode;
     uint16_t THRE_UP;
     uint16_t THRE_DOWN;
-    uint16_t THRE_UP_RIGHT;
-    uint16_t THRE_DOWN_RIGHT;
-    uint16_t THRE_UP_LEFT;
-    uint16_t THRE_DOWN_LEFT;
     static constexpr uint8_t BUFF_SIZE = 16;
     uint16_t buff[BUFF_SIZE];
+    bool upTriggered;
+    bool downTriggered;
+    int staticCounter;
+    uint16_t lastCheckedValue;
+    uint16_t staticThreshold;
 
 public:
     uint32_t counter;

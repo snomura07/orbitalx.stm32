@@ -6,8 +6,10 @@ Adc* Adc::instance = nullptr;
 Adc::Adc(ADC_HandleTypeDef &hadc_, Iled *iled_ ):
     hadc(&hadc_),
     iled(iled_),
-    encWriteIndex(0),
-    encDataCount(0)
+    rightEncWriteIndex(0),
+    rightEncDataCount(0),
+    leftEncWriteIndex(0),
+    leftEncDataCount(0)
 {
     instance = this;
 }
@@ -33,19 +35,25 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
 }
 
 void Adc::handleDMAComplete() {
-    encBuff[encWriteIndex][0] = adcBuff[RIGHT_ENC_CH];
-    encBuff[encWriteIndex][1] = adcBuff[LEFT_ENC_CH];
-
     // リングバッファの更新
-    encWriteIndex = (encWriteIndex + 1) % BUFF_SIZE;
-    if (encDataCount < BUFF_SIZE) {
-        encDataCount++;
+    rightEncBuff[rightEncWriteIndex] = adcBuff[RIGHT_ENC_CH];
+    leftEncBuff[leftEncWriteIndex]   = adcBuff[LEFT_ENC_CH];
+    rightEncWriteIndex = (rightEncWriteIndex + 1) % BUFF_SIZE;
+    if (rightEncDataCount < BUFF_SIZE) {
+        rightEncDataCount++;
+    }
+
+    leftEncWriteIndex = (leftEncWriteIndex + 1) % BUFF_SIZE;
+    if (leftEncDataCount < BUFF_SIZE) {
+        leftEncDataCount++;
     }
 
     iled->off();
 }
 
 void Adc::resetEncDataCount() {
-    encDataCount  = 0;
-    encWriteIndex = 0;
+    rightEncDataCount  = 0;
+    rightEncWriteIndex = 0;
+    leftEncDataCount   = 0;
+    leftEncWriteIndex  = 0;
 }

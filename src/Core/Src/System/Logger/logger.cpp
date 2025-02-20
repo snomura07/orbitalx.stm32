@@ -29,35 +29,14 @@ void Logger::setLog3(int16_t val){
 }
 
 void Logger::dump(){
-    sendMessage("▼log1");
-    sendMessage("\r\n");
     for(int i=0; i<log1.log.MAX_SIZE; i++){
-        sendInt(i);
-        sendMessage(":");
+        sendMessage("[adc]@");
         sendInt(log1.log.getData(i));
-        sendMessage("\r\n");
-        HAL_Delay(1);
-    }
-    sendMessage("\r\n");
-
-    sendMessage("▼log2");
-    sendMessage("\r\n");
-    for(int i=0; i<log2.log.MAX_SIZE; i++){
-        sendInt(i);
-        sendMessage(":");
+        sendMessage(",");
         sendInt(log2.log.getData(i));
         sendMessage("\r\n");
-        HAL_Delay(1);
+        HAL_Delay(5);
     }
     sendMessage("\r\n");
 
-    sendMessage("▼log3");
-    sendMessage("\r\n");
-    for(int i=0; i<log3.log.MAX_SIZE; i++){
-        sendInt(i);
-        sendMessage(":");
-        sendInt(log3.log.getData(i));
-        sendMessage("\r\n");
-        HAL_Delay(1);
-    }
 }
