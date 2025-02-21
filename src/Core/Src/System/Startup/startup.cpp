@@ -71,5 +71,5 @@ void Startup::checkTimer(){
     sendMessage("\r\n");
     sendMessage("timer7 [1call/10ms]: ");
     sendMessage(timer7->isStarted()==true?"started":"stoped");
-    sendMessage("\r\n");
+    sendMessage("\r\n\r\n");
 }

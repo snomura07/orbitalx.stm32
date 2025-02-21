@@ -13,8 +13,18 @@ public:
         int16_t y;
         int16_t z;
     };
+    struct AxisLong
+    {
+        int32_t x;
+        int32_t y;
+        int32_t z;
+    };
     Axis accelRaw;
     Axis gyroRaw;
+    Axis accelOffset;
+    Axis gyroOffset;
+    Axis accelCorrected;
+    Axis gyroCorrected;
     uint8_t whoAmI;
     static Imu* instance;
 
@@ -23,6 +33,7 @@ public:
     ~Imu();
     bool init();
     void update();
+    void calcZeroPoint(int32_t samples);
     void dump();
     char* getChipName();
     void handleDMAComplete();

@@ -8,6 +8,8 @@ Imu::Imu(SPI_HandleTypeDef &hspi_, uint8_t deviceAddress):
     whoAmI(0xFF)
 {
     instance = this;
+    accelOffset = {-802, 111, 16474};
+    gyroOffset  = {-63, -4, 90};
 }
 Imu::~Imu(){}
 
@@ -38,6 +40,73 @@ bool Imu::init() {
     startDMATransfer();
     return true;
 }
+
+void Imu::update() {
+    // 値の数値の取得はDMAで裏で実行
+    accelCorrected.x = accelRaw.x - accelOffset.x;
+    accelCorrected.y = accelRaw.y - accelOffset.y;
+    accelCorrected.z = accelRaw.z - accelOffset.z;
+    gyroCorrected.x  = gyroRaw.x  - gyroOffset.x;
+    gyroCorrected.y  = gyroRaw.y  - gyroOffset.y;
+    gyroCorrected.z  = gyroRaw.z  - gyroOffset.z;
+}
+
+void Imu::calcZeroPoint(int32_t samples) {
+    AxisLong accelSum = {0, 0, 0};
+    AxisLong gyroSum  = {0, 0, 0};
+
+    for (int i = 0; i < samples; i++) {
+        HAL_Delay(10);  // 10msごとにサンプリング
+
+        accelSum.x += accelRaw.x;
+        accelSum.y += accelRaw.y;
+        accelSum.z += accelRaw.z;
+
+        gyroSum.x  += gyroRaw.x;
+        gyroSum.y  += gyroRaw.y;
+        gyroSum.z  += gyroRaw.z;
+
+        sendInt(i);
+        sendMessage(" sum: ");
+        sendLong(accelSum.x);
+        sendMessage(", ");
+        sendLong(accelSum.y);
+        sendMessage(", ");
+        sendLong(accelSum.z);
+        sendMessage(", ");
+        sendLong(gyroSum.x);
+        sendMessage(", ");
+        sendLong(gyroSum.y);
+        sendMessage(", ");
+        sendLong(gyroSum.z);
+        sendMessage("\r\n");
+    }
+
+    // 平均値をゼロ点として設定
+    accelOffset.x = static_cast<int16_t>(accelSum.x / samples);
+    accelOffset.y = static_cast<int16_t>(accelSum.y / samples);
+    accelOffset.z = static_cast<int16_t>(accelSum.z / samples);
+
+    gyroOffset.x  = static_cast<int16_t>(gyroSum.x / samples);
+    gyroOffset.y  = static_cast<int16_t>(gyroSum.y / samples);
+    gyroOffset.z  = static_cast<int16_t>(gyroSum.z / samples);
+
+    sendMessage("accel offset: ");
+    sendLong(accelOffset.x);
+    sendMessage(", ");
+    sendLong(accelOffset.y);
+    sendMessage(", ");
+    sendLong(accelOffset.z);
+    sendMessage("\r\n");
+    sendMessage("gyro offset: ");
+    sendLong(gyroOffset.x);
+    sendMessage(", ");
+    sendLong(gyroOffset.y);
+    sendMessage(", ");
+    sendLong(gyroOffset.z);
+    sendMessage("\r\n");
+}
+
 
 void Imu::startDMATransfer() {
     txBuffDma[0] = ICM20648::ACCEL_XOUT_H | 0x80;
@@ -103,7 +172,23 @@ bool Imu::readRegister(uint8_t reg, uint8_t* data, uint16_t size) {
 }
 
 void Imu::dump(){
-    sendMessage("accel[LSB]: ");
+    sendMessage("accel[CORR]: ");
+    sendInt(accelCorrected.x);
+    sendMessage(", ");
+    sendInt(accelCorrected.y);
+    sendMessage(", ");
+    sendInt(accelCorrected.z);
+    sendMessage(", ");
+
+    sendMessage("gyro[CORR] : ");
+    sendInt(gyroCorrected.x);
+    sendMessage(", ");
+    sendInt(gyroCorrected.y);
+    sendMessage(", ");
+    sendInt(gyroCorrected.z);
+    sendMessage(", ");
+
+    sendMessage("accel[RAW]: ");
     sendInt(accelRaw.x);
     sendMessage(", ");
     sendInt(accelRaw.y);
@@ -111,7 +196,7 @@ void Imu::dump(){
     sendInt(accelRaw.z);
     sendMessage(", ");
 
-    sendMessage("gyro[LSB] : ");
+    sendMessage("gyro[RAW] : ");
     sendInt(gyroRaw.x);
     sendMessage(", ");
     sendInt(gyroRaw.y);

@@ -185,8 +185,11 @@ int main(void)
   startup.run();
   objHub.ledBlueFrontPtr->on();
   objHub.ledBlueBackPtr->on();
-  objHub.rMotPtr->start();
-  objHub.lMotPtr->start();
+  // objHub.rMotPtr->start();
+  // objHub.lMotPtr->start();
+
+  // HAL_Delay(1000);
+  // objHub.imuPtr->calcZeroPoint(500);
 
   /* USER CODE END 2 */
 
@@ -194,10 +197,11 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+    objHub.imuPtr->dump();
+
     // objHub.wallSensPtr->dump();
 
     // objHub.battPtr->dump();
-    objHub.imuPtr->dump();
     // objHub.rEncPtr->dump();
 
     // objHub.usartPtr->sendString("[adc]@");
@@ -814,6 +818,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
       objHub.lEncPtr    ->update();
       objHub.adcPtr     ->resetEncDataCount();
       objHub.battPtr    ->update();
+      objHub.imuPtr     ->update();
     }
 
     // TIM15 callback -> 1call/s
