@@ -1,24 +1,12 @@
 #ifndef IMU_H
 #define IMU_H
 
-#include "icm_20648.h"
-#include <stm32g4xx_hal.h>
+#include <MasterDefine.h>
 #include <UsartInterface/usart_interface.h>
+#include "icm_20648.h"
 
 class Imu : public UsartInterface{
 public:
-    struct Axis
-    {
-        int16_t x;
-        int16_t y;
-        int16_t z;
-    };
-    struct AxisLong
-    {
-        int32_t x;
-        int32_t y;
-        int32_t z;
-    };
     Axis accelRaw;
     Axis gyroRaw;
     Axis accelOffset;
@@ -35,8 +23,10 @@ public:
     void update();
     void calcZeroPoint(int32_t samples);
     void dump();
-    char* getChipName();
     void handleDMAComplete();
+    char* getChipName();
+    float getGyroScale();
+    float getAccelScale();
 
 private:
     void startDMATransfer();

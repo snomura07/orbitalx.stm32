@@ -37,7 +37,11 @@
 #include <FailSafe/fail_safe.h>
 #include <Logger/logger.h>
 #include <Adc/adc.h>
-
+#include <AngularVelocity/angular_velocity.h>
+#include <Angle/angle.h>
+#include <Accel/accel.h>
+#include <Velocity/velocity.h>
+#include <Distance/distance.h>
 
 /* USER CODE END Includes */
 
@@ -128,24 +132,30 @@ int main(void)
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
-  objHub.ledBlueFrontPtr = new Led(Led::ModeEnum::BLUE_FRONT);
-  objHub.ledBlueBackPtr  = new Led(Led::ModeEnum::BLUE_BACK);
-  objHub.ledOrangePtr    = new Led(Led::ModeEnum::ORANGE);
-  objHub.ledGreenPtr     = new Led(Led::ModeEnum::GREEN);
-  objHub.ledRedPtr       = new Led(Led::ModeEnum::RED);
-  objHub.ledDarkGreenPtr = new Led(Led::ModeEnum::DARK_GREEN);
-  objHub.iledPtr         = new Iled();
-  objHub.adcPtr          = new Adc(hadc1, objHub.iledPtr);
-  objHub.wallSensPtr     = new WallSensor(objHub.adcPtr, objHub.iledPtr);
-  objHub.imuPtr          = new Imu(hspi1);
-  objHub.rEncPtr         = new Encoder(objHub.adcPtr, Encoder::ModeEnum::RIGHT);
-  objHub.lEncPtr         = new Encoder(objHub.adcPtr, Encoder::ModeEnum::LEFT);
-  objHub.rMotPtr         = new Motor(htim3, Motor::ModeEnum::RIGHT);
-  objHub.lMotPtr         = new Motor(htim2, Motor::ModeEnum::LEFT);
-  objHub.battPtr         = new Battery(objHub.adcPtr);
-  objHub.mapPtr          = new Map();
-  objHub.timerCntPtr     = new TimerCount();
-  objHub.usartPtr        = new Usart(huart1);
+  objHub.ledBlueFrontPtr    = new Led(Led::ModeEnum::BLUE_FRONT);
+  objHub.ledBlueBackPtr     = new Led(Led::ModeEnum::BLUE_BACK);
+  objHub.ledOrangePtr       = new Led(Led::ModeEnum::ORANGE);
+  objHub.ledGreenPtr        = new Led(Led::ModeEnum::GREEN);
+  objHub.ledRedPtr          = new Led(Led::ModeEnum::RED);
+  objHub.ledDarkGreenPtr    = new Led(Led::ModeEnum::DARK_GREEN);
+  objHub.iledPtr            = new Iled();
+  objHub.adcPtr             = new Adc(hadc1, objHub.iledPtr);
+  objHub.wallSensPtr        = new WallSensor(objHub.adcPtr, objHub.iledPtr);
+  objHub.imuPtr             = new Imu(hspi1);
+  objHub.rEncPtr            = new Encoder(objHub.adcPtr, Encoder::ModeEnum::RIGHT);
+  objHub.lEncPtr            = new Encoder(objHub.adcPtr, Encoder::ModeEnum::LEFT);
+  objHub.rMotPtr            = new Motor(htim3, Motor::ModeEnum::RIGHT);
+  objHub.lMotPtr            = new Motor(htim2, Motor::ModeEnum::LEFT);
+  objHub.battPtr            = new Battery(objHub.adcPtr);
+  objHub.mapPtr             = new Map();
+  objHub.timerCntPtr        = new TimerCount();
+  objHub.usartPtr           = new Usart(huart1);
+  objHub.angularVelocityPtr = new AngularVelocity(objHub.imuPtr);
+  objHub.anglePtr           = new Angle(objHub.angularVelocityPtr);
+  objHub.accelPtr           = new Accel(objHub.imuPtr);
+  objHub.velocityPtr        = new Velocity(objHub.accelPtr);
+  objHub.distancePtr        = new Distance(objHub.velocityPtr);
+
   objHub.initDependencies();
   startup.objHub  = &objHub;
   startup.timer1  = &timer1;
@@ -195,12 +205,21 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  objHub.anglePtr->reset();
+  objHub.velocityPtr->reset();
+  objHub.distancePtr->reset();
   while (1)
   {
-    objHub.imuPtr->dump();
-
+    // objHub.accelPtr->dump();
+    objHub.usartPtr->sendString("[adc]@");
+    objHub.usartPtr->sendInt16t(abs((int16_t)objHub.velocityPtr->mmps.y));
+    objHub.usartPtr->sendString("\r\n");
+    // objHub.velocityPtr->dump();
+    // objHub.distancePtr->dump();
+    // objHub.anglePtr->dump();
+    // objHub.angularVelocityPtr->dump();
+    // objHub.imuPtr->dump();
     // objHub.wallSensPtr->dump();
-
     // objHub.battPtr->dump();
     // objHub.rEncPtr->dump();
 
@@ -456,7 +475,7 @@ static void MX_TIM1_Init(void)
 
   /* USER CODE END TIM1_Init 1 */
   htim1.Instance = TIM1;
-  htim1.Init.Prescaler = 119;
+  htim1.Init.Prescaler = 239;
   htim1.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim1.Init.Period = 999;
   htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
@@ -819,6 +838,11 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
       objHub.adcPtr     ->resetEncDataCount();
       objHub.battPtr    ->update();
       objHub.imuPtr     ->update();
+      objHub.angularVelocityPtr ->update();
+      objHub.anglePtr   ->update();
+      objHub.accelPtr   ->update();
+      objHub.velocityPtr->update();
+      objHub.distancePtr->update();
     }
 
     // TIM15 callback -> 1call/s

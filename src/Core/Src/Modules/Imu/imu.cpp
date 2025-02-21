@@ -8,8 +8,8 @@ Imu::Imu(SPI_HandleTypeDef &hspi_, uint8_t deviceAddress):
     whoAmI(0xFF)
 {
     instance = this;
-    accelOffset = {-802, 111, 16474};
-    gyroOffset  = {-63, -4, 90};
+    accelOffset = {-100, 0, 2058};
+    gyroOffset  = {-6, 0, 9};
 }
 Imu::~Imu(){}
 
@@ -23,18 +23,29 @@ bool Imu::init() {
     uint8_t addr = 0x01;
     for(int i=0; i<5; i++){
         writeRegister(ICM20648::PWR_MGMT_1, &addr, 1);
-        HAL_Delay(100);
+        HAL_Delay(10);
     }
 
-    // 加速度: ±16g
-    addr = 0x18;
+    // バンク切り替え
+    uint8_t bank = 0x20;
+    writeRegister(ICM20648::REG_BANK_SEL, &bank, 1);
+    HAL_Delay(10);
+
+    // 加速度: ±16g, 11.5Hz-DLPF
+    addr = 0x2F;
     writeRegister(ICM20648::ACCEL_CONFIG, &addr, 1);
-    HAL_Delay(100);
+    HAL_Delay(10);
 
     // ジャイロ: ±2,000°/s
-    addr = 0x18;
+    addr = 0x06;
     writeRegister(ICM20648::GYRO_CONFIG, &addr, 1);
     HAL_Delay(100);
+
+    // バンク戻す
+    bank = 0x00;
+    writeRegister(ICM20648::REG_BANK_SEL, &bank, 1);
+    HAL_Delay(10);
+
 
     // DMAスタート
     startDMATransfer();
@@ -146,13 +157,11 @@ void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi) {
 
 bool Imu::writeRegister(uint8_t reg, uint8_t* data, uint16_t size) {
     uint8_t txBuffer[size + 1];
-    txBuffer[0] = reg & 0x7F;  // 最上位ビットをクリア (書き込み)
+    txBuffer[0] = reg;
     memcpy(&txBuffer[1], data, size);
 
     HAL_GPIO_WritePin(SPI_CS_GPIO_Port, SPI_CS_Pin, GPIO_PIN_RESET);
-    HAL_Delay(1);
     bool status = (HAL_SPI_Transmit(hspi, txBuffer, size + 1, HAL_MAX_DELAY) == HAL_OK);
-    HAL_Delay(1);
     HAL_GPIO_WritePin(SPI_CS_GPIO_Port, SPI_CS_Pin, GPIO_PIN_SET);
 
     return status;
@@ -162,10 +171,8 @@ bool Imu::readRegister(uint8_t reg, uint8_t* data, uint16_t size) {
     uint8_t txBuffer = reg | 0x80;  // 最上位ビットをセット (読み込み)
 
     HAL_GPIO_WritePin(SPI_CS_GPIO_Port, SPI_CS_Pin, GPIO_PIN_RESET);
-    HAL_Delay(1);
     bool status = (HAL_SPI_Transmit(hspi, &txBuffer, 1, HAL_MAX_DELAY) == HAL_OK &&
                    HAL_SPI_Receive(hspi, data, size, HAL_MAX_DELAY) == HAL_OK);
-    HAL_Delay(1);
     HAL_GPIO_WritePin(SPI_CS_GPIO_Port, SPI_CS_Pin, GPIO_PIN_SET);
 
     return status;
@@ -207,4 +214,12 @@ void Imu::dump(){
 
 char* Imu::getChipName() {
     return ICM20648::CHIP_NAME;
+}
+
+float Imu::getGyroScale() {
+    return ICM20648::GYRO_SCALE;
+}
+
+float Imu::getAccelScale() {
+    return ICM20648::ACCEL_SCALE;
 }
