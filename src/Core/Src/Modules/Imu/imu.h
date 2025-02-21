@@ -1,31 +1,32 @@
 #ifndef IMU_H
 #define IMU_H
 
-#include "icm_20648.h"
-#include <stm32g4xx_hal.h>
+#include <MasterDefine.h>
 #include <UsartInterface/usart_interface.h>
+#include "icm_20648.h"
 
 class Imu : public UsartInterface{
 public:
-    struct Axis
-    {
-        int16_t x;
-        int16_t y;
-        int16_t z;
-    };
     Axis accelRaw;
     Axis gyroRaw;
+    Axis accelOffset;
+    Axis gyroOffset;
+    Axis accelCorrected;
+    Axis gyroCorrected;
+    uint8_t whoAmI;
     static Imu* instance;
 
 public:
     Imu(SPI_HandleTypeDef &hspi_, uint8_t deviceAddress = ICM20648::DEFAULT_ADDRESS);
     ~Imu();
     bool init();
-    uint8_t whoAmI();
     void update();
+    void calcZeroPoint(int32_t samples);
     void dump();
-    char* getChipName();
     void handleDMAComplete();
+    char* getChipName();
+    float getGyroScale();
+    float getAccelScale();
 
 private:
     void startDMATransfer();
@@ -36,9 +37,8 @@ private:
 private:
     SPI_HandleTypeDef *hspi;
     uint8_t devAddr;
-    bool dmaTransferInProgress;
     uint8_t txBuffDma[13];  // 最大12バイト + レジスタアドレス
-    uint8_t rxBuffDma[12];  // 受信用バッファ
+    uint8_t rxBuffDma[13];  // 受信用バッファ
 };
 
 #endif

@@ -13,6 +13,11 @@
 #include <TimerCount/timer_count.h>
 #include <Usart/usart.h>
 #include <Adc/adc.h>
+#include <AngularVelocity/angular_velocity.h>
+#include <Angle/angle.h>
+#include <Accel/accel.h>
+#include <Velocity/velocity.h>
+#include <Distance/distance.h>
 
 class ObjectHub {
 public:
@@ -40,6 +45,11 @@ public:
     TimerCount *timerCntPtr;
     Usart *usartPtr;
     Adc *adcPtr;
+    AngularVelocity *angularVelocityPtr;
+    Angle *anglePtr;
+    Accel *accelPtr;
+    Velocity *velocityPtr;
+    Distance *distancePtr;
 };
 
 #endif

@@ -20,7 +20,7 @@ Encoder::Encoder(Adc *adc_, ModeEnum mode_):
     }
     else {
         THRE_UP   = 1400;
-        THRE_DOWN = 1050;
+        THRE_DOWN = 1100;
         staticThreshold = 50;
     }
 }

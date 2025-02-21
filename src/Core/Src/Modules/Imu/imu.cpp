@@ -5,37 +5,121 @@ Imu* Imu::instance;
 Imu::Imu(SPI_HandleTypeDef &hspi_, uint8_t deviceAddress):
     hspi(&hspi_),
     devAddr(deviceAddress << 1),
-    dmaTransferInProgress(false)
+    whoAmI(0xFF)
 {
     instance = this;
+    accelOffset = {-100, 0, 2058};
+    gyroOffset  = {-6, 0, 9};
 }
 Imu::~Imu(){}
 
 bool Imu::init() {
+    // who am i 取得 何回か取得
+    for(int i=0; i<5; i++){
+        readRegister(ICM20648::WHO_AM_I, &whoAmI, 1);
+    }
+
     // スリープ解除 一度送信しただけじゃ解除されないので複数回送信
     uint8_t addr = 0x01;
     for(int i=0; i<5; i++){
         writeRegister(ICM20648::PWR_MGMT_1, &addr, 1);
-        HAL_Delay(100);
+        HAL_Delay(10);
     }
 
-    // 加速度: ±16g
-    addr = 0x18;
+    // バンク切り替え
+    uint8_t bank = 0x20;
+    writeRegister(ICM20648::REG_BANK_SEL, &bank, 1);
+    HAL_Delay(10);
+
+    // 加速度: ±16g, 11.5Hz-DLPF
+    addr = 0x2F;
     writeRegister(ICM20648::ACCEL_CONFIG, &addr, 1);
-    HAL_Delay(100);
+    HAL_Delay(10);
 
     // ジャイロ: ±2,000°/s
-    addr = 0x18;
+    addr = 0x06;
     writeRegister(ICM20648::GYRO_CONFIG, &addr, 1);
     HAL_Delay(100);
+
+    // バンク戻す
+    bank = 0x00;
+    writeRegister(ICM20648::REG_BANK_SEL, &bank, 1);
+    HAL_Delay(10);
+
 
     // DMAスタート
     startDMATransfer();
     return true;
 }
 
+void Imu::update() {
+    // 値の数値の取得はDMAで裏で実行
+    accelCorrected.x = accelRaw.x - accelOffset.x;
+    accelCorrected.y = accelRaw.y - accelOffset.y;
+    accelCorrected.z = accelRaw.z - accelOffset.z;
+    gyroCorrected.x  = gyroRaw.x  - gyroOffset.x;
+    gyroCorrected.y  = gyroRaw.y  - gyroOffset.y;
+    gyroCorrected.z  = gyroRaw.z  - gyroOffset.z;
+}
+
+void Imu::calcZeroPoint(int32_t samples) {
+    AxisLong accelSum = {0, 0, 0};
+    AxisLong gyroSum  = {0, 0, 0};
+
+    for (int i = 0; i < samples; i++) {
+        HAL_Delay(10);  // 10msごとにサンプリング
+
+        accelSum.x += accelRaw.x;
+        accelSum.y += accelRaw.y;
+        accelSum.z += accelRaw.z;
+
+        gyroSum.x  += gyroRaw.x;
+        gyroSum.y  += gyroRaw.y;
+        gyroSum.z  += gyroRaw.z;
+
+        sendInt(i);
+        sendMessage(" sum: ");
+        sendLong(accelSum.x);
+        sendMessage(", ");
+        sendLong(accelSum.y);
+        sendMessage(", ");
+        sendLong(accelSum.z);
+        sendMessage(", ");
+        sendLong(gyroSum.x);
+        sendMessage(", ");
+        sendLong(gyroSum.y);
+        sendMessage(", ");
+        sendLong(gyroSum.z);
+        sendMessage("\r\n");
+    }
+
+    // 平均値をゼロ点として設定
+    accelOffset.x = static_cast<int16_t>(accelSum.x / samples);
+    accelOffset.y = static_cast<int16_t>(accelSum.y / samples);
+    accelOffset.z = static_cast<int16_t>(accelSum.z / samples);
+
+    gyroOffset.x  = static_cast<int16_t>(gyroSum.x / samples);
+    gyroOffset.y  = static_cast<int16_t>(gyroSum.y / samples);
+    gyroOffset.z  = static_cast<int16_t>(gyroSum.z / samples);
+
+    sendMessage("accel offset: ");
+    sendLong(accelOffset.x);
+    sendMessage(", ");
+    sendLong(accelOffset.y);
+    sendMessage(", ");
+    sendLong(accelOffset.z);
+    sendMessage("\r\n");
+    sendMessage("gyro offset: ");
+    sendLong(gyroOffset.x);
+    sendMessage(", ");
+    sendLong(gyroOffset.y);
+    sendMessage(", ");
+    sendLong(gyroOffset.z);
+    sendMessage("\r\n");
+}
+
+
 void Imu::startDMATransfer() {
-    dmaTransferInProgress = false;
     txBuffDma[0] = ICM20648::ACCEL_XOUT_H | 0x80;
 
     HAL_GPIO_WritePin(SPI_CS_GPIO_Port, SPI_CS_Pin, GPIO_PIN_RESET);
@@ -52,7 +136,9 @@ void Imu::handleDMAComplete() {
     gyroRaw.y  = (int16_t)((rxBuffDma[9]  << 8) | rxBuffDma[10]);
     gyroRaw.z  = (int16_t)((rxBuffDma[11] << 8) | rxBuffDma[12]);
 
-    dmaTransferInProgress = false;
+    HAL_DMA_Abort(hspi->hdmatx);
+    HAL_DMA_Abort(hspi->hdmarx);
+
     startDMATransfer();
 }
 
@@ -69,17 +155,9 @@ void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi) {
     }
 }
 
-uint8_t Imu::whoAmI() {
-    uint8_t whoAmI = 0;
-    if (!readRegister(ICM20648::WHO_AM_I, &whoAmI, 1)) {
-        return 0xFF;
-    }
-    return whoAmI;
-}
-
 bool Imu::writeRegister(uint8_t reg, uint8_t* data, uint16_t size) {
     uint8_t txBuffer[size + 1];
-    txBuffer[0] = reg & 0x7F;  // 最上位ビットをクリア (書き込み)
+    txBuffer[0] = reg;
     memcpy(&txBuffer[1], data, size);
 
     HAL_GPIO_WritePin(SPI_CS_GPIO_Port, SPI_CS_Pin, GPIO_PIN_RESET);
@@ -101,7 +179,23 @@ bool Imu::readRegister(uint8_t reg, uint8_t* data, uint16_t size) {
 }
 
 void Imu::dump(){
-    sendMessage("accel[LSB]: ");
+    sendMessage("accel[CORR]: ");
+    sendInt(accelCorrected.x);
+    sendMessage(", ");
+    sendInt(accelCorrected.y);
+    sendMessage(", ");
+    sendInt(accelCorrected.z);
+    sendMessage(", ");
+
+    sendMessage("gyro[CORR] : ");
+    sendInt(gyroCorrected.x);
+    sendMessage(", ");
+    sendInt(gyroCorrected.y);
+    sendMessage(", ");
+    sendInt(gyroCorrected.z);
+    sendMessage(", ");
+
+    sendMessage("accel[RAW]: ");
     sendInt(accelRaw.x);
     sendMessage(", ");
     sendInt(accelRaw.y);
@@ -109,7 +203,7 @@ void Imu::dump(){
     sendInt(accelRaw.z);
     sendMessage(", ");
 
-    sendMessage("gyro[LSB] : ");
+    sendMessage("gyro[RAW] : ");
     sendInt(gyroRaw.x);
     sendMessage(", ");
     sendInt(gyroRaw.y);
@@ -120,4 +214,12 @@ void Imu::dump(){
 
 char* Imu::getChipName() {
     return ICM20648::CHIP_NAME;
+}
+
+float Imu::getGyroScale() {
+    return ICM20648::GYRO_SCALE;
+}
+
+float Imu::getAccelScale() {
+    return ICM20648::ACCEL_SCALE;
 }

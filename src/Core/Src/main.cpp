@@ -37,7 +37,11 @@
 #include <FailSafe/fail_safe.h>
 #include <Logger/logger.h>
 #include <Adc/adc.h>
-
+#include <AngularVelocity/angular_velocity.h>
+#include <Angle/angle.h>
+#include <Accel/accel.h>
+#include <Velocity/velocity.h>
+#include <Distance/distance.h>
 
 /* USER CODE END Includes */
 
@@ -128,24 +132,30 @@ int main(void)
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
-  objHub.ledBlueFrontPtr = new Led(Led::ModeEnum::BLUE_FRONT);
-  objHub.ledBlueBackPtr  = new Led(Led::ModeEnum::BLUE_BACK);
-  objHub.ledOrangePtr    = new Led(Led::ModeEnum::ORANGE);
-  objHub.ledGreenPtr     = new Led(Led::ModeEnum::GREEN);
-  objHub.ledRedPtr       = new Led(Led::ModeEnum::RED);
-  objHub.ledDarkGreenPtr = new Led(Led::ModeEnum::DARK_GREEN);
-  objHub.iledPtr         = new Iled();
-  objHub.adcPtr          = new Adc(hadc1, objHub.iledPtr);
-  objHub.wallSensPtr     = new WallSensor(objHub.adcPtr, objHub.iledPtr);
-  objHub.imuPtr          = new Imu(hspi1);
-  objHub.rEncPtr         = new Encoder(objHub.adcPtr, Encoder::ModeEnum::RIGHT);
-  objHub.lEncPtr         = new Encoder(objHub.adcPtr, Encoder::ModeEnum::LEFT);
-  objHub.rMotPtr         = new Motor(htim3, Motor::ModeEnum::RIGHT);
-  objHub.lMotPtr         = new Motor(htim2, Motor::ModeEnum::LEFT);
-  objHub.battPtr         = new Battery(objHub.adcPtr);
-  objHub.mapPtr          = new Map();
-  objHub.timerCntPtr     = new TimerCount();
-  objHub.usartPtr        = new Usart(huart1);
+  objHub.ledBlueFrontPtr    = new Led(Led::ModeEnum::BLUE_FRONT);
+  objHub.ledBlueBackPtr     = new Led(Led::ModeEnum::BLUE_BACK);
+  objHub.ledOrangePtr       = new Led(Led::ModeEnum::ORANGE);
+  objHub.ledGreenPtr        = new Led(Led::ModeEnum::GREEN);
+  objHub.ledRedPtr          = new Led(Led::ModeEnum::RED);
+  objHub.ledDarkGreenPtr    = new Led(Led::ModeEnum::DARK_GREEN);
+  objHub.iledPtr            = new Iled();
+  objHub.adcPtr             = new Adc(hadc1, objHub.iledPtr);
+  objHub.wallSensPtr        = new WallSensor(objHub.adcPtr, objHub.iledPtr);
+  objHub.imuPtr             = new Imu(hspi1);
+  objHub.rEncPtr            = new Encoder(objHub.adcPtr, Encoder::ModeEnum::RIGHT);
+  objHub.lEncPtr            = new Encoder(objHub.adcPtr, Encoder::ModeEnum::LEFT);
+  objHub.rMotPtr            = new Motor(htim3, Motor::ModeEnum::RIGHT);
+  objHub.lMotPtr            = new Motor(htim2, Motor::ModeEnum::LEFT);
+  objHub.battPtr            = new Battery(objHub.adcPtr);
+  objHub.mapPtr             = new Map();
+  objHub.timerCntPtr        = new TimerCount();
+  objHub.usartPtr           = new Usart(huart1);
+  objHub.angularVelocityPtr = new AngularVelocity(objHub.imuPtr);
+  objHub.anglePtr           = new Angle(objHub.angularVelocityPtr);
+  objHub.accelPtr           = new Accel(objHub.imuPtr);
+  objHub.velocityPtr        = new Velocity(objHub.accelPtr);
+  objHub.distancePtr        = new Distance(objHub.velocityPtr);
+
   objHub.initDependencies();
   startup.objHub  = &objHub;
   startup.timer1  = &timer1;
@@ -185,19 +195,32 @@ int main(void)
   startup.run();
   objHub.ledBlueFrontPtr->on();
   objHub.ledBlueBackPtr->on();
-  objHub.rMotPtr->start();
-  objHub.lMotPtr->start();
+  // objHub.rMotPtr->start();
+  // objHub.lMotPtr->start();
+
+  // HAL_Delay(1000);
+  // objHub.imuPtr->calcZeroPoint(500);
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  objHub.anglePtr->reset();
+  objHub.velocityPtr->reset();
+  objHub.distancePtr->reset();
   while (1)
   {
-    // objHub.wallSensPtr->dump();
-
-    // objHub.battPtr->dump();
+    // objHub.accelPtr->dump();
+    objHub.usartPtr->sendString("[adc]@");
+    objHub.usartPtr->sendInt16t(abs((int16_t)objHub.velocityPtr->mmps.y));
+    objHub.usartPtr->sendString("\r\n");
+    // objHub.velocityPtr->dump();
+    // objHub.distancePtr->dump();
+    // objHub.anglePtr->dump();
+    // objHub.angularVelocityPtr->dump();
     // objHub.imuPtr->dump();
+    // objHub.wallSensPtr->dump();
+    // objHub.battPtr->dump();
     // objHub.rEncPtr->dump();
 
     // objHub.usartPtr->sendString("[adc]@");
@@ -413,10 +436,10 @@ static void MX_SPI1_Init(void)
   hspi1.Init.Mode = SPI_MODE_MASTER;
   hspi1.Init.Direction = SPI_DIRECTION_2LINES;
   hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
-  hspi1.Init.CLKPolarity = SPI_POLARITY_HIGH;
-  hspi1.Init.CLKPhase = SPI_PHASE_2EDGE;
+  hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
+  hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
   hspi1.Init.NSS = SPI_NSS_SOFT;
-  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_16;
+  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_32;
   hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
   hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
@@ -452,7 +475,7 @@ static void MX_TIM1_Init(void)
 
   /* USER CODE END TIM1_Init 1 */
   htim1.Instance = TIM1;
-  htim1.Init.Prescaler = 119;
+  htim1.Init.Prescaler = 239;
   htim1.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim1.Init.Period = 999;
   htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
@@ -814,6 +837,12 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
       objHub.lEncPtr    ->update();
       objHub.adcPtr     ->resetEncDataCount();
       objHub.battPtr    ->update();
+      objHub.imuPtr     ->update();
+      objHub.angularVelocityPtr ->update();
+      objHub.anglePtr   ->update();
+      objHub.accelPtr   ->update();
+      objHub.velocityPtr->update();
+      objHub.distancePtr->update();
     }
 
     // TIM15 callback -> 1call/s
@@ -830,15 +859,15 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
     // TIM7 callback -> 1call per 10ms
     if (htim->Instance == TIM7) {
-      objHub.usartPtr->sendString("[adc]@");
-      objHub.usartPtr->sendUint16t(objHub.rEncPtr->currRaw);
-      objHub.usartPtr->sendString(",");
-      objHub.usartPtr->sendUint16t(objHub.lEncPtr->currRaw);
-      objHub.usartPtr->sendString(",");
-      objHub.usartPtr->sendUint16t(objHub.rEncPtr->counter);
-      objHub.usartPtr->sendString(",");
-      objHub.usartPtr->sendUint16t(objHub.lEncPtr->counter);
-      objHub.usartPtr->sendString("\r\n");
+      // objHub.usartPtr->sendString("[adc]@");
+      // objHub.usartPtr->sendUint16t(objHub.rEncPtr->currRaw);
+      // objHub.usartPtr->sendString(",");
+      // objHub.usartPtr->sendUint16t(objHub.lEncPtr->currRaw);
+      // objHub.usartPtr->sendString(",");
+      // objHub.usartPtr->sendUint16t(objHub.rEncPtr->counter);
+      // objHub.usartPtr->sendString(",");
+      // objHub.usartPtr->sendUint16t(objHub.lEncPtr->counter);
+      // objHub.usartPtr->sendString("\r\n");
       // failSafe.update();
     }
 }

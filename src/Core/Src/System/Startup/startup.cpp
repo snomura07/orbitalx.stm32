@@ -38,7 +38,7 @@ void Startup::checkImu(){
     sendMessage(objHub->imuPtr->getChipName());
     sendMessage("\r\n");
     sendMessage("WHO_AM_I: ");
-    sendInt(objHub->imuPtr->whoAmI());
+    sendInt(objHub->imuPtr->whoAmI);
     sendMessage("\r\n\r\n");
 }
 
@@ -71,5 +71,5 @@ void Startup::checkTimer(){
     sendMessage("\r\n");
     sendMessage("timer7 [1call/10ms]: ");
     sendMessage(timer7->isStarted()==true?"started":"stoped");
-    sendMessage("\r\n");
+    sendMessage("\r\n\r\n");
 }
