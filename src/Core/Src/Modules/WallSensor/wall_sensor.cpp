@@ -10,30 +10,31 @@ WallSensor:: WallSensor(Adc *adc_, Iled *iled_):
 WallSensor::~WallSensor(){}
 
 void WallSensor::update(){
-    rFront.on = adc->adcBuff[RIGHT_FRONT_WSENS_CH];
-    rSide.on  = adc->adcBuff[RIGHT_SIDE_WSENS_CH];
-    lFront.on = adc->adcBuff[LEFT_FRONT_WSENS_CH];
-    lSide.on  = adc->adcBuff[LEFT_SIDE_WSENS_CH];
-
-    rFront.filtered = rFront.on;
-    rSide.filtered  = rSide.on ;
-    lFront.filtered = lFront.on;
-    lSide.filtered  = lSide.on ;
-
-    iled->on(); // OFFはadc側
+    if(isIledOn) {
+        rFront = adc->adcBuff[RIGHT_FRONT_WSENS_CH];
+        rSide  = adc->adcBuff[RIGHT_SIDE_WSENS_CH];
+        lFront = adc->adcBuff[LEFT_FRONT_WSENS_CH];
+        lSide  = adc->adcBuff[LEFT_SIDE_WSENS_CH];
+        iled->off();
+        isIledOn = false;
+    }
+    else {
+        iled->on();
+        isIledOn = true;
+    }
 }
 
 void WallSensor::dump(){
     sendMessage("rFront:");
-    sendInt(rFront.filtered);
+    sendInt(rFront);
     sendMessage(", ");
     sendMessage("rSide:");
-    sendInt(rSide.filtered);
+    sendInt(rSide);
     sendMessage(", ");
     sendMessage("lFront:");
-    sendInt(lFront.filtered);
+    sendInt(lFront);
     sendMessage(", ");
     sendMessage("lSide:");
-    sendInt(lSide.filtered);
+    sendInt(lSide);
     sendMessage("\r\n");
 }

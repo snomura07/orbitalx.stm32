@@ -6,15 +6,6 @@
 
 class WallSensor : public UsartInterface{
 public:
-    struct WallSensInfo
-    {
-        uint16_t on;
-        uint16_t off;
-        uint16_t filtered;
-    };
-
-
-public:
     WallSensor(Adc *adc_, Iled *ied_);
     ~WallSensor();
     void update();
@@ -23,10 +14,10 @@ public:
 private:
     Adc *adc;
     Iled *iled;
-    WallSensInfo rFront;
-    WallSensInfo rSide;
-    WallSensInfo lFront;
-    WallSensInfo lSide;
+    uint16_t rFront;
+    uint16_t rSide;
+    uint16_t lFront;
+    uint16_t lSide;
     bool isIledOn;
 };
 

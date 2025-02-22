@@ -47,8 +47,6 @@ void Adc::handleDMAComplete() {
     if (leftEncDataCount < BUFF_SIZE) {
         leftEncDataCount++;
     }
-
-    iled->off();
 }
 
 void Adc::resetEncDataCount() {

@@ -212,16 +212,6 @@ int main(void)
   objHub.distancePtr->reset();
   while (1)
   {
-    objHub.rMotPtr->setDuty(200);
-    objHub.lMotPtr->setDuty(200);
-    HAL_Delay(3000);
-    objHub.rMotPtr->setDuty(0);
-    objHub.lMotPtr->setDuty(0);
-    HAL_Delay(3000);
-    objHub.rMotPtr->setDuty(200);
-    objHub.lMotPtr->setDuty(200);
-    HAL_Delay(3000);
-
     // objHub.encDistancePtr->dump();
     // objHub.accelPtr->dump();
     // objHub.velocityPtr->dump();
@@ -229,7 +219,7 @@ int main(void)
     // objHub.anglePtr->dump();
     // objHub.angularVelocityPtr->dump();
     // objHub.imuPtr->dump();
-    // objHub.wallSensPtr->dump();
+    objHub.wallSensPtr->dump();
     // objHub.battPtr->dump();
     // objHub.rEncPtr->dump();
 
@@ -870,10 +860,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
     // TIM7 callback -> 1call per 10ms
     if (htim->Instance == TIM7) {
-      objHub.usartPtr->sendString("[adc]@");
-      objHub.usartPtr->sendFloat(objHub.velocityPtr->mmps.y);
-      objHub.usartPtr->sendString("\r\n");
-
       // objHub.usartPtr->sendString("[adc]@");
       // objHub.usartPtr->sendUint16t(objHub.rEncPtr->currRaw);
       // objHub.usartPtr->sendString(",");
