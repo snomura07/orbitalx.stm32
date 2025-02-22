@@ -4,13 +4,14 @@
 #include <MasterDefine.h>
 #include <UsartInterface/usart_interface.h>
 #include <Accel/accel.h>
+#include <EncoderDistance/encoder_distance.h>
 
 class Velocity : public UsartInterface{
 public:
     AxisFloat mmps;
 
 public:
-    Velocity(Accel *accel_);
+    Velocity(Accel *accel_, EncoderDistance *encDistance_);
     ~Velocity();
     void init();
     void update();
@@ -19,8 +20,10 @@ public:
 
 private:
     Accel *accel;
+    EncoderDistance *encDistance;
     uint32_t lastTime;
     float dt;
+    float lastDistance;
 };
 
 #endif

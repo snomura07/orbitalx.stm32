@@ -20,6 +20,8 @@ public:
 private:
     Encoder *rightEncoder;
     Encoder *leftEncoder;
+    float rightCount2Dis;
+    float leftCount2Dis;
 };
 
 #endif
