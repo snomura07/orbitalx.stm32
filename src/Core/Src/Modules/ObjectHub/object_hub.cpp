@@ -24,4 +24,5 @@ void ObjectHub::initDependencies(){
     accelPtr->setUsart(usartPtr);
     velocityPtr->setUsart(usartPtr);
     distancePtr->setUsart(usartPtr);
+    encDistancePtr->setUsart(usartPtr);
 }

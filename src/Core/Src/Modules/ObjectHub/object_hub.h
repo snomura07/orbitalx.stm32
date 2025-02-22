@@ -18,6 +18,7 @@
 #include <Accel/accel.h>
 #include <Velocity/velocity.h>
 #include <Distance/distance.h>
+#include <EncoderDistance/encoder_distance.h>
 
 class ObjectHub {
 public:
@@ -50,6 +51,7 @@ public:
     Accel *accelPtr;
     Velocity *velocityPtr;
     Distance *distancePtr;
+    EncoderDistance *encDistancePtr;
 };
 
 #endif
