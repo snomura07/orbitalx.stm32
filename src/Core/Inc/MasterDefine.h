@@ -7,7 +7,10 @@
 
 #define LED_ON  0
 #define LED_OFF 1
-#define DELTA_T 0.001
+#define PI 3.14f
+#define RIGHT_ENC_PPR  18
+#define LEFT_ENC_PPR  13
+#define WHEEL_DIAMETER 14.3f
 
 struct Axis
 {

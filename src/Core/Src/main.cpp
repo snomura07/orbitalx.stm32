@@ -42,6 +42,7 @@
 #include <Accel/accel.h>
 #include <Velocity/velocity.h>
 #include <Distance/distance.h>
+#include <EncoderDistance/encoder_distance.h>
 
 /* USER CODE END Includes */
 
@@ -146,6 +147,7 @@ int main(void)
   objHub.lEncPtr            = new Encoder(objHub.adcPtr, Encoder::ModeEnum::LEFT);
   objHub.rMotPtr            = new Motor(htim3, Motor::ModeEnum::RIGHT);
   objHub.lMotPtr            = new Motor(htim2, Motor::ModeEnum::LEFT);
+  objHub.encDistancePtr     = new EncoderDistance(objHub.rEncPtr, objHub.lEncPtr);
   objHub.battPtr            = new Battery(objHub.adcPtr);
   objHub.mapPtr             = new Map();
   objHub.timerCntPtr        = new TimerCount();
@@ -153,7 +155,7 @@ int main(void)
   objHub.angularVelocityPtr = new AngularVelocity(objHub.imuPtr);
   objHub.anglePtr           = new Angle(objHub.angularVelocityPtr);
   objHub.accelPtr           = new Accel(objHub.imuPtr);
-  objHub.velocityPtr        = new Velocity(objHub.accelPtr);
+  objHub.velocityPtr        = new Velocity(objHub.accelPtr, objHub.encDistancePtr);
   objHub.distancePtr        = new Distance(objHub.velocityPtr);
 
   objHub.initDependencies();
@@ -195,8 +197,8 @@ int main(void)
   startup.run();
   objHub.ledBlueFrontPtr->on();
   objHub.ledBlueBackPtr->on();
-  // objHub.rMotPtr->start();
-  // objHub.lMotPtr->start();
+  objHub.rMotPtr->start();
+  objHub.lMotPtr->start();
 
   // HAL_Delay(1000);
   // objHub.imuPtr->calcZeroPoint(500);
@@ -210,10 +212,18 @@ int main(void)
   objHub.distancePtr->reset();
   while (1)
   {
+    objHub.rMotPtr->setDuty(200);
+    objHub.lMotPtr->setDuty(200);
+    HAL_Delay(3000);
+    objHub.rMotPtr->setDuty(0);
+    objHub.lMotPtr->setDuty(0);
+    HAL_Delay(3000);
+    objHub.rMotPtr->setDuty(200);
+    objHub.lMotPtr->setDuty(200);
+    HAL_Delay(3000);
+
+    // objHub.encDistancePtr->dump();
     // objHub.accelPtr->dump();
-    objHub.usartPtr->sendString("[adc]@");
-    objHub.usartPtr->sendInt16t(abs((int16_t)objHub.velocityPtr->mmps.y));
-    objHub.usartPtr->sendString("\r\n");
     // objHub.velocityPtr->dump();
     // objHub.distancePtr->dump();
     // objHub.anglePtr->dump();
@@ -831,18 +841,19 @@ static void MX_GPIO_Init(void)
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
     // TIM1 callback -> 1call per 1ms
     if (htim->Instance == TIM1) {
-      objHub.timerCntPtr->update();
-      objHub.wallSensPtr->update();
-      objHub.rEncPtr    ->update();
-      objHub.lEncPtr    ->update();
-      objHub.adcPtr     ->resetEncDataCount();
-      objHub.battPtr    ->update();
-      objHub.imuPtr     ->update();
+      objHub.timerCntPtr        ->update();
+      objHub.wallSensPtr        ->update();
+      objHub.rEncPtr            ->update();
+      objHub.lEncPtr            ->update();
+      objHub.adcPtr             ->resetEncDataCount();
+      objHub.encDistancePtr     ->update();
+      objHub.battPtr            ->update();
+      objHub.imuPtr             ->update();
       objHub.angularVelocityPtr ->update();
-      objHub.anglePtr   ->update();
-      objHub.accelPtr   ->update();
-      objHub.velocityPtr->update();
-      objHub.distancePtr->update();
+      objHub.anglePtr           ->update();
+      objHub.accelPtr           ->update();
+      objHub.velocityPtr        ->update();
+      objHub.distancePtr        ->update();
     }
 
     // TIM15 callback -> 1call/s
@@ -859,6 +870,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
     // TIM7 callback -> 1call per 10ms
     if (htim->Instance == TIM7) {
+      objHub.usartPtr->sendString("[adc]@");
+      objHub.usartPtr->sendFloat(objHub.velocityPtr->mmps.y);
+      objHub.usartPtr->sendString("\r\n");
+
       // objHub.usartPtr->sendString("[adc]@");
       // objHub.usartPtr->sendUint16t(objHub.rEncPtr->currRaw);
       // objHub.usartPtr->sendString(",");

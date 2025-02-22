@@ -72,6 +72,7 @@ add_executable(
     Core/Src/Dynamics/Accel/accel.cpp
     Core/Src/Dynamics/Velocity/velocity.cpp
     Core/Src/Dynamics/Distance/distance.cpp
+    Core/Src/Dynamics/EncoderDistance/encoder_distance.cpp
     Core/Src/Utils/Usart/usart.cpp
     # Core/Src/Utils/DataFlash/data_flash.cpp
     Core/Src/Interface/UsartInterface/usart_interface.cpp
