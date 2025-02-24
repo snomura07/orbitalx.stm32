@@ -2,6 +2,8 @@
 #define SYSTEM_ACTION_ROUTER_H_
 #include <main.h>
 #include <Imu/imu.h>
+#include <LedController/led_controller.h>
+#include <WallSensor/wall_sensor.h>
 
 class ActionLauncher {
 private:
@@ -12,20 +14,23 @@ private:
         Test2,
         Test3,
         Test4,
-        Reserve1,
-        Reserve2,
-        Reserve3,
-        Reserve4,
+        EnumSize,
     };
 
 public:
-    ActionLauncher(Imu *imu_);
+    ActionLauncher();
     ~ActionLauncher();
+    void init(Imu *imu_, LedController *ledController_, WallSensor *wallSensor_);
     void select();
     void launch();
 
 private:
+    void standbyStay();
+
+private:
     Imu *imu;
+    LedController *ledController;
+    WallSensor *wallSensor;
     int16_t actionIndex;
 };
 

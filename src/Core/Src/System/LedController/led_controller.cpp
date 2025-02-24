@@ -1,6 +1,8 @@
 #include "led_controller.h"
 
-LedController::LedController() {}
+LedController::LedController():
+    blinkToggle(false)
+{}
 LedController::~LedController(){}
 
 void LedController::init(Led *led0_, Led *led1_, Led *led2_, Led *led3_, Led *led4_, Led *led5_) {
@@ -13,10 +15,10 @@ void LedController::init(Led *led0_, Led *led1_, Led *led2_, Led *led3_, Led *le
 }
 
 void LedController::on(int8_t num){
-    if(num<1 || num>LED_SIZE) return;
+    if(num<0 || num>LED_SIZE) return;
 
     for(int i=0; i<LED_SIZE; i++){
-        if(i == num-1){
+        if(i == num){
             ledArr[i]->on();
         }
         else{
@@ -34,5 +36,20 @@ void LedController::allOff(){
 void LedController::allOn(){
     for(int i=0; i<LED_SIZE; i++){
         ledArr[i]->on();
+    }
+}
+
+void LedController::launchBlink(){
+    if(blinkToggle){
+        blinkToggle = !blinkToggle;
+        allOff();
+        ledArr[1]->on();
+        ledArr[2]->on();
+        HAL_Delay(80);
+    }
+    else {
+        blinkToggle = !blinkToggle;
+        allOff();
+        HAL_Delay(80);
     }
 }

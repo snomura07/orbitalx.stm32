@@ -40,6 +40,7 @@
 #include <FailSafe/fail_safe.h>
 #include <Logger/logger.h>
 #include <LedController/led_controller.h>
+#include <ActionLauncher/action_launcher.h>
 
 // Dynamics
 #include <AngularVelocity/angular_velocity.h>
@@ -93,6 +94,7 @@ TimerController timer1(htim1);   // 1call/1ms for count
 TimerController timer6(htim6);   // 1call/10ms for objHub update
 TimerController timer7(htim7);   // 1call/10ms for fail safe
 LedController ledController;
+ActionLauncher actionLauncher;
 FailSafe failSafe;
 Logger logger;
 Debug::Menu debugMenu;
@@ -187,6 +189,7 @@ int main(void)
                      objHub.ledGreenPtr,
                      objHub.ledOrangePtr,
                      objHub.ledBlueBackPtr );
+  actionLauncher.init(objHub.imuPtr, &ledController, objHub.wallSensPtr);
 
   /* USER CODE END SysInit */
 
@@ -218,6 +221,9 @@ int main(void)
   objHub.rMotPtr->start();
   objHub.lMotPtr->start();
 
+  actionLauncher.select();
+
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -227,25 +233,6 @@ int main(void)
   objHub.distancePtr->reset();
   while (1)
   {
-    ledController.on(1);
-    HAL_Delay(1000);
-    ledController.on(2);
-    HAL_Delay(1000);
-    ledController.on(3);
-    HAL_Delay(1000);
-    ledController.on(4);
-    HAL_Delay(1000);
-    ledController.on(5);
-    HAL_Delay(1000);
-    ledController.on(6);
-    HAL_Delay(1000);
-
-    // objHub.usartPtr->sendString("[adc]@");
-    // objHub.usartPtr->sendInt16t(objHub.imuPtr->gyroRaw.x);
-    // objHub.usartPtr->sendString(",");
-    // objHub.usartPtr->sendInt16t(objHub.imuPtr->gyroRaw.y);
-    // objHub.usartPtr->sendString("\r\n");
-
     HAL_Delay(10);
 
     /* USER CODE END WHILE */
