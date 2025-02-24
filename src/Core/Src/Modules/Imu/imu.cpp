@@ -129,6 +129,13 @@ void Imu::startDMATransfer() {
 void Imu::handleDMAComplete() {
     HAL_GPIO_WritePin(SPI_CS_GPIO_Port, SPI_CS_Pin, GPIO_PIN_SET);
 
+    // DMA の状態をチェック
+    if (HAL_DMA_GetState(hspi->hdmarx) == HAL_DMA_STATE_BUSY ||
+        HAL_DMA_GetState(hspi->hdmatx) == HAL_DMA_STATE_BUSY) {
+        HAL_DMA_Abort(hspi->hdmarx);
+        HAL_DMA_Abort(hspi->hdmatx);
+    }
+
     accelRaw.x = (int16_t)((rxBuffDma[1]  << 8) | rxBuffDma[2]);
     accelRaw.y = (int16_t)((rxBuffDma[3]  << 8) | rxBuffDma[4]);
     accelRaw.z = (int16_t)((rxBuffDma[5]  << 8) | rxBuffDma[6]);
@@ -136,8 +143,8 @@ void Imu::handleDMAComplete() {
     gyroRaw.y  = (int16_t)((rxBuffDma[9]  << 8) | rxBuffDma[10]);
     gyroRaw.z  = (int16_t)((rxBuffDma[11] << 8) | rxBuffDma[12]);
 
-    HAL_DMA_Abort(hspi->hdmatx);
-    HAL_DMA_Abort(hspi->hdmarx);
+    // HAL_DMA_Abort(hspi->hdmatx);
+    // HAL_DMA_Abort(hspi->hdmarx);
 
     startDMATransfer();
 }

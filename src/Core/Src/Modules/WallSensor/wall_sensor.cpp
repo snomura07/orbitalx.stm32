@@ -5,7 +5,11 @@
 WallSensor:: WallSensor(Adc *adc_, Iled *iled_):
     adc(adc_),
     iled(iled_),
-    isIledOn(false)
+    isIledOn(false),
+    rFront(0),
+    rSide(0),
+    lFront(0),
+    lSide(0)
 {}
 WallSensor::~WallSensor(){}
 

@@ -67,6 +67,8 @@ add_executable(
     Core/Src/System/TimerController/timer_controller.cpp
     Core/Src/System/FailSafe/fail_safe.cpp
     Core/Src/System/Logger/logger.cpp
+    Core/Src/System/ActionLauncher/action_launcher.cpp
+    Core/Src/System/LedController/led_controller.cpp
     Core/Src/Dynamics/AngularVelocity/angular_velocity.cpp
     Core/Src/Dynamics/Angle/angle.cpp
     Core/Src/Dynamics/Accel/accel.cpp

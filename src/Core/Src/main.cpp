@@ -21,6 +21,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+// Modules
 #include <Led/led.h>
 #include <Map/map.h>
 #include <Imu/imu.h>
@@ -30,19 +31,27 @@
 #include <WallSensor/wall_sensor.h>
 #include <Iled/i_led.h>
 #include <TimerCount/timer_count.h>
-#include <Usart/usart.h>
+#include <Adc/adc.h>
+
+// System
 #include <Debug/Menu/menu.h>
 #include <Startup/startup.h>
 #include <TimerController/timer_controller.h>
 #include <FailSafe/fail_safe.h>
 #include <Logger/logger.h>
-#include <Adc/adc.h>
+#include <LedController/led_controller.h>
+#include <ActionLauncher/action_launcher.h>
+
+// Dynamics
 #include <AngularVelocity/angular_velocity.h>
 #include <Angle/angle.h>
 #include <Accel/accel.h>
 #include <Velocity/velocity.h>
 #include <Distance/distance.h>
 #include <EncoderDistance/encoder_distance.h>
+
+//Utils
+#include <Usart/usart.h>
 
 /* USER CODE END Includes */
 
@@ -84,6 +93,8 @@ TimerController timer1(htim1);   // 1call/1ms for count
 // TimerController timer15(htim15); // 1call/s
 TimerController timer6(htim6);   // 1call/10ms for objHub update
 TimerController timer7(htim7);   // 1call/10ms for fail safe
+LedController ledController;
+ActionLauncher actionLauncher;
 FailSafe failSafe;
 Logger logger;
 Debug::Menu debugMenu;
@@ -133,6 +144,7 @@ int main(void)
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
+  // init OgjectHub
   objHub.ledBlueFrontPtr    = new Led(Led::ModeEnum::BLUE_FRONT);
   objHub.ledBlueBackPtr     = new Led(Led::ModeEnum::BLUE_BACK);
   objHub.ledOrangePtr       = new Led(Led::ModeEnum::ORANGE);
@@ -157,8 +169,9 @@ int main(void)
   objHub.accelPtr           = new Accel(objHub.imuPtr);
   objHub.velocityPtr        = new Velocity(objHub.accelPtr, objHub.encDistancePtr);
   objHub.distancePtr        = new Distance(objHub.velocityPtr);
-
   objHub.initDependencies();
+
+  // init System
   startup.objHub  = &objHub;
   startup.timer1  = &timer1;
   // startup.timer15 = &timer15;
@@ -170,6 +183,14 @@ int main(void)
   failSafe.timer6  = &timer6;
   logger.setTimerCnt(objHub.timerCntPtr);
   logger.setUsart(objHub.usartPtr);
+  ledController.init(objHub.ledBlueFrontPtr,
+                     objHub.ledDarkGreenPtr,
+                     objHub.ledRedPtr,
+                     objHub.ledGreenPtr,
+                     objHub.ledOrangePtr,
+                     objHub.ledBlueBackPtr );
+  actionLauncher.init(objHub.imuPtr, &ledController, objHub.wallSensPtr);
+
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
@@ -200,8 +221,8 @@ int main(void)
   objHub.rMotPtr->start();
   objHub.lMotPtr->start();
 
-  // HAL_Delay(1000);
-  // objHub.imuPtr->calcZeroPoint(500);
+  actionLauncher.select();
+
 
   /* USER CODE END 2 */
 
@@ -212,35 +233,6 @@ int main(void)
   objHub.distancePtr->reset();
   while (1)
   {
-    // objHub.encDistancePtr->dump();
-    // objHub.accelPtr->dump();
-    // objHub.velocityPtr->dump();
-    // objHub.distancePtr->dump();
-    // objHub.anglePtr->dump();
-    // objHub.angularVelocityPtr->dump();
-    // objHub.imuPtr->dump();
-    objHub.wallSensPtr->dump();
-    // objHub.battPtr->dump();
-    // objHub.rEncPtr->dump();
-
-    // objHub.usartPtr->sendString("[adc]@");
-    // objHub.usartPtr->sendUint16t(objHub.rEncPtr->currRaw);
-    // objHub.usartPtr->sendString(",");
-    // objHub.usartPtr->sendUint16t(objHub.lEncPtr->currRaw);
-    // objHub.usartPtr->sendString(",");
-    // objHub.usartPtr->sendUint16t(objHub.rEncPtr->counter);
-    // objHub.usartPtr->sendString(",");
-    // objHub.usartPtr->sendUint16t(objHub.lEncPtr->counter);
-    // objHub.usartPtr->sendString("\r\n");
-
-    // objHub.lMotPtr->setDuty(0);
-    // objHub.lEncPtr->counter = 0;
-    // HAL_Delay(2000);
-    // objHub.lMotPtr->setDuty(300);
-    // HAL_Delay(2000);
-    // objHub.lMotPtr->setDuty(0);
-    // objHub.lEncPtr->counter = 0;
-    // HAL_Delay(2000);
     HAL_Delay(10);
 
     /* USER CODE END WHILE */

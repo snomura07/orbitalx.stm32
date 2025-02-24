@@ -6,6 +6,12 @@
 
 class WallSensor : public UsartInterface{
 public:
+    uint16_t rFront;
+    uint16_t rSide;
+    uint16_t lFront;
+    uint16_t lSide;
+
+public:
     WallSensor(Adc *adc_, Iled *ied_);
     ~WallSensor();
     void update();
@@ -14,10 +20,6 @@ public:
 private:
     Adc *adc;
     Iled *iled;
-    uint16_t rFront;
-    uint16_t rSide;
-    uint16_t lFront;
-    uint16_t lSide;
     bool isIledOn;
 };
 
