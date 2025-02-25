@@ -41,6 +41,7 @@
 #include <Logger/logger.h>
 #include <LedController/led_controller.h>
 #include <ActionLauncher/action_launcher.h>
+#include <MotorController/motor_controller.h>
 
 // Dynamics
 #include <AngularVelocity/angular_velocity.h>
@@ -95,6 +96,7 @@ TimerController timer6(htim6);   // 1call/10ms for objHub update
 TimerController timer7(htim7);   // 1call/10ms for fail safe
 LedController ledController;
 ActionLauncher actionLauncher;
+MotorController motorController;
 FailSafe failSafe;
 Logger logger;
 Debug::Menu debugMenu;
@@ -178,19 +180,30 @@ int main(void)
   startup.timer6  = &timer6;
   startup.timer7  = &timer7;
   startup.setUsart(objHub.usartPtr);
+
   failSafe.objHub  = &objHub;
   // failSafe.timer15 = &timer15;
   failSafe.timer6  = &timer6;
+
   logger.setTimerCnt(objHub.timerCntPtr);
   logger.setUsart(objHub.usartPtr);
+
   ledController.init(objHub.ledBlueFrontPtr,
                      objHub.ledDarkGreenPtr,
                      objHub.ledRedPtr,
                      objHub.ledGreenPtr,
                      objHub.ledOrangePtr,
                      objHub.ledBlueBackPtr );
-  actionLauncher.init(objHub.imuPtr, &ledController, objHub.wallSensPtr);
 
+  actionLauncher.init(objHub.imuPtr,
+                      &ledController,
+                      objHub.wallSensPtr);
+
+  motorController.init(objHub.rMotPtr,
+                       objHub.lMotPtr,
+                       objHub.velocityPtr,
+                       objHub.angularVelocityPtr);
+  motorController.setUsart(objHub.usartPtr);
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
@@ -221,7 +234,7 @@ int main(void)
   objHub.rMotPtr->start();
   objHub.lMotPtr->start();
 
-  actionLauncher.select();
+  // actionLauncher.select();
 
 
   /* USER CODE END 2 */
@@ -836,6 +849,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
       objHub.accelPtr           ->update();
       objHub.velocityPtr        ->update();
       objHub.distancePtr        ->update();
+
     }
 
     // TIM15 callback -> 1call/s
@@ -845,6 +859,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
     // TIM6 callback -> 1call per 10ms
     if (htim->Instance == TIM6) {
+      motorController.update();
         // objHub.rEncPtr ->update();
         // objHub.lEncPtr ->update();
         // objHub.wallSensPtr->update();
