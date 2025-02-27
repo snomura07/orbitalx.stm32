@@ -70,6 +70,7 @@ add_executable(
     Core/Src/System/ActionLauncher/action_launcher.cpp
     Core/Src/System/LedController/led_controller.cpp
     Core/Src/System/MotorController/motor_controller.cpp
+    Core/Src/System/RunCore/run_core.cpp
     Core/Src/Dynamics/AngularVelocity/angular_velocity.cpp
     Core/Src/Dynamics/Angle/angle.cpp
     Core/Src/Dynamics/Accel/accel.cpp

@@ -22,6 +22,7 @@ public:
     void setDesiredVelocity(float vd);
     void setDesiredAngularVelocity(float wd);
     void setAccel(float a);
+    void setAngularAccel(float wa);
     void update();
     void activate();
     void deActivate();
@@ -43,7 +44,8 @@ private:
     float desiredAngularVelocity;
     float preDesiredVelocity;
     float preDesiredAngularVelocity;
-    float accel;             // mm/ss
+    float accel;                        // mm/ss
+    float angularAccel;                 // deg/ss
     float currDesiredVelocity;          // mm/s
     float currDesiredAngularVelocity;   // deg/s
     bool isActive;

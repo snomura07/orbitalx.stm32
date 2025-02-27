@@ -5,10 +5,11 @@ ActionLauncher::ActionLauncher():
 {}
 ActionLauncher::~ActionLauncher(){}
 
-void ActionLauncher::init(Imu *imu_, LedController *ledController_, WallSensor *wallSensor_) {
+void ActionLauncher::init(Imu *imu_, LedController *ledController_, WallSensor *wallSensor_, RunCore *runCore_) {
     imu           = imu_;
     ledController = ledController_;
     wallSensor    = wallSensor_;
+    runCore       = runCore_;
 }
 
 void ActionLauncher::select() {
@@ -52,7 +53,7 @@ void ActionLauncher::launch() {
             while(1){ledController->on(1);}
             break;
         case Test1:
-            while(1){ledController->on(2);}
+            runCore->moveForward(200.0);
             break;
         case Test2:
             while(1){ledController->on(3);}

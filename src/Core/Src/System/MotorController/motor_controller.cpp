@@ -3,6 +3,7 @@
 MotorController::MotorController():
     isActive(false),
     accel(0.0),
+    angularAccel(0.0),
     desiredVelocity(0.0),
     desiredAngularVelocity(0.0),
     currDesiredVelocity(0.0),
@@ -36,6 +37,10 @@ void MotorController::setAccel(float a) {
     accel = a;
 }
 
+void MotorController::setAngularAccel(float wa) {
+    angularAccel = wa;
+}
+
 void MotorController::update() {
     updateCurrDesiredVelocity();
     updateCurrDesiredAngularVelocity();
@@ -43,9 +48,10 @@ void MotorController::update() {
     float uV = updateVelocityPID();
     float uW = updateAngularVelocityPID();
 
-    float uR = 200.0f - uW + uV;
-    float uL = 200.0f + uW + uV;
-
+    float uR = 200.0f - uW;// + uV;
+    float uL = 200.0f + uW;// + uV;
+    rMot->setDuty(uR);
+    lMot->setDuty(uL);
 }
 
 void MotorController::updateCurrDesiredVelocity() {
@@ -64,14 +70,23 @@ void MotorController::updateCurrDesiredVelocity() {
             currDesiredVelocity = desiredVelocity;
         }
     }
-
-    sendMessage("[adc]@");
-    sendFloat(currDesiredVelocity);
-    sendMessage("\r\n");
 }
 
 void MotorController::updateCurrDesiredAngularVelocity() {
-
+    //加速
+    if(preDesiredAngularVelocity < desiredAngularVelocity){
+        currDesiredAngularVelocity += angularAccel*DELTA_T;
+        if(currDesiredAngularVelocity > desiredAngularVelocity) {
+            currDesiredAngularVelocity = desiredAngularVelocity;
+        }
+    }
+    //減速
+    else{
+        currDesiredAngularVelocity -= angularAccel*DELTA_T;
+        if(currDesiredAngularVelocity < desiredAngularVelocity) {
+            currDesiredAngularVelocity = desiredAngularVelocity;
+        }
+    }
 }
 
 float MotorController::updateVelocityPID() {
@@ -98,6 +113,6 @@ void MotorController::activate() {
 
 void MotorController::deActivate() {
     rMot->stop();
-    lMot->stop();    
+    lMot->stop();
     isActive = false;
 }

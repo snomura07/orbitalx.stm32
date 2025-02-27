@@ -42,6 +42,7 @@
 #include <LedController/led_controller.h>
 #include <ActionLauncher/action_launcher.h>
 #include <MotorController/motor_controller.h>
+#include <RunCore/run_core.h>
 
 // Dynamics
 #include <AngularVelocity/angular_velocity.h>
@@ -97,6 +98,7 @@ TimerController timer7(htim7);   // 1call/10ms for fail safe
 LedController ledController;
 ActionLauncher actionLauncher;
 MotorController motorController;
+RunCore runCore;
 FailSafe failSafe;
 Logger logger;
 Debug::Menu debugMenu;
@@ -195,15 +197,20 @@ int main(void)
                      objHub.ledOrangePtr,
                      objHub.ledBlueBackPtr );
 
-  actionLauncher.init(objHub.imuPtr,
-                      &ledController,
-                      objHub.wallSensPtr);
-
   motorController.init(objHub.rMotPtr,
                        objHub.lMotPtr,
                        objHub.velocityPtr,
                        objHub.angularVelocityPtr);
   motorController.setUsart(objHub.usartPtr);
+
+  runCore.init(&motorController,
+               objHub.encDistancePtr);
+
+  actionLauncher.init(objHub.imuPtr,
+                      &ledController,
+                      objHub.wallSensPtr,
+                      &runCore);
+
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
@@ -231,12 +238,8 @@ int main(void)
   startup.run();
   objHub.ledBlueFrontPtr->on();
   objHub.ledBlueBackPtr->on();
-  objHub.rMotPtr->start();
-  objHub.lMotPtr->start();
-
-  // actionLauncher.select();
-
-
+  // objHub.rMotPtr->start();
+  // objHub.lMotPtr->start();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -244,20 +247,20 @@ int main(void)
   objHub.anglePtr->reset();
   objHub.velocityPtr->reset();
   objHub.distancePtr->reset();
+  // actionLauncher.select();
+
+  // runCore.moveForward(200.0);
+
   while (1)
   {
-    motorController.setAccel(6000.0);
-    motorController.setDesiredVelocity(300.0);
-    motorController.setDesiredAngularVelocity(0.0);
+    objHub.rMotPtr->start();
+    objHub.lMotPtr->start();
+    objHub.rMotPtr->setDuty(50);
+    objHub.lMotPtr->setDuty(50);
     HAL_Delay(2000);
-    motorController.setDesiredVelocity(600.0);
+    objHub.rMotPtr->stop();
+    objHub.lMotPtr->stop();
     HAL_Delay(2000);
-    motorController.setDesiredVelocity(200.0);
-    HAL_Delay(2000);
-    motorController.setDesiredVelocity(0.0);
-    HAL_Delay(2000);
-
-
 
     HAL_Delay(10);
 

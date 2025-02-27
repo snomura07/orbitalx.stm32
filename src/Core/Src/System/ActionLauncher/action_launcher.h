@@ -4,6 +4,7 @@
 #include <Imu/imu.h>
 #include <LedController/led_controller.h>
 #include <WallSensor/wall_sensor.h>
+#include <RunCore/run_core.h>
 
 class ActionLauncher {
 private:
@@ -20,7 +21,7 @@ private:
 public:
     ActionLauncher();
     ~ActionLauncher();
-    void init(Imu *imu_, LedController *ledController_, WallSensor *wallSensor_);
+    void init(Imu *imu_, LedController *ledController_, WallSensor *wallSensor_, RunCore *runCore_);
     void select();
     void launch();
 
@@ -31,6 +32,7 @@ private:
     Imu *imu;
     LedController *ledController;
     WallSensor *wallSensor;
+    RunCore *runCore;
     int16_t actionIndex;
 };
 
