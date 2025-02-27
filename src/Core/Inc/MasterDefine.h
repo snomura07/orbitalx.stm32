@@ -11,7 +11,7 @@
 #define RIGHT_ENC_PPR  18
 #define LEFT_ENC_PPR  13
 #define WHEEL_DIAMETER 14.3f
-
+#define DELTA_T 0.001
 struct Axis
 {
     int16_t x;

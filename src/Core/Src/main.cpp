@@ -246,6 +246,19 @@ int main(void)
   objHub.distancePtr->reset();
   while (1)
   {
+    motorController.setAccel(6000.0);
+    motorController.setDesiredVelocity(300.0);
+    motorController.setDesiredAngularVelocity(0.0);
+    HAL_Delay(2000);
+    motorController.setDesiredVelocity(600.0);
+    HAL_Delay(2000);
+    motorController.setDesiredVelocity(200.0);
+    HAL_Delay(2000);
+    motorController.setDesiredVelocity(0.0);
+    HAL_Delay(2000);
+
+
+
     HAL_Delay(10);
 
     /* USER CODE END WHILE */

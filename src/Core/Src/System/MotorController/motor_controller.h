@@ -13,7 +13,6 @@ public:
         float err;
         float errSum;
         float preErr;
-        float desired;
     };
 
 public:
@@ -22,9 +21,14 @@ public:
     void init(Motor *rMot_, Motor *lMot_, Velocity *vel_, AngularVelocity *currAngVel_);
     void setDesiredVelocity(float vd);
     void setDesiredAngularVelocity(float wd);
+    void setAccel(float a);
     void update();
+    void activate();
+    void deActivate();
 
 private:
+    void updateCurrDesiredVelocity();
+    void updateCurrDesiredAngularVelocity();
     float updateVelocityPID();
     float updateAngularVelocityPID();
 
@@ -35,6 +39,14 @@ private:
     AngularVelocity *currAngVel;
     PidElem pidVel;
     PidElem pidAngVel;
+    float desiredVelocity;
+    float desiredAngularVelocity;
+    float preDesiredVelocity;
+    float preDesiredAngularVelocity;
+    float accel;             // mm/ss
+    float currDesiredVelocity;          // mm/s
+    float currDesiredAngularVelocity;   // deg/s
+    bool isActive;
 };
 
 #endif
