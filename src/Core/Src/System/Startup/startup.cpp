@@ -10,6 +10,13 @@ void Startup::run(){
     checkImu();
     checkEncoder();
     checkTimer();
+
+    sendMessage("[info]@NAME: ");
+    sendMessage(NAME);
+    sendMessage("\r\n");
+    sendMessage("[info]@VERSION: ");
+    sendMessage(VERSION);
+    sendMessage("\r\n");
 }
 
 void Startup::checkMe(){

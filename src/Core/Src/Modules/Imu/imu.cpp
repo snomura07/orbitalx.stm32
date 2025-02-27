@@ -15,8 +15,11 @@ Imu::~Imu(){}
 
 bool Imu::init() {
     // who am i 取得 何回か取得
-    for(int i=0; i<5; i++){
+    for(int i=0; i<10; i++){
         readRegister(ICM20648::WHO_AM_I, &whoAmI, 1);
+        if(whoAmI == ICM20648::WHO_AM_I_DEFAULT){
+            break;
+        }
     }
 
     // スリープ解除 一度送信しただけじゃ解除されないので複数回送信
