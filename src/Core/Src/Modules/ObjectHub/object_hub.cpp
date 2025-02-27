@@ -19,10 +19,4 @@ void ObjectHub::initDependencies(){
     wallSensPtr->setUsart(usartPtr);
     mapPtr->setUsart(usartPtr);
     timerCntPtr->setUsart(usartPtr);
-    angularVelocityPtr->setUsart(usartPtr);
-    anglePtr->setUsart(usartPtr);
-    accelPtr->setUsart(usartPtr);
-    velocityPtr->setUsart(usartPtr);
-    distancePtr->setUsart(usartPtr);
-    encDistancePtr->setUsart(usartPtr);
 }

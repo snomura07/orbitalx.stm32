@@ -22,6 +22,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 // Modules
+#include <ObjectHub/object_hub.h>
 #include <Led/led.h>
 #include <Map/map.h>
 #include <Imu/imu.h>
@@ -45,6 +46,7 @@
 #include <RunCore/run_core.h>
 
 // Dynamics
+#include <DynamicsHub/dynamics_hub.h>
 #include <AngularVelocity/angular_velocity.h>
 #include <Angle/angle.h>
 #include <Accel/accel.h>
@@ -90,6 +92,7 @@ UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN PV */
 ObjectHub objHub;
+DynamicsHub dynHub;
 Startup startup;
 TimerController timer1(htim1);   // 1call/1ms for count
 // TimerController timer15(htim15); // 1call/s
@@ -163,17 +166,21 @@ int main(void)
   objHub.lEncPtr            = new Encoder(objHub.adcPtr, Encoder::ModeEnum::LEFT);
   objHub.rMotPtr            = new Motor(htim3, Motor::ModeEnum::RIGHT);
   objHub.lMotPtr            = new Motor(htim2, Motor::ModeEnum::LEFT);
-  objHub.encDistancePtr     = new EncoderDistance(objHub.rEncPtr, objHub.lEncPtr);
   objHub.battPtr            = new Battery(objHub.adcPtr);
   objHub.mapPtr             = new Map();
   objHub.timerCntPtr        = new TimerCount();
   objHub.usartPtr           = new Usart(huart1);
-  objHub.angularVelocityPtr = new AngularVelocity(objHub.imuPtr);
-  objHub.anglePtr           = new Angle(objHub.angularVelocityPtr);
-  objHub.accelPtr           = new Accel(objHub.imuPtr);
-  objHub.velocityPtr        = new Velocity(objHub.accelPtr, objHub.encDistancePtr);
-  objHub.distancePtr        = new Distance(objHub.velocityPtr);
   objHub.initDependencies();
+
+  //Dynamics
+  dynHub.usartPtr           = objHub.usartPtr;
+  dynHub.angularVelocityPtr = new AngularVelocity(objHub.imuPtr);
+  dynHub.anglePtr           = new Angle(dynHub.angularVelocityPtr);
+  dynHub.accelPtr           = new Accel(objHub.imuPtr);
+  dynHub.velocityPtr        = new Velocity(dynHub.accelPtr, dynHub.encDistancePtr);
+  dynHub.distancePtr        = new Distance(dynHub.velocityPtr);
+  dynHub.encDistancePtr     = new EncoderDistance(objHub.rEncPtr, objHub.lEncPtr);
+  dynHub.initDependencies();
 
   // init System
   startup.objHub  = &objHub;
@@ -199,12 +206,12 @@ int main(void)
 
   motorController.init(objHub.rMotPtr,
                        objHub.lMotPtr,
-                       objHub.velocityPtr,
-                       objHub.angularVelocityPtr);
+                       dynHub.velocityPtr,
+                       dynHub.angularVelocityPtr);
   motorController.setUsart(objHub.usartPtr);
 
   runCore.init(&motorController,
-               objHub.encDistancePtr);
+               dynHub.encDistancePtr);
 
   actionLauncher.init(objHub.imuPtr,
                       &ledController,
@@ -244,9 +251,9 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  objHub.anglePtr->reset();
-  objHub.velocityPtr->reset();
-  objHub.distancePtr->reset();
+  dynHub.anglePtr->reset();
+  dynHub.velocityPtr->reset();
+  dynHub.distancePtr->reset();
   // actionLauncher.select();
 
   // runCore.moveForward(200.0);
@@ -857,14 +864,15 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
       objHub.rEncPtr            ->update();
       objHub.lEncPtr            ->update();
       objHub.adcPtr             ->resetEncDataCount();
-      objHub.encDistancePtr     ->update();
       objHub.battPtr            ->update();
       objHub.imuPtr             ->update();
-      objHub.angularVelocityPtr ->update();
-      objHub.anglePtr           ->update();
-      objHub.accelPtr           ->update();
-      objHub.velocityPtr        ->update();
-      objHub.distancePtr        ->update();
+
+      dynHub.encDistancePtr     ->update();
+      dynHub.angularVelocityPtr ->update();
+      dynHub.anglePtr           ->update();
+      dynHub.accelPtr           ->update();
+      dynHub.velocityPtr        ->update();
+      dynHub.distancePtr        ->update();
 
     }
 
