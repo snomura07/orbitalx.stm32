@@ -8,6 +8,8 @@
 class EncoderDistance : public UsartInterface{
 public:
     float mm;
+    float rDis;
+    float lDis;
 
 public:
     EncoderDistance(Encoder *rightEncoder_, Encoder *leftEncoder_);

@@ -5,7 +5,6 @@
 WallSensor:: WallSensor(Adc *adc_, Iled *iled_):
     adc(adc_),
     iled(iled_),
-    isIledOn(false),
     rFront(0),
     rSide(0),
     lFront(0),
@@ -14,18 +13,11 @@ WallSensor:: WallSensor(Adc *adc_, Iled *iled_):
 WallSensor::~WallSensor(){}
 
 void WallSensor::update(){
-    if(isIledOn) {
-        rFront = adc->adcBuff[RIGHT_FRONT_WSENS_CH];
-        rSide  = adc->adcBuff[RIGHT_SIDE_WSENS_CH];
-        lFront = adc->adcBuff[LEFT_FRONT_WSENS_CH];
-        lSide  = adc->adcBuff[LEFT_SIDE_WSENS_CH];
-        iled->off();
-        isIledOn = false;
-    }
-    else {
-        iled->on();
-        isIledOn = true;
-    }
+    iled->on();
+    rFront = adc->adcBuff[RIGHT_FRONT_WSENS_CH];
+    rSide  = adc->adcBuff[RIGHT_SIDE_WSENS_CH];
+    lFront = adc->adcBuff[LEFT_FRONT_WSENS_CH];
+    lSide  = adc->adcBuff[LEFT_SIDE_WSENS_CH];
 }
 
 void WallSensor::dump(){

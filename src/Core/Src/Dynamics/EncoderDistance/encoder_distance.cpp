@@ -3,7 +3,9 @@
 EncoderDistance::EncoderDistance(Encoder *rightEncoder_, Encoder *leftEncoder_) :
     rightEncoder(rightEncoder_),
     leftEncoder(leftEncoder_),
-    mm(0.0)
+    mm(0.0),
+    rDis(0.0),
+    lDis(0.0)
 {
     //カウンタ*1回転当たりのカウント数 = 回転数
     //回転数*2πr = 移動距離
@@ -16,8 +18,8 @@ EncoderDistance::~EncoderDistance(){}
 void EncoderDistance::init(){}
 
 void EncoderDistance::update() {
-    float rDis = (float)rightEncoder->counter * rightCount2Dis;
-    float lDis = (float)leftEncoder->counter  * leftCount2Dis;
+    rDis = (float)rightEncoder->counter * rightCount2Dis;
+    lDis = (float)leftEncoder->counter  * leftCount2Dis;
     mm = (rDis+lDis)/2.0;
 }
 

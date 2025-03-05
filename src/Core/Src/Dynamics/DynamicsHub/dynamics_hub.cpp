@@ -10,4 +10,21 @@ void DynamicsHub::initDependencies(){
     velocityPtr->setUsart(usartPtr);
     distancePtr->setUsart(usartPtr);
     encDistancePtr->setUsart(usartPtr);
+    this->setUsart(usartPtr);
+}
+
+void DynamicsHub::dump() {
+    sendMessage("[adc]@");
+    sendMessage("angVel:");
+    sendFloat(angularVelocityPtr->dps.z);
+    sendMessage(",");
+    sendMessage("angle:");
+    sendFloat(anglePtr->deg);
+    sendMessage(",");
+    sendMessage("vel:");
+    sendFloat(velocityPtr->mmps.y);
+    sendMessage(",");
+    sendMessage("encDis:");
+    sendFloat(encDistancePtr->mm);
+    sendMessage("\r\n");
 }

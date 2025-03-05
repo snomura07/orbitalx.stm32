@@ -245,8 +245,8 @@ int main(void)
   startup.run();
   objHub.ledBlueFrontPtr->on();
   objHub.ledBlueBackPtr->on();
-  // objHub.rMotPtr->start();
-  // objHub.lMotPtr->start();
+  objHub.rMotPtr->start();
+  objHub.lMotPtr->start();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -257,18 +257,29 @@ int main(void)
   // actionLauncher.select();
 
   // runCore.moveForward(200.0);
+  objHub.rMotPtr->setDuty(200);
+  objHub.lMotPtr->setDuty(200);
 
   while (1)
   {
-    objHub.rMotPtr->start();
-    objHub.lMotPtr->start();
-    objHub.rMotPtr->setDuty(50);
-    objHub.lMotPtr->setDuty(50);
-    HAL_Delay(2000);
-    objHub.rMotPtr->stop();
-    objHub.lMotPtr->stop();
-    HAL_Delay(2000);
+    objHub.usartPtr->sendString("[adc]@");
+    objHub.usartPtr->sendString("rightEnc:");
+    objHub.usartPtr->sendUint16t(objHub.rEncPtr->currRaw);
+    objHub.usartPtr->sendString(",");
+    objHub.usartPtr->sendString("leftEnc:");
+    objHub.usartPtr->sendUint16t(objHub.lEncPtr->currRaw);
+    objHub.usartPtr->sendString(",");
+    objHub.usartPtr->sendString("rightCount:");
+    objHub.usartPtr->sendUint16t(objHub.rEncPtr->counter);
+    objHub.usartPtr->sendString(",");
+    objHub.usartPtr->sendString("leftCount:");
+    objHub.usartPtr->sendUint16t(objHub.lEncPtr->counter);
+    objHub.usartPtr->sendString(",");
+    objHub.usartPtr->sendString("vel:");
+    objHub.usartPtr->sendUint16t(dynHub.velocityPtr->mmps.y);
+    objHub.usartPtr->sendString("\r\n");
 
+    // dynHub.dump();
     HAL_Delay(10);
 
     /* USER CODE END WHILE */

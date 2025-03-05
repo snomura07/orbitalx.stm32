@@ -19,8 +19,8 @@ Encoder::Encoder(Adc *adc_, ModeEnum mode_):
         staticThreshold = 50;
     }
     else {
-        THRE_UP   = 1400;
-        THRE_DOWN = 1100;
+        THRE_UP   = 2050;
+        THRE_DOWN = 1950;
         staticThreshold = 50;
     }
 }
