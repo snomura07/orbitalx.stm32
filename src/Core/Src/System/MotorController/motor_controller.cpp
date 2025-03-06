@@ -48,10 +48,10 @@ void MotorController::update() {
     float uV = updateVelocityPID();
     float uW = updateAngularVelocityPID();
 
-    float uR = 200.0f - uW;// + uV;
-    float uL = 200.0f + uW;// + uV;
-    rMot->setDuty(uR);
-    lMot->setDuty(uL);
+    float uR = 100.0f - uW;// + uV;
+    float uL = 100.0f + uW;// + uV;
+    rMot->setDuty((uint16_t)uR);
+    lMot->setDuty((uint16_t)uL);
 }
 
 void MotorController::updateCurrDesiredVelocity() {
@@ -112,6 +112,8 @@ void MotorController::activate() {
 }
 
 void MotorController::deActivate() {
+    rMot->setDuty(0);
+    lMot->setDuty(0);
     rMot->stop();
     lMot->stop();
     isActive = false;

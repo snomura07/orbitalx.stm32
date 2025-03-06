@@ -17,16 +17,14 @@ void Velocity::update() {
     uint32_t now = HAL_GetTick();
     dt = (float)(now - lastTime) / 1000.0f;
 
-    mmps.x += accel->mmpss.x * dt;
+    // mmps.x += accel->mmpss.x * dt;
     // mmps.y += accel->mmpss.y * dt;
-    mmps.z += accel->mmpss.z * dt;
+    // mmps.z += accel->mmpss.z * dt;
 
-    if(dt > 0.01){
-        float vc     = (float)(encDistance->mm - lastDistance) / dt;
-        mmps.y       = 0.9*mmps.y + 0.1*vc;
-        lastDistance = encDistance->mm;
-        lastTime     = now;
-    }
+    float vc     = (encDistance->mm - lastDistance) / dt;
+    mmps.y       = 0.95*mmps.y + 0.05*vc;
+    lastDistance = encDistance->mm;
+    lastTime     = now;
 }
 
 void Velocity::reset() {
@@ -35,12 +33,13 @@ void Velocity::reset() {
 
 void Velocity::dump() {
     sendMessage("Velocity: ");
-    sendFloat(mmps.x);
-    sendMessage(", ");
     sendFloat(mmps.y);
     sendMessage(", ");
-    sendFloat(mmps.z);
-    sendMessage("[mm/s], ");
+    sendMessage("encDis: ");
+    sendFloat(encDistance->mm);
+    sendMessage(", ");
+    sendFloat(lastDistance);
+    sendMessage(", ");
     sendFloat(dt);
     sendMessage("\r\n");
 }

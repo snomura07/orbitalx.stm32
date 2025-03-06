@@ -174,12 +174,12 @@ int main(void)
 
   //Dynamics
   dynHub.usartPtr           = objHub.usartPtr;
+  dynHub.encDistancePtr     = new EncoderDistance(objHub.rEncPtr, objHub.lEncPtr);
   dynHub.angularVelocityPtr = new AngularVelocity(objHub.imuPtr);
   dynHub.anglePtr           = new Angle(dynHub.angularVelocityPtr);
   dynHub.accelPtr           = new Accel(objHub.imuPtr);
   dynHub.velocityPtr        = new Velocity(dynHub.accelPtr, dynHub.encDistancePtr);
   dynHub.distancePtr        = new Distance(dynHub.velocityPtr);
-  dynHub.encDistancePtr     = new EncoderDistance(objHub.rEncPtr, objHub.lEncPtr);
   dynHub.initDependencies();
 
   // init System
@@ -194,7 +194,6 @@ int main(void)
   // failSafe.timer15 = &timer15;
   failSafe.timer6  = &timer6;
 
-  logger.setTimerCnt(objHub.timerCntPtr);
   logger.setUsart(objHub.usartPtr);
 
   ledController.init(objHub.ledBlueFrontPtr,
@@ -245,8 +244,8 @@ int main(void)
   startup.run();
   objHub.ledBlueFrontPtr->on();
   objHub.ledBlueBackPtr->on();
-  objHub.rMotPtr->start();
-  objHub.lMotPtr->start();
+  // objHub.rMotPtr->start();
+  // objHub.lMotPtr->start();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -256,28 +255,32 @@ int main(void)
   dynHub.distancePtr->reset();
   // actionLauncher.select();
 
-  // runCore.moveForward(200.0);
-  objHub.rMotPtr->setDuty(200);
-  objHub.lMotPtr->setDuty(200);
+  logger.activate();
+  runCore.moveForward(1000.0);
+  logger.deActivate();
+
+  HAL_Delay(5000);
+  objHub.ledDarkGreenPtr->on();
+  logger.dump();
 
   while (1)
   {
-    objHub.usartPtr->sendString("[adc]@");
-    objHub.usartPtr->sendString("rightEnc:");
-    objHub.usartPtr->sendUint16t(objHub.rEncPtr->currRaw);
-    objHub.usartPtr->sendString(",");
-    objHub.usartPtr->sendString("leftEnc:");
-    objHub.usartPtr->sendUint16t(objHub.lEncPtr->currRaw);
-    objHub.usartPtr->sendString(",");
-    objHub.usartPtr->sendString("rightCount:");
-    objHub.usartPtr->sendUint16t(objHub.rEncPtr->counter);
-    objHub.usartPtr->sendString(",");
-    objHub.usartPtr->sendString("leftCount:");
-    objHub.usartPtr->sendUint16t(objHub.lEncPtr->counter);
-    objHub.usartPtr->sendString(",");
-    objHub.usartPtr->sendString("vel:");
-    objHub.usartPtr->sendUint16t(dynHub.velocityPtr->mmps.y);
-    objHub.usartPtr->sendString("\r\n");
+    // objHub.usartPtr->sendString("[adc]@");
+    // objHub.usartPtr->sendString("rightEnc:");
+    // objHub.usartPtr->sendUint16t(objHub.rEncPtr->currRaw);
+    // objHub.usartPtr->sendString(",");
+    // objHub.usartPtr->sendString("leftEnc:");
+    // objHub.usartPtr->sendUint16t(objHub.lEncPtr->currRaw);
+    // objHub.usartPtr->sendString(",");
+    // objHub.usartPtr->sendString("rightCount:");
+    // objHub.usartPtr->sendUint16t(objHub.rEncPtr->counter);
+    // objHub.usartPtr->sendString(",");
+    // objHub.usartPtr->sendString("leftCount:");
+    // objHub.usartPtr->sendUint16t(objHub.lEncPtr->counter);
+    // objHub.usartPtr->sendString(",");
+    // objHub.usartPtr->sendString("vel:");
+    // objHub.usartPtr->sendUint16t(dynHub.velocityPtr->mmps.y);
+    // objHub.usartPtr->sendString("\r\n");
 
     // dynHub.dump();
     HAL_Delay(10);
@@ -882,9 +885,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
       dynHub.angularVelocityPtr ->update();
       dynHub.anglePtr           ->update();
       dynHub.accelPtr           ->update();
-      dynHub.velocityPtr        ->update();
       dynHub.distancePtr        ->update();
-
     }
 
     // TIM15 callback -> 1call/s
@@ -894,6 +895,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
     // TIM6 callback -> 1call per 10ms
     if (htim->Instance == TIM6) {
+      dynHub.velocityPtr->update();
       motorController.update();
         // objHub.rEncPtr ->update();
         // objHub.lEncPtr ->update();
@@ -902,6 +904,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
     // TIM7 callback -> 1call per 10ms
     if (htim->Instance == TIM7) {
+      logger.setLog1((int16_t)dynHub.encDistancePtr->mm);
+      logger.setLog2((int16_t)dynHub.velocityPtr->mmps.y);
+
       // objHub.usartPtr->sendString("[adc]@");
       // objHub.usartPtr->sendUint16t(objHub.rEncPtr->currRaw);
       // objHub.usartPtr->sendString(",");

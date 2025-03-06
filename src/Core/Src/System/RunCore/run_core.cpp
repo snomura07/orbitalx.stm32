@@ -15,7 +15,8 @@ void RunCore::moveForward(float dis) {
     motorController->setAngularAccel(6000.0);
     motorController->activate();
 
-    while(currDis->mm < dis);
+    // while(currDis->mm < dis);
+    HAL_Delay(800);
     motorController->setDesiredVelocity(0.0);
     motorController->deActivate();
 }
