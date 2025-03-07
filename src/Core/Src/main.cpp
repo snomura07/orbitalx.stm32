@@ -33,6 +33,7 @@
 #include <Iled/i_led.h>
 #include <TimerCount/timer_count.h>
 #include <Adc/adc.h>
+#include <Parameter/parameter.h>
 
 // System
 #include <Debug/Menu/menu.h>
@@ -56,6 +57,7 @@
 
 //Utils
 #include <Usart/usart.h>
+#include <DataFlash/data_flash.h>
 
 /* USER CODE END Includes */
 
@@ -104,6 +106,7 @@ MotorController motorController;
 RunCore runCore;
 FailSafe failSafe;
 Logger logger;
+DataFlash dataFlash;
 Debug::Menu debugMenu;
 /* USER CODE END PV */
 
@@ -255,13 +258,37 @@ int main(void)
   dynHub.distancePtr->reset();
   // actionLauncher.select();
 
-  logger.activate();
-  runCore.moveForward(1000.0);
-  logger.deActivate();
+  // logger.activate();
+  // runCore.moveForward(1000.0);
+  // logger.deActivate();
+  // HAL_Delay(5000);
+  // objHub.ledDarkGreenPtr->on();
+  // logger.dump();
 
-  HAL_Delay(5000);
-  objHub.ledDarkGreenPtr->on();
-  logger.dump();
+  // DataFlash flash;
+  // uint16_t writeData[4] = {0x1234, 0x5678, 0x9ABC, 0xDEF0};
+  // // 書き込みテスト
+  // if (flash.writeData(0x0800F400, writeData, 4)) {
+  //     objHub.usartPtr->sendString("write success \r\n");
+  // } else {
+  //     objHub.usartPtr->sendString("write failed... \r\n");
+  // }
+
+  uint16_t readData[4] = {0};
+  if (flash.readData(0x0800F400, readData, 4)) {
+    objHub.usartPtr->sendString("read success \r\n");
+    objHub.usartPtr->sendUint16t(readData[0]);
+    objHub.usartPtr->sendString(", ");
+    objHub.usartPtr->sendUint16t(readData[1]);
+    objHub.usartPtr->sendString(", ");
+    objHub.usartPtr->sendUint16t(readData[2]);
+    objHub.usartPtr->sendString(", ");
+    objHub.usartPtr->sendUint16t(readData[3]);
+    objHub.usartPtr->sendString("\r\n");
+
+  } else {
+      objHub.usartPtr->sendString("read failed... \r\n");
+  }
 
   while (1)
   {
