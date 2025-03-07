@@ -3,9 +3,9 @@
 
 #include <memory>
 #include <Log/log.h>
-#include <UsartInterface/usart_interface.h>
+#include <UtilInterface/util_interface.h>
 
-class Logger : public UsartInterface{
+class Logger : public UtilInterface{
 public:
     Logger();
     ~Logger();

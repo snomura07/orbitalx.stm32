@@ -62,7 +62,6 @@ add_executable(
     Core/Src/Modules/TimerCount/timer_count.cpp
     Core/Src/Modules/Log/log.cpp
     Core/Src/Modules/Adc/adc.cpp
-    Core/Src/Modules/Parameter/parameter.cpp
     Core/Src/System/Debug/Menu/menu.cpp
     Core/Src/System/Startup/startup.cpp
     Core/Src/System/TimerController/timer_controller.cpp
@@ -81,7 +80,8 @@ add_executable(
     Core/Src/Dynamics/EncoderDistance/encoder_distance.cpp
     Core/Src/Utils/Usart/usart.cpp
     Core/Src/Utils/DataFlash/data_flash.cpp
-    Core/Src/Interface/UsartInterface/usart_interface.cpp
+    Core/Src/Utils/Parameter/parameter.cpp
+    Core/Src/Interface/UtilInterface/util_interface.cpp
 )
 
 # インクルードディレクトリ

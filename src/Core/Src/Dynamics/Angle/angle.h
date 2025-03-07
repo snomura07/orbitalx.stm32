@@ -2,10 +2,10 @@
 #define ANGLE_H
 
 #include <MasterDefine.h>
-#include <UsartInterface/usart_interface.h>
+#include <UtilInterface/util_interface.h>
 #include <AngularVelocity/angular_velocity.h>
 
-class Angle : public UsartInterface{
+class Angle : public UtilInterface{
 public:
     float deg; //yawのみ
 

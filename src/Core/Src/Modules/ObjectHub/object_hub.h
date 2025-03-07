@@ -13,6 +13,8 @@
 #include <TimerCount/timer_count.h>
 #include <Usart/usart.h>
 #include <Adc/adc.h>
+#include <DataFlash/data_flash.h>
+#include <Parameter/parameter.h>
 
 class ObjectHub {
 public:
@@ -40,6 +42,8 @@ public:
     TimerCount *timerCntPtr;
     Usart *usartPtr;
     Adc *adcPtr;
+    DataFlash *dataFlashPtr;
+    Parameter *paramPtr;
 };
 
 #endif

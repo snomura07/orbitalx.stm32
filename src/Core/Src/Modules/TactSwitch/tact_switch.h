@@ -2,9 +2,9 @@
 #define TACT_SWITCH_H
 
 #include <main.h>
-#include <UsartInterface/usart_interface.h>
+#include <UtilInterface/util_interface.h>
 
-class TactSwitch : public UsartInterface{
+class TactSwitch : public UtilInterface{
 public:
     TactSwitch();
     ~TactSwitch();

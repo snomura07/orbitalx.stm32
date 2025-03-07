@@ -2,10 +2,10 @@
 #define SYSTEM_DEBUG_MENU_H_
 
 #include <memory>
-#include <UsartInterface/usart_interface.h>
+#include <UtilInterface/util_interface.h>
 
 namespace Debug {
-class Menu : public UsartInterface{
+class Menu : public UtilInterface{
 public:
     Menu();
     ~Menu();

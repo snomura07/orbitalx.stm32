@@ -8,9 +8,9 @@
 #include <Velocity/velocity.h>
 #include <Distance/distance.h>
 #include <EncoderDistance/encoder_distance.h>
-#include <UsartInterface/usart_interface.h>
+#include <UtilInterface/util_interface.h>
 
-class DynamicsHub : public UsartInterface {
+class DynamicsHub : public UtilInterface {
 public:
     DynamicsHub();
     ~DynamicsHub();

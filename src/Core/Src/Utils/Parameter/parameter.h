@@ -1,13 +1,11 @@
 #ifndef PARAMETER_H
 #define PARAMETER_H
-#include <UsartInterface/usart_interface.h>
 #include <DataFlash/data_flash.h>
 
-class Parameter : public UsartInterface{
+class Parameter{
 public:
-    Parameter();
+    Parameter(DataFlash *dataFlash_);
     ~Parameter();
-    void init(DataFlash *dataFlash_);
 
 private:
     DataFlash *dataFlash;

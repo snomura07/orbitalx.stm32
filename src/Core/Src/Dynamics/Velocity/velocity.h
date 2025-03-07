@@ -2,11 +2,11 @@
 #define VELOCITY_H
 
 #include <MasterDefine.h>
-#include <UsartInterface/usart_interface.h>
+#include <UtilInterface/util_interface.h>
 #include <Accel/accel.h>
 #include <EncoderDistance/encoder_distance.h>
 
-class Velocity : public UsartInterface{
+class Velocity : public UtilInterface{
 public:
     AxisFloat mmps;
 

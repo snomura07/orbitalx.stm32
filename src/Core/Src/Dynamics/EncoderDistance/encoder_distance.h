@@ -2,10 +2,10 @@
 #define ENCODER_DISTANCE_H
 
 #include <MasterDefine.h>
-#include <UsartInterface/usart_interface.h>
+#include <UtilInterface/util_interface.h>
 #include <Encoder/encoder.h>
 
-class EncoderDistance : public UsartInterface{
+class EncoderDistance : public UtilInterface{
 public:
     float mm;
     float rDis;

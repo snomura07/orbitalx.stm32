@@ -2,10 +2,10 @@
 #define IMU_H
 
 #include <MasterDefine.h>
-#include <UsartInterface/usart_interface.h>
+#include <UtilInterface/util_interface.h>
 #include "icm_20648.h"
 
-class Imu : public UsartInterface{
+class Imu : public UtilInterface{
 public:
     Axis accelRaw;
     Axis gyroRaw;

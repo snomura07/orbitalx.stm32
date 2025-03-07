@@ -154,7 +154,7 @@ int main(void)
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
-  // init OgjectHub
+  // Module
   objHub.ledBlueFrontPtr    = new Led(Led::ModeEnum::BLUE_FRONT);
   objHub.ledBlueBackPtr     = new Led(Led::ModeEnum::BLUE_BACK);
   objHub.ledOrangePtr       = new Led(Led::ModeEnum::ORANGE);
@@ -173,9 +173,11 @@ int main(void)
   objHub.mapPtr             = new Map();
   objHub.timerCntPtr        = new TimerCount();
   objHub.usartPtr           = new Usart(huart1);
+  objHub.dataFlashPtr       = new DataFlash();
+  objHub.paramPtr           = new Parameter(objHub.dataFlashPtr);
   objHub.initDependencies();
 
-  //Dynamics
+  // Dynamics
   dynHub.usartPtr           = objHub.usartPtr;
   dynHub.encDistancePtr     = new EncoderDistance(objHub.rEncPtr, objHub.lEncPtr);
   dynHub.angularVelocityPtr = new AngularVelocity(objHub.imuPtr);
@@ -185,19 +187,19 @@ int main(void)
   dynHub.distancePtr        = new Distance(dynHub.velocityPtr);
   dynHub.initDependencies();
 
-  // init System
+  // System
   startup.objHub  = &objHub;
   startup.timer1  = &timer1;
   // startup.timer15 = &timer15;
   startup.timer6  = &timer6;
   startup.timer7  = &timer7;
-  startup.setUsart(objHub.usartPtr);
+  startup.setUsartPtr(objHub.usartPtr);
 
   failSafe.objHub  = &objHub;
   // failSafe.timer15 = &timer15;
   failSafe.timer6  = &timer6;
 
-  logger.setUsart(objHub.usartPtr);
+  logger.setUsartPtr(objHub.usartPtr);
 
   ledController.init(objHub.ledBlueFrontPtr,
                      objHub.ledDarkGreenPtr,
@@ -210,7 +212,7 @@ int main(void)
                        objHub.lMotPtr,
                        dynHub.velocityPtr,
                        dynHub.angularVelocityPtr);
-  motorController.setUsart(objHub.usartPtr);
+  motorController.setUsartPtr(objHub.usartPtr);
 
   runCore.init(&motorController,
                dynHub.encDistancePtr);
@@ -274,21 +276,21 @@ int main(void)
   //     objHub.usartPtr->sendString("write failed... \r\n");
   // }
 
-  uint16_t readData[4] = {0};
-  if (flash.readData(0x0800F400, readData, 4)) {
-    objHub.usartPtr->sendString("read success \r\n");
-    objHub.usartPtr->sendUint16t(readData[0]);
-    objHub.usartPtr->sendString(", ");
-    objHub.usartPtr->sendUint16t(readData[1]);
-    objHub.usartPtr->sendString(", ");
-    objHub.usartPtr->sendUint16t(readData[2]);
-    objHub.usartPtr->sendString(", ");
-    objHub.usartPtr->sendUint16t(readData[3]);
-    objHub.usartPtr->sendString("\r\n");
+  // uint16_t readData[4] = {0};
+  // if (flash.readData(0x0800F400, readData, 4)) {
+  //   objHub.usartPtr->sendString("read success \r\n");
+  //   objHub.usartPtr->sendUint16t(readData[0]);
+  //   objHub.usartPtr->sendString(", ");
+  //   objHub.usartPtr->sendUint16t(readData[1]);
+  //   objHub.usartPtr->sendString(", ");
+  //   objHub.usartPtr->sendUint16t(readData[2]);
+  //   objHub.usartPtr->sendString(", ");
+  //   objHub.usartPtr->sendUint16t(readData[3]);
+  //   objHub.usartPtr->sendString("\r\n");
 
-  } else {
-      objHub.usartPtr->sendString("read failed... \r\n");
-  }
+  // } else {
+  //     objHub.usartPtr->sendString("read failed... \r\n");
+  // }
 
   while (1)
   {

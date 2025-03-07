@@ -2,9 +2,9 @@
 #define SRC_MODULES_LED_H_
 
 #include <main.h>
-#include <UsartInterface/usart_interface.h>
+#include <UtilInterface/util_interface.h>
 
-class Led : public UsartInterface{
+class Led : public UtilInterface{
 public:
 	enum ModeEnum{
 		ORANGE,

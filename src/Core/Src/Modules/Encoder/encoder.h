@@ -1,9 +1,9 @@
 #ifndef ENCODER_H
 #define ENCODER_H
-#include <UsartInterface/usart_interface.h>
+#include <UtilInterface/util_interface.h>
 #include <Adc/adc.h>
 
-class Encoder : public UsartInterface{
+class Encoder : public UtilInterface{
 public:
 	enum ModeEnum{
 		RIGHT,

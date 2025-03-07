@@ -4,19 +4,21 @@ ObjectHub::ObjectHub(){}
 ObjectHub::~ObjectHub(){}
 
 void ObjectHub::initDependencies(){
-    ledBlueFrontPtr->setUsart(usartPtr);
-    ledBlueBackPtr->setUsart(usartPtr);
-    ledOrangePtr->setUsart(usartPtr);
-    ledGreenPtr->setUsart(usartPtr);
-    ledRedPtr->setUsart(usartPtr);
-    ledDarkGreenPtr->setUsart(usartPtr);
-    imuPtr->setUsart(usartPtr);
-    rEncPtr->setUsart(usartPtr);
-    lEncPtr->setUsart(usartPtr);
-    rMotPtr->setUsart(usartPtr);
-    lMotPtr->setUsart(usartPtr);
-    battPtr->setUsart(usartPtr);
-    wallSensPtr->setUsart(usartPtr);
-    mapPtr->setUsart(usartPtr);
-    timerCntPtr->setUsart(usartPtr);
+    ledBlueFrontPtr->setUsartPtr(usartPtr);
+    ledBlueBackPtr->setUsartPtr(usartPtr);
+    ledOrangePtr->setUsartPtr(usartPtr);
+    ledGreenPtr->setUsartPtr(usartPtr);
+    ledRedPtr->setUsartPtr(usartPtr);
+    ledDarkGreenPtr->setUsartPtr(usartPtr);
+    imuPtr->setUsartPtr(usartPtr);
+    rEncPtr->setUsartPtr(usartPtr);
+    lEncPtr->setUsartPtr(usartPtr);
+    rMotPtr->setUsartPtr(usartPtr);
+    lMotPtr->setUsartPtr(usartPtr);
+    battPtr->setUsartPtr(usartPtr);
+    wallSensPtr->setUsartPtr(usartPtr);
+    mapPtr->setUsartPtr(usartPtr);
+    timerCntPtr->setUsartPtr(usartPtr);
+
+
 }
