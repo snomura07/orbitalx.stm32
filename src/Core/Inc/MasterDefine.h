@@ -12,6 +12,8 @@
 #define LEFT_ENC_PPR  13
 #define WHEEL_DIAMETER 14.3f
 #define DELTA_T 0.001
+
+#define DATAFLASH_START_ADDR  0x0800F400
 struct Axis
 {
     int16_t x;

@@ -3,11 +3,12 @@
 
 #include <cstdint>
 #include <cstddef>
+#include <MasterDefine.h>
 
 class DataFlash {
 public:
-    static constexpr uint32_t FlashStartAddress = 0x0800F400; // 保存領域の開始アドレス
-    static constexpr uint32_t FlashSize = 5 * 1024;           // 保存領域のサイズ (5KB)
+    static constexpr uint32_t FlashStartAddress = DATAFLASH_START_ADDR; // 保存領域の開始アドレス
+    static constexpr uint32_t FlashSize = 5 * 1024;                     // 保存領域のサイズ (5KB)
 
     DataFlash();
     ~DataFlash();
@@ -21,6 +22,9 @@ private:
     bool eraseSector(uint32_t address);
     bool writeDoubleWord(uint32_t address, uint64_t data) const;
     bool isAddressValid(uint32_t address, size_t size) const;
+
+private:
+    uint32_t lastErasedPage;
 };
 
 #endif // DATAFLASH_H

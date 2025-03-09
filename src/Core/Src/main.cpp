@@ -267,30 +267,14 @@ int main(void)
   // objHub.ledDarkGreenPtr->on();
   // logger.dump();
 
-  // DataFlash flash;
-  // uint16_t writeData[4] = {0x1234, 0x5678, 0x9ABC, 0xDEF0};
-  // // 書き込みテスト
-  // if (flash.writeData(0x0800F400, writeData, 4)) {
-  //     objHub.usartPtr->sendString("write success \r\n");
-  // } else {
-  //     objHub.usartPtr->sendString("write failed... \r\n");
-  // }
-
-  // uint16_t readData[4] = {0};
-  // if (flash.readData(0x0800F400, readData, 4)) {
-  //   objHub.usartPtr->sendString("read success \r\n");
-  //   objHub.usartPtr->sendUint16t(readData[0]);
-  //   objHub.usartPtr->sendString(", ");
-  //   objHub.usartPtr->sendUint16t(readData[1]);
-  //   objHub.usartPtr->sendString(", ");
-  //   objHub.usartPtr->sendUint16t(readData[2]);
-  //   objHub.usartPtr->sendString(", ");
-  //   objHub.usartPtr->sendUint16t(readData[3]);
-  //   objHub.usartPtr->sendString("\r\n");
-
-  // } else {
-  //     objHub.usartPtr->sendString("read failed... \r\n");
-  // }
+  objHub.paramPtr->writePidGainVel(0.11, 0.006, -0.2);
+  objHub.paramPtr->readAll();
+  objHub.usartPtr->sendFloat(objHub.paramPtr->pidGainVel.kP);
+  objHub.usartPtr->sendString(", ");
+  objHub.usartPtr->sendFloat(objHub.paramPtr->pidGainVel.kI);
+  objHub.usartPtr->sendString(", ");
+  objHub.usartPtr->sendFloat(objHub.paramPtr->pidGainVel.kD);
+  objHub.usartPtr->sendString("\r\n");
 
   while (1)
   {

@@ -1,16 +1,24 @@
 #include "main.h"
 #include "data_flash.h"
 
-DataFlash::DataFlash() {}
+DataFlash::DataFlash():
+    lastErasedPage(0xFFFFFFFF)
+{}
 DataFlash::~DataFlash() {}
 
 bool DataFlash::writeData(uint32_t address, const uint16_t* data, size_t length) {
     if (!data || length == 0) return false;
     if (!isAddressValid(address, length * 2)) return false;
     if (!unlockFlash()) return false;
-    if (!eraseSector(address)) {
-        lockFlash();
-        return false;
+
+    // 同じページのデータを消さないようにする
+    uint32_t currentPage = (address - 0x08000000) / FLASH_PAGE_SIZE;
+    if (currentPage != lastErasedPage) {
+        if (!eraseSector(address)) {
+            lockFlash();
+            return false;
+        }
+        lastErasedPage = currentPage;
     }
 
     uint32_t addr = address;
@@ -28,7 +36,6 @@ bool DataFlash::writeData(uint32_t address, const uint16_t* data, size_t length)
         addr += 8;
     }
 
-    // フラッシュメモリを再ロック
     return lockFlash();
 }
 
