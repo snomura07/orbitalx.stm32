@@ -36,7 +36,6 @@
 #include <Parameter/parameter.h>
 
 // System
-#include <Debug/Menu/menu.h>
 #include <Startup/startup.h>
 #include <TimerController/timer_controller.h>
 #include <FailSafe/fail_safe.h>
@@ -45,6 +44,8 @@
 #include <ActionLauncher/action_launcher.h>
 #include <MotorController/motor_controller.h>
 #include <RunCore/run_core.h>
+#include <Debug/Menu/menu.h>
+#include <Debug/ParameterManager/parameter_manager.h>
 
 // Dynamics
 #include <DynamicsHub/dynamics_hub.h>
@@ -108,6 +109,7 @@ FailSafe failSafe;
 Logger logger;
 DataFlash dataFlash;
 Debug::Menu debugMenu;
+Debug::ParameterManager paramManager;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -222,6 +224,9 @@ int main(void)
                       objHub.wallSensPtr,
                       &runCore);
 
+  paramManager.setUsartPtr(objHub.usartPtr);
+  paramManager.setParamPtr(objHub.paramPtr);
+
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
@@ -267,14 +272,14 @@ int main(void)
   // objHub.ledDarkGreenPtr->on();
   // logger.dump();
 
-  objHub.paramPtr->writePidGainVel(0.11, 0.006, -0.2);
-  objHub.paramPtr->readAll();
-  objHub.usartPtr->sendFloat(objHub.paramPtr->pidGainVel.kP);
-  objHub.usartPtr->sendString(", ");
-  objHub.usartPtr->sendFloat(objHub.paramPtr->pidGainVel.kI);
-  objHub.usartPtr->sendString(", ");
-  objHub.usartPtr->sendFloat(objHub.paramPtr->pidGainVel.kD);
-  objHub.usartPtr->sendString("\r\n");
+  // objHub.paramPtr->writePidGainVel(0.11, 0.006, -0.2);
+  // objHub.paramPtr->readAll();
+  // objHub.usartPtr->sendFloat(objHub.paramPtr->pidGainVel.kP);
+  // objHub.usartPtr->sendString(", ");
+  // objHub.usartPtr->sendFloat(objHub.paramPtr->pidGainVel.kI);
+  // objHub.usartPtr->sendString(", ");
+  // objHub.usartPtr->sendFloat(objHub.paramPtr->pidGainVel.kD);
+  // objHub.usartPtr->sendString("\r\n");
 
   while (1)
   {
@@ -917,8 +922,12 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
     // TIM7 callback -> 1call per 10ms
     if (htim->Instance == TIM7) {
-      logger.setLog1((int16_t)dynHub.encDistancePtr->mm);
-      logger.setLog2((int16_t)dynHub.velocityPtr->mmps.y);
+      if(paramManager.comCheck()){
+
+      }
+
+      // logger.setLog1((int16_t)dynHub.encDistancePtr->mm);
+      // logger.setLog2((int16_t)dynHub.velocityPtr->mmps.y);
 
       // objHub.usartPtr->sendString("[adc]@");
       // objHub.usartPtr->sendUint16t(objHub.rEncPtr->currRaw);
