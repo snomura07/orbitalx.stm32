@@ -62,7 +62,6 @@ add_executable(
     Core/Src/Modules/TimerCount/timer_count.cpp
     Core/Src/Modules/Log/log.cpp
     Core/Src/Modules/Adc/adc.cpp
-    Core/Src/System/Debug/Menu/menu.cpp
     Core/Src/System/Startup/startup.cpp
     Core/Src/System/TimerController/timer_controller.cpp
     Core/Src/System/FailSafe/fail_safe.cpp
@@ -71,6 +70,8 @@ add_executable(
     Core/Src/System/LedController/led_controller.cpp
     Core/Src/System/MotorController/motor_controller.cpp
     Core/Src/System/RunCore/run_core.cpp
+    Core/Src/System/Debug/Menu/menu.cpp
+    Core/Src/System/Debug/ParameterManager/parameter_manager.cpp
     Core/Src/Dynamics/DynamicsHub/dynamics_hub.cpp
     Core/Src/Dynamics/AngularVelocity/angular_velocity.cpp
     Core/Src/Dynamics/Angle/angle.cpp
