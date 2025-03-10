@@ -53,8 +53,9 @@ char Usart::receiveChar(){
 char Usart::receiveCharNonBlocking(){
     uint8_t received;
     if (__HAL_UART_GET_FLAG(huart, UART_FLAG_RXNE)) {
-        HAL_UART_Receive(huart, &received, 1, HAL_MAX_DELAY);
-        return (char)received;
+        if (HAL_UART_Receive(huart, &received, 1, 0) == HAL_OK) {
+            return (char)received;
+        }
     }
     return '\0';
 }
