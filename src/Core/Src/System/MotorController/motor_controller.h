@@ -5,9 +5,9 @@
 #include <Velocity/velocity.h>
 #include <AngularVelocity/angular_velocity.h>
 
-#include <UsartInterface/usart_interface.h>
+#include <UtilInterface/util_interface.h>
 
-class MotorController : public UsartInterface{
+class MotorController : public UtilInterface{
 public:
     struct PidElem {
         float err;

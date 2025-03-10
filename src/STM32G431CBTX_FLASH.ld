@@ -45,7 +45,8 @@ _Min_Stack_Size = 0x400; /* required amount of stack */
 MEMORY
 {
   RAM    (xrw)    : ORIGIN = 0x20000000,   LENGTH = 32K
-  FLASH    (rx)    : ORIGIN = 0x8000000,   LENGTH = 128K
+  FLASH    (rx)    : ORIGIN = 0x8000000,   LENGTH = 123K
+  DATAFLASH (rw)  : ORIGIN = 0x0800F400, LENGTH = 5K
 }
 
 /* Sections */
@@ -145,6 +146,11 @@ SECTIONS
     _edata = .;        /* define a global symbol at data end */
 
   } >RAM AT> FLASH
+
+  .data_flash (NOLOAD) :
+  {
+      *(.data_flash*)
+  } >DATAFLASH
 
   /* Uninitialized data section into "RAM" Ram type memory */
   . = ALIGN(4);

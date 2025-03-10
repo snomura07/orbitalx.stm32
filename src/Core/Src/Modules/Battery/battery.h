@@ -1,9 +1,9 @@
 #ifndef BATTERY_H
 #define BATTERY_H
-#include <UsartInterface/usart_interface.h>
+#include <UtilInterface/util_interface.h>
 #include <Adc/adc.h>
 
-class Battery : public UsartInterface{
+class Battery : public UtilInterface{
 public:
     Battery(Adc *adc_);
     ~Battery();

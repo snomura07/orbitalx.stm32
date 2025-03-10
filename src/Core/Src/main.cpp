@@ -33,6 +33,7 @@
 #include <Iled/i_led.h>
 #include <TimerCount/timer_count.h>
 #include <Adc/adc.h>
+#include <Parameter/parameter.h>
 
 // System
 #include <Debug/Menu/menu.h>
@@ -56,6 +57,7 @@
 
 //Utils
 #include <Usart/usart.h>
+#include <DataFlash/data_flash.h>
 
 /* USER CODE END Includes */
 
@@ -104,6 +106,7 @@ MotorController motorController;
 RunCore runCore;
 FailSafe failSafe;
 Logger logger;
+DataFlash dataFlash;
 Debug::Menu debugMenu;
 /* USER CODE END PV */
 
@@ -151,7 +154,7 @@ int main(void)
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
-  // init OgjectHub
+  // Module
   objHub.ledBlueFrontPtr    = new Led(Led::ModeEnum::BLUE_FRONT);
   objHub.ledBlueBackPtr     = new Led(Led::ModeEnum::BLUE_BACK);
   objHub.ledOrangePtr       = new Led(Led::ModeEnum::ORANGE);
@@ -170,9 +173,11 @@ int main(void)
   objHub.mapPtr             = new Map();
   objHub.timerCntPtr        = new TimerCount();
   objHub.usartPtr           = new Usart(huart1);
+  objHub.dataFlashPtr       = new DataFlash();
+  objHub.paramPtr           = new Parameter(objHub.dataFlashPtr);
   objHub.initDependencies();
 
-  //Dynamics
+  // Dynamics
   dynHub.usartPtr           = objHub.usartPtr;
   dynHub.encDistancePtr     = new EncoderDistance(objHub.rEncPtr, objHub.lEncPtr);
   dynHub.angularVelocityPtr = new AngularVelocity(objHub.imuPtr);
@@ -182,19 +187,19 @@ int main(void)
   dynHub.distancePtr        = new Distance(dynHub.velocityPtr);
   dynHub.initDependencies();
 
-  // init System
+  // System
   startup.objHub  = &objHub;
   startup.timer1  = &timer1;
   // startup.timer15 = &timer15;
   startup.timer6  = &timer6;
   startup.timer7  = &timer7;
-  startup.setUsart(objHub.usartPtr);
+  startup.setUsartPtr(objHub.usartPtr);
 
   failSafe.objHub  = &objHub;
   // failSafe.timer15 = &timer15;
   failSafe.timer6  = &timer6;
 
-  logger.setUsart(objHub.usartPtr);
+  logger.setUsartPtr(objHub.usartPtr);
 
   ledController.init(objHub.ledBlueFrontPtr,
                      objHub.ledDarkGreenPtr,
@@ -207,7 +212,7 @@ int main(void)
                        objHub.lMotPtr,
                        dynHub.velocityPtr,
                        dynHub.angularVelocityPtr);
-  motorController.setUsart(objHub.usartPtr);
+  motorController.setUsartPtr(objHub.usartPtr);
 
   runCore.init(&motorController,
                dynHub.encDistancePtr);
@@ -255,13 +260,21 @@ int main(void)
   dynHub.distancePtr->reset();
   // actionLauncher.select();
 
-  logger.activate();
-  runCore.moveForward(1000.0);
-  logger.deActivate();
+  // logger.activate();
+  // runCore.moveForward(1000.0);
+  // logger.deActivate();
+  // HAL_Delay(5000);
+  // objHub.ledDarkGreenPtr->on();
+  // logger.dump();
 
-  HAL_Delay(5000);
-  objHub.ledDarkGreenPtr->on();
-  logger.dump();
+  objHub.paramPtr->writePidGainVel(0.11, 0.006, -0.2);
+  objHub.paramPtr->readAll();
+  objHub.usartPtr->sendFloat(objHub.paramPtr->pidGainVel.kP);
+  objHub.usartPtr->sendString(", ");
+  objHub.usartPtr->sendFloat(objHub.paramPtr->pidGainVel.kI);
+  objHub.usartPtr->sendString(", ");
+  objHub.usartPtr->sendFloat(objHub.paramPtr->pidGainVel.kD);
+  objHub.usartPtr->sendString("\r\n");
 
   while (1)
   {

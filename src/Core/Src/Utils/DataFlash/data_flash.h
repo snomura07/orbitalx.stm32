@@ -3,27 +3,28 @@
 
 #include <cstdint>
 #include <cstddef>
+#include <MasterDefine.h>
 
 class DataFlash {
 public:
-    static constexpr uint32_t FlashStartAddress = 0x0800F400; // 保存領域の開始アドレス
-    static constexpr uint32_t FlashSize = 5 * 1024;           // 保存領域のサイズ (5KB)
+    static constexpr uint32_t FlashStartAddress = DATAFLASH_START_ADDR; // 保存領域の開始アドレス
+    static constexpr uint32_t FlashSize = 5 * 1024;                     // 保存領域のサイズ (5KB)
 
     DataFlash();
     ~DataFlash();
 
-    // 2バイト配列をフラッシュに書き込む
-    bool writeData(const uint16_t* data, size_t length);
-
-    // フラッシュからデータを読み出して2バイト配列に格納
-    bool readData(uint16_t* data, size_t length) const;
+    bool writeData(uint32_t address, const uint16_t* data, size_t length);
+    bool readData(uint32_t address, uint16_t* data, size_t length) const;
 
 private:
     bool unlockFlash() const;
     bool lockFlash() const;
     bool eraseSector(uint32_t address);
-    bool writeWord(uint32_t address, uint32_t data) const;
+    bool writeDoubleWord(uint32_t address, uint64_t data) const;
     bool isAddressValid(uint32_t address, size_t size) const;
+
+private:
+    uint32_t lastErasedPage;
 };
 
 #endif // DATAFLASH_H

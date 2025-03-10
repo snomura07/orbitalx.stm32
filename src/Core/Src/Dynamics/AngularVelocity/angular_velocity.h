@@ -2,10 +2,10 @@
 #define ANGULAR_VELOCITY_H
 
 #include <MasterDefine.h>
-#include <UsartInterface/usart_interface.h>
+#include <UtilInterface/util_interface.h>
 #include <Imu/imu.h>
 
-class AngularVelocity : public UsartInterface{
+class AngularVelocity : public UtilInterface{
 public:
     AxisFloat dps;
 

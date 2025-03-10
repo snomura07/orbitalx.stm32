@@ -3,10 +3,10 @@
 
 #include <memory>
 #include <ObjectHub/object_hub.h>
-#include <UsartInterface/usart_interface.h>
+#include <UtilInterface/util_interface.h>
 #include <TimerController/timer_controller.h>
 
-class Startup : public UsartInterface{
+class Startup : public UtilInterface{
 public:
     Startup();
     ~Startup();

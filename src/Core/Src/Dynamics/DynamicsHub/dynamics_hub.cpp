@@ -4,13 +4,13 @@ DynamicsHub::DynamicsHub(){}
 DynamicsHub::~DynamicsHub(){}
 
 void DynamicsHub::initDependencies(){
-    angularVelocityPtr->setUsart(usartPtr);
-    anglePtr->setUsart(usartPtr);
-    accelPtr->setUsart(usartPtr);
-    velocityPtr->setUsart(usartPtr);
-    distancePtr->setUsart(usartPtr);
-    encDistancePtr->setUsart(usartPtr);
-    this->setUsart(usartPtr);
+    angularVelocityPtr->setUsartPtr(usartPtr);
+    anglePtr->setUsartPtr(usartPtr);
+    accelPtr->setUsartPtr(usartPtr);
+    velocityPtr->setUsartPtr(usartPtr);
+    distancePtr->setUsartPtr(usartPtr);
+    encDistancePtr->setUsartPtr(usartPtr);
+    this->setUsartPtr(usartPtr);
 }
 
 void DynamicsHub::dump() {

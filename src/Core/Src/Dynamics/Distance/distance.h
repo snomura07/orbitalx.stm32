@@ -2,10 +2,10 @@
 #define DISTANCE_H
 
 #include <MasterDefine.h>
-#include <UsartInterface/usart_interface.h>
+#include <UtilInterface/util_interface.h>
 #include <Velocity/velocity.h>
 
-class Distance : public UsartInterface{
+class Distance : public UtilInterface{
 public:
     AxisFloat mm;
 

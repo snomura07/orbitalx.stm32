@@ -1,10 +1,10 @@
 #ifndef WALL_SENSOR_H
 #define WALL_SENSOR_H
-#include <UsartInterface/usart_interface.h>
+#include <UtilInterface/util_interface.h>
 #include <Iled/i_led.h>
 #include <Adc/adc.h>
 
-class WallSensor : public UsartInterface{
+class WallSensor : public UtilInterface{
 public:
     uint16_t rFront;
     uint16_t rSide;

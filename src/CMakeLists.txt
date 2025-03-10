@@ -79,8 +79,9 @@ add_executable(
     Core/Src/Dynamics/Distance/distance.cpp
     Core/Src/Dynamics/EncoderDistance/encoder_distance.cpp
     Core/Src/Utils/Usart/usart.cpp
-    # Core/Src/Utils/DataFlash/data_flash.cpp
-    Core/Src/Interface/UsartInterface/usart_interface.cpp
+    Core/Src/Utils/DataFlash/data_flash.cpp
+    Core/Src/Utils/Parameter/parameter.cpp
+    Core/Src/Interface/UtilInterface/util_interface.cpp
 )
 
 # インクルードディレクトリ
