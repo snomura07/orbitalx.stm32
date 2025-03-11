@@ -1,8 +1,14 @@
 #include "usart.h"
 #include <math.h>
 
+Usart* Usart::instance = nullptr;
+
 Usart::Usart(UART_HandleTypeDef &huart_){
-    huart = &huart_;
+    huart        = &huart_;
+    instance     = this;
+    receivedChar = 0;
+    clearBuff();
+    startSequentialReceive();
 }
 Usart::~Usart(){}
 
@@ -42,6 +48,56 @@ void Usart::sendFloat(float value){
         sprintf(buffer, "%d.%03d", integerPart, fractionalPart);
     }
     sendString(buffer);
+}
+
+void Usart::startSequentialReceive() {
+    // HAL_UART_Receive_IT(huart, &receivedChar, 1);
+}
+
+
+/*******************************/
+/*                             */
+/*                             */
+/* HAL callback function       */
+/*                             */
+/*                             */
+/*******************************/
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)  {
+    // Usart::instance->sendString("ok \r\n");
+
+    // if (huart->Instance == USART1) {
+
+    //     // 1 バイト受信したら発火
+    //     Usart::instance->received();
+    // }
+}
+
+void Usart::received() {
+    if (receivedChar == '\n') {     // 改行を受信したらメッセージの終端と判断
+        rxBuffer[rxIndex] = '\0';   // 文字列の終端を追加
+    } 
+    else {
+        if (rxIndex < RX_BUFFER_SIZE - 1) {
+            rxBuffer[rxIndex++] = receivedChar;
+        }
+    }
+
+    // 次の 1 バイトを受信開始
+    HAL_UART_Receive_IT(huart, &receivedChar, 1);
+
+}
+
+void Usart::clearBuff(){
+    rxIndex = 0;
+    memset(rxBuffer, 0, RX_BUFFER_SIZE);
+}
+
+void Usart::buffCheck(){
+    sendString("index: ");
+    sendInt16t(rxIndex);
+    sendString(" received: ");
+    sendString((char*)rxBuffer);
+    sendString("\r\n");
 }
 
 char Usart::receiveChar(){

@@ -10,6 +10,13 @@
 
 class Usart{
 public:
+    static Usart* instance;
+    static constexpr uint8_t RX_BUFFER_SIZE = 64;
+    uint8_t rxBuffer[RX_BUFFER_SIZE];
+    uint8_t rxIndex;
+    uint8_t receivedChar;
+
+public:
     Usart(UART_HandleTypeDef &huart_);
     ~Usart();
     void sendString(const char *str);
@@ -18,6 +25,11 @@ public:
     void sendInt32t(int32_t value);
     void sendUint32t(uint32_t value);
     void sendFloat(float value);
+
+    void startSequentialReceive();
+    void received();
+    void clearBuff();
+    void buffCheck();
 
     char receiveChar();
     char receiveCharNonBlocking();

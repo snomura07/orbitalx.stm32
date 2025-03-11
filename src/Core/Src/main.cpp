@@ -283,6 +283,9 @@ int main(void)
 
   while (1)
   {
+    char receivedChar = objHub.usartPtr->receiveChar();
+    objHub.usartPtr->sendString(&receivedChar);
+
     // objHub.usartPtr->sendString("[adc]@");
     // objHub.usartPtr->sendString("rightEnc:");
     // objHub.usartPtr->sendUint16t(objHub.rEncPtr->currRaw);
@@ -922,9 +925,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
     // TIM7 callback -> 1call per 10ms
     if (htim->Instance == TIM7) {
-      if(paramManager.comCheck()){
+      // if(paramManager.comCheck()){
 
-      }
+      // }
 
       // logger.setLog1((int16_t)dynHub.encDistancePtr->mm);
       // logger.setLog2((int16_t)dynHub.velocityPtr->mmps.y);
