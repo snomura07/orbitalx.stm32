@@ -14,6 +14,17 @@ void Parameter::readAll() {
     readFloatBlock(PID_GAIN_VEL_ADDR_2, readData);
     pidGainVel.kD = readData[0];
 
+    readStringBlock(MACHINE_NAME_1, machineName, sizeof(machineName));
+
+    readStringBlock(MACHINE_INFO_1, version, sizeof(version));
+}
+
+void Parameter::writeMachineName(const char* name) {
+    writeStringBlock(MACHINE_NAME_1, name, 8); //1ブロック分
+}
+
+void Parameter::writeVersion(const char* ver) {
+    writeStringBlock(MACHINE_INFO_1, ver, 6);
 }
 
 void Parameter::writePidGainVel(float kp, float ki, float kd) {
@@ -25,7 +36,6 @@ void Parameter::writePidGainVel(float kp, float ki, float kd) {
     writeData[0] = kd;
     writeData[1] = 0;
     writeFloatBlock(PID_GAIN_VEL_ADDR_2, writeData);
-
 }
 
 void Parameter::readIntBlock(uint32_t address, int16_t* outData) {
@@ -51,24 +61,50 @@ void Parameter::readFloatBlock(uint32_t address, float* outData) {
     }
 }
 
+void Parameter::readStringBlock(uint32_t address, char* outData, size_t maxLength) {
+    size_t wordLength         = (maxLength + 1) / 2;
+    uint16_t data[wordLength] = {0};
+
+    dataFlash->readData(address, data, wordLength);
+
+    for (size_t i = 0; i < maxLength; i++) {
+        outData[i] = static_cast<char>((data[i / 2] >> (8 * (i % 2))) & 0xFF);
+        if (outData[i] == '\0') break;
+    }
+    outData[maxLength - 1] = '\0';
+}
+
 void Parameter::writeIntBlock(uint32_t address, const int16_t* data) {
-    uint16_t writeData[4] = {0};
+    uint16_t wData[4] = {0};
 
     for (size_t i = 0; i < 4; i++) {
-        writeData[i] = static_cast<uint16_t>(data[i]);
+        wData[i] = static_cast<uint16_t>(data[i]);
     }
 
-    dataFlash->writeData(address, writeData, 4);
+    dataFlash->writeData(address, wData, 4);
 }
 
 void Parameter::writeFloatBlock(uint32_t address, const float* data) {
-    uint16_t writeData[4] = {0};
+    uint16_t wData[4] = {0};
 
     for (int i = 0; i < 2; i++) {
         int32_t intValue     = static_cast<int32_t>(data[i] * 1000.0f);  // **1000倍して整数化**
-        writeData[i * 2]     = static_cast<uint16_t>(intValue & 0xFFFF);
-        writeData[i * 2 + 1] = static_cast<uint16_t>((intValue >> 16) & 0xFFFF);
+        wData[i * 2]     = static_cast<uint16_t>(intValue & 0xFFFF);
+        wData[i * 2 + 1] = static_cast<uint16_t>((intValue >> 16) & 0xFFFF);
     }
 
-    dataFlash->writeData(address, writeData, 4);
+    dataFlash->writeData(address, wData, 4);
+}
+
+void Parameter::writeStringBlock(uint32_t address, const char* str, size_t maxLength) {
+    size_t length = maxLength;
+    size_t wordLength = (length + 1) / 2;
+
+    uint16_t data[wordLength] = {0};
+    for (size_t i = 0; i < length; i++) {
+        uint16_t byte = static_cast<uint16_t>(str[i]);
+        data[i / 2] |= byte << (8 * (i % 2)); // 1バイトずつ詰める
+    }
+
+    dataFlash->writeData(address, data, wordLength);
 }

@@ -14,9 +14,9 @@ void Startup::run(){
 
 void Startup::checkMe(){
     sendMessage("\r\n===== ");
-    sendMessage(NAME);
+    sendMessage(paramPtr->machineName);
     sendMessage(" ver.");
-    sendMessage(VERSION);
+    sendMessage(paramPtr->version);
     sendMessage(" =====\r\n");
 }
 

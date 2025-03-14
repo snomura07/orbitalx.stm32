@@ -180,6 +180,7 @@ int main(void)
   objHub.dataFlashPtr       = new DataFlash();
   objHub.paramPtr           = new Parameter(objHub.dataFlashPtr);
   objHub.initDependencies();
+  objHub.paramPtr->readAll();
 
   // Dynamics
   dynHub.usartPtr           = objHub.usartPtr;
@@ -198,6 +199,7 @@ int main(void)
   startup.timer6  = &timer6;
   startup.timer7  = &timer7;
   startup.setUsartPtr(objHub.usartPtr);
+  startup.setParamPtr(objHub.paramPtr);
 
   failSafe.objHub  = &objHub;
   // failSafe.timer15 = &timer15;
@@ -270,8 +272,20 @@ int main(void)
   dynHub.distancePtr->reset();
   // actionLauncher.select();
 
+  // objHub.paramPtr->writeMachineName("OrbitalX");
   // objHub.paramPtr->writePidGainVel(0.11, 0.006, -0.2);
-  // objHub.paramPtr->readAll();
+  // objHub.paramPtr->writeVersion("2.1.0");
+  objHub.usartPtr->sendFloat(objHub.paramPtr->pidGainVel.kP);
+  objHub.usartPtr->sendString(", ");
+  objHub.usartPtr->sendFloat(objHub.paramPtr->pidGainVel.kI);
+  objHub.usartPtr->sendString(", ");
+  objHub.usartPtr->sendFloat(objHub.paramPtr->pidGainVel.kD);
+  objHub.usartPtr->sendString(", ");
+  objHub.usartPtr->sendString(objHub.paramPtr->machineName);
+  objHub.usartPtr->sendString(", ver:");
+  objHub.usartPtr->sendString(objHub.paramPtr->version);
+  objHub.usartPtr->sendString("\r\n");
+
   // objHub.usartPtr->sendFloat(objHub.paramPtr->pidGainVel.kP);
   // objHub.usartPtr->sendString(", ");
   // objHub.usartPtr->sendFloat(objHub.paramPtr->pidGainVel.kI);
@@ -282,10 +296,9 @@ int main(void)
 
   while (1)
   {
-    monitorGateway.addGraphData("label1", 0.001);
-    monitorGateway.addGraphData("label2", 2.0);
-    monitorGateway.sendGraphData();
-
+    // monitorGateway.addGraphData("label1", 0.001);
+    // monitorGateway.addGraphData("label2", 2.0);
+    // monitorGateway.sendGraphData();
     // objHub.usartPtr->buffCheck();
     // objHub.usartPtr->sendString("[adc]@");
     // objHub.usartPtr->sendString("rightEnc:");
