@@ -6,9 +6,10 @@ Usart* Usart::instance = nullptr;
 Usart::Usart(UART_HandleTypeDef &huart_){
     huart        = &huart_;
     instance     = this;
+    isReceived   = false;
+    rxIndex      = 0;
     receivedChar = 0;
     clearBuff();
-    startSequentialReceive();
 }
 Usart::~Usart(){}
 
@@ -50,10 +51,9 @@ void Usart::sendFloat(float value){
     sendString(buffer);
 }
 
-void Usart::startSequentialReceive() {
-    // HAL_UART_Receive_IT(huart, &receivedChar, 1);
+void Usart::startPolling() {
+    HAL_UART_Receive_IT(huart, &receivedChar, 1);
 }
-
 
 /*******************************/
 /*                             */
@@ -63,40 +63,34 @@ void Usart::startSequentialReceive() {
 /*                             */
 /*******************************/
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)  {
-    // Usart::instance->sendString("ok \r\n");
+    if (huart->Instance == USART1) {
+        // 受信データを格納
+        uint8_t receivedChar = Usart::instance->receivedChar;
+        Usart::instance->rxBuffer[Usart::instance->rxIndex] = receivedChar;
 
-    // if (huart->Instance == USART1) {
-
-    //     // 1 バイト受信したら発火
-    //     Usart::instance->received();
-    // }
-}
-
-void Usart::received() {
-    if (receivedChar == '\n') {     // 改行を受信したらメッセージの終端と判断
-        rxBuffer[rxIndex] = '\0';   // 文字列の終端を追加
-    } 
-    else {
-        if (rxIndex < RX_BUFFER_SIZE - 1) {
-            rxBuffer[rxIndex++] = receivedChar;
+        if (receivedChar == '\n') {
+            Usart::instance->rxBuffer[Usart::instance->rxIndex] = '\0'; // \n を \0 に置換
+            Usart::instance->isReceived = true;
+        }
+        else {
+            // 次の受信を開始
+            Usart::instance->rxIndex++;
+            Usart::instance->startPolling();
         }
     }
-
-    // 次の 1 バイトを受信開始
-    HAL_UART_Receive_IT(huart, &receivedChar, 1);
-
 }
 
 void Usart::clearBuff(){
-    rxIndex = 0;
+    rxIndex    = 0;
+    isReceived = false;
     memset(rxBuffer, 0, RX_BUFFER_SIZE);
 }
 
-void Usart::buffCheck(){
-    sendString("index: ");
-    sendInt16t(rxIndex);
-    sendString(" received: ");
-    sendString((char*)rxBuffer);
+void Usart::buffCheck() {
+    sendString("check: ");
+    sendInt16t(isReceived);
+    sendString(" recv: ");
+    sendString((char *)rxBuffer);
     sendString("\r\n");
 }
 

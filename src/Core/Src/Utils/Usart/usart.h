@@ -2,7 +2,7 @@
 #define SRC_UTILS_USART_H_
 
 #include <main.h>
-#include <stm32g4xx_hal.h>
+#include <MasterDefine.h>
 #ifdef __cplusplus
     #include <cstring>
     #include <cstdio>
@@ -11,8 +11,8 @@
 class Usart{
 public:
     static Usart* instance;
-    static constexpr uint8_t RX_BUFFER_SIZE = 64;
     uint8_t rxBuffer[RX_BUFFER_SIZE];
+    bool isReceived;
     uint8_t rxIndex;
     uint8_t receivedChar;
 
@@ -26,8 +26,7 @@ public:
     void sendUint32t(uint32_t value);
     void sendFloat(float value);
 
-    void startSequentialReceive();
-    void received();
+    void startPolling();
     void clearBuff();
     void buffCheck();
 
