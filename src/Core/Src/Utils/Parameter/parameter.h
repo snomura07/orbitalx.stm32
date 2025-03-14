@@ -15,6 +15,7 @@ public:
     Parameter(DataFlash *dataFlash_);
     ~Parameter();
     void readAll();
+    void writeAll();
     void writeMachineName(const char* name);
     void writeVersion(const char*  ver);
     void writePidGainVel(float kp, float ki, float kd);

@@ -19,6 +19,12 @@ void Parameter::readAll() {
     readStringBlock(MACHINE_INFO_1, version, sizeof(version));
 }
 
+void Parameter::writeAll() {
+    writeMachineName(machineName);
+    writeVersion(version);
+    writePidGainVel(pidGainVel.kP, pidGainVel.kI, pidGainVel.kD);
+}
+
 void Parameter::writeMachineName(const char* name) {
     writeStringBlock(MACHINE_NAME_1, name, 8); //1ブロック分
 }

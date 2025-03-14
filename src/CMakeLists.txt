@@ -12,7 +12,7 @@ set(CMAKE_CXX_COMPILER arm-none-eabi-g++)
 set(CMAKE_ASM_COMPILER arm-none-eabi-gcc)
 
 # コンパイルフラグ
-set(CMAKE_C_FLAGS "-mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -Os -ffunction-sections -fdata-sections -Wall")
+set(CMAKE_C_FLAGS "-mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -Os -ffunction-sections -fdata-sections -fno-inline-functions -Wall")
 set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -fno-exceptions -fno-rtti -fno-use-cxa-atexit")
 set(CMAKE_ASM_FLAGS "${CMAKE_C_FLAGS} -x assembler-with-cpp")
 
@@ -83,6 +83,7 @@ add_executable(
     Core/Src/Utils/Usart/usart.cpp
     Core/Src/Utils/DataFlash/data_flash.cpp
     Core/Src/Utils/Parameter/parameter.cpp
+    Core/Src/Utils/Custom/custom.cpp
     Core/Src/Interface/UtilInterface/util_interface.cpp
 )
 

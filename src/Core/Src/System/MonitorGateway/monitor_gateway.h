@@ -11,10 +11,14 @@ public:
     bool receiveCheck();
     void addGraphData(char *label, float data);
     void sendGraphData();
+    void sendInfoData();
 
 private:
     void parseFromString();
-    void serializeToString();
+    void parseInfoData();
+    void updateParam(const char* keyValue);
+
+    float customStrToF(const char* str);
 
 private:
     uint8_t rxBuffer[RX_BUFFER_SIZE];

@@ -232,6 +232,7 @@ int main(void)
   paramManager.setParamPtr(objHub.paramPtr);
 
   monitorGateway.setUsartPtr(objHub.usartPtr);
+  monitorGateway.setParamPtr(objHub.paramPtr);
 
   /* USER CODE END SysInit */
 
@@ -275,24 +276,16 @@ int main(void)
   // objHub.paramPtr->writeMachineName("OrbitalX");
   // objHub.paramPtr->writePidGainVel(0.11, 0.006, -0.2);
   // objHub.paramPtr->writeVersion("2.1.0");
-  objHub.usartPtr->sendFloat(objHub.paramPtr->pidGainVel.kP);
-  objHub.usartPtr->sendString(", ");
-  objHub.usartPtr->sendFloat(objHub.paramPtr->pidGainVel.kI);
-  objHub.usartPtr->sendString(", ");
-  objHub.usartPtr->sendFloat(objHub.paramPtr->pidGainVel.kD);
-  objHub.usartPtr->sendString(", ");
-  objHub.usartPtr->sendString(objHub.paramPtr->machineName);
-  objHub.usartPtr->sendString(", ver:");
-  objHub.usartPtr->sendString(objHub.paramPtr->version);
-  objHub.usartPtr->sendString("\r\n");
-
   // objHub.usartPtr->sendFloat(objHub.paramPtr->pidGainVel.kP);
   // objHub.usartPtr->sendString(", ");
   // objHub.usartPtr->sendFloat(objHub.paramPtr->pidGainVel.kI);
   // objHub.usartPtr->sendString(", ");
   // objHub.usartPtr->sendFloat(objHub.paramPtr->pidGainVel.kD);
-  // objHub.usartPtr->sendString("\r\n");
-
+  // objHub.usartPtr->sendString(", ");
+  objHub.usartPtr->sendString(objHub.paramPtr->machineName);
+  objHub.usartPtr->sendString(", ver:");
+  objHub.usartPtr->sendString(objHub.paramPtr->version);
+  objHub.usartPtr->sendString("\r\n");
 
   while (1)
   {
