@@ -72,6 +72,7 @@ add_executable(
     Core/Src/System/RunCore/run_core.cpp
     Core/Src/System/Debug/Menu/menu.cpp
     Core/Src/System/Debug/ParameterManager/parameter_manager.cpp
+    Core/Src/System/MonitorGateway/monitor_gateway.cpp
     Core/Src/Dynamics/DynamicsHub/dynamics_hub.cpp
     Core/Src/Dynamics/AngularVelocity/angular_velocity.cpp
     Core/Src/Dynamics/Angle/angle.cpp

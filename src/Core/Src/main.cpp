@@ -44,6 +44,7 @@
 #include <ActionLauncher/action_launcher.h>
 #include <MotorController/motor_controller.h>
 #include <RunCore/run_core.h>
+#include <MonitorGateway/monitor_gateway.h>
 #include <Debug/Menu/menu.h>
 #include <Debug/ParameterManager/parameter_manager.h>
 
@@ -110,6 +111,7 @@ Logger logger;
 DataFlash dataFlash;
 Debug::Menu debugMenu;
 Debug::ParameterManager paramManager;
+MonitorGateway monitorGateway;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -227,6 +229,8 @@ int main(void)
   paramManager.setUsartPtr(objHub.usartPtr);
   paramManager.setParamPtr(objHub.paramPtr);
 
+  monitorGateway.setUsartPtr(objHub.usartPtr);
+
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
@@ -241,6 +245,9 @@ int main(void)
   MX_TIM6_Init();
   MX_TIM7_Init();
   /* USER CODE BEGIN 2 */
+  // Usart reveice start
+  objHub.usartPtr->startPolling();
+
   // DMA SPI start
   objHub.imuPtr->init();
 
@@ -254,8 +261,6 @@ int main(void)
   startup.run();
   objHub.ledBlueFrontPtr->on();
   objHub.ledBlueBackPtr->on();
-  // objHub.rMotPtr->start();
-  // objHub.lMotPtr->start();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -264,13 +269,6 @@ int main(void)
   dynHub.velocityPtr->reset();
   dynHub.distancePtr->reset();
   // actionLauncher.select();
-
-  // logger.activate();
-  // runCore.moveForward(1000.0);
-  // logger.deActivate();
-  // HAL_Delay(5000);
-  // objHub.ledDarkGreenPtr->on();
-  // logger.dump();
 
   // objHub.paramPtr->writePidGainVel(0.11, 0.006, -0.2);
   // objHub.paramPtr->readAll();
@@ -281,11 +279,14 @@ int main(void)
   // objHub.usartPtr->sendFloat(objHub.paramPtr->pidGainVel.kD);
   // objHub.usartPtr->sendString("\r\n");
 
+
   while (1)
   {
-    char receivedChar = objHub.usartPtr->receiveChar();
-    objHub.usartPtr->sendString(&receivedChar);
+    monitorGateway.addGraphData("label1", 0.001);
+    monitorGateway.addGraphData("label2", 2.0);
+    monitorGateway.sendGraphData();
 
+    // objHub.usartPtr->buffCheck();
     // objHub.usartPtr->sendString("[adc]@");
     // objHub.usartPtr->sendString("rightEnc:");
     // objHub.usartPtr->sendUint16t(objHub.rEncPtr->currRaw);
@@ -925,6 +926,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
     // TIM7 callback -> 1call per 10ms
     if (htim->Instance == TIM7) {
+      if(monitorGateway.receiveCheck()){
+
+      }
+
       // if(paramManager.comCheck()){
 
       // }
