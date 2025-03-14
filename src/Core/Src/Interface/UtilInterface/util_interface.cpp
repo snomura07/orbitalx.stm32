@@ -28,6 +28,23 @@ void UtilInterface::sendFloat(float value) {
     usartPtr->sendFloat(value);
 }
 
+bool UtilInterface::isReceived() {
+    return usartPtr->isReceived;
+}
+
+void UtilInterface::copyRxBuffer(uint8_t *dest, size_t size) {
+    memcpy(dest, usartPtr->rxBuffer, size);
+    usartPtr->clearBuff();
+}
+
+int UtilInterface::getRxBufferSize() {
+    return usartPtr->rxIndex;
+}
+
+void UtilInterface::startPolling() {
+    usartPtr->startPolling();
+}
+
 char UtilInterface::receiveChar() {
     char data = 0;
     data = usartPtr->receiveChar();

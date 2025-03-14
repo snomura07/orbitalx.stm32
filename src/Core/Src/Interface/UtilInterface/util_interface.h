@@ -22,8 +22,14 @@ protected:
     void sendInt(int16_t value);
     void sendLong(int32_t value);
     void sendFloat(float value);
+
+    bool isReceived();
+    void copyRxBuffer(uint8_t *dest, size_t size);
+    int  getRxBufferSize();
+    void startPolling();
     char receiveChar();
     char receiveCharNonBlocking();
+
 };
 
 #endif

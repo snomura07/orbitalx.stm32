@@ -8,24 +8,42 @@ ParameterManager::ParameterManager():
 ParameterManager::~ParameterManager(){}
 
 bool ParameterManager::comCheck() {
-    bool res = false;
-    char received = receiveCharNonBlocking();
-    if (received == '\0') return res;
+    if(!UtilInterface::isReceived()) return false;
 
-    if (rxIndex < sizeof(rxBuffer) - 1) {
-        rxBuffer[rxIndex++] = received;
+    int size = UtilInterface::getRxBufferSize();
+    uint8_t buff[size];
+    UtilInterface::copyRxBuffer(buff, size);
+
+    if (memcmp(buff, "[debug]@", 8) == 0) {
+        float gg = 0.001;
+        sendMessage("[info]@");
+        sendMessage("GAIN1:");
+        sendFloat(gg);
+        sendMessage(",");
+        sendMessage("GAIN2:");
+        gg = 1.0;
+        sendFloat(gg);
+        sendMessage(",");
+        sendMessage("GAIN3:");
+        gg = 13.0;
+        sendFloat(gg);
+        sendMessage(",");
+        sendMessage("GAIN4:");
+        gg = 0.987;
+        sendFloat(gg);
+        sendMessage(",");
+        sendMessage("GAIN5:");
+        sendFloat(gg);
+        sendMessage(",");
+        sendMessage("GAIN6:");
+        sendFloat(gg);
+        sendMessage(",");
+        sendMessage("GAIN7:");
+        sendFloat(gg);
+        sendMessage("\r\n");
+
     }
 
-    if (received == '\n' || received == '\r') {
-        rxBuffer[rxIndex] = '\0';
-
-        if (strcmp(rxBuffer, "[debug]@") == 0) {
-            sendMessage("[info]@デバッグモード有効");
-        }
-
-        rxIndex = 0;
-        memset(rxBuffer, 0, sizeof(rxBuffer));
-    }
-
+    return true;
 }
 };
