@@ -23,9 +23,6 @@ void MonitorGateway::parseFromString() {
     if (memcmp(rxBuffer, "[debug]@", strlen("[debug]@")) == 0) {
         sendInfoData();
     }
-    else if (memcmp(rxBuffer, "[adc]@", strlen("[adc]@")) == 0) {
-        sendMessage("get: [adc]@ \r\n");
-    }
     else if (memcmp(rxBuffer, "[info]@", strlen("[info]@")) == 0) {
         parseInfoData();
     }
@@ -75,6 +72,15 @@ void MonitorGateway::updateParam(const char* keyValue, bool isLast) {
     else if(memcmp(key, "GAIN_VEL_KD", strlen("GAIN_VEL_KD")) == 0){
         paramPtr->pidGainVel.kD = val;
     }
+    else if(memcmp(key, "GAIN_ANG_VEL_KP", strlen("GAIN_ANG_VEL_KP")) == 0){
+        paramPtr->pidGainAngVel.kP = val;
+    }
+    else if(memcmp(key, "GAIN_ANG_VEL_KI", strlen("GAIN_ANG_VEL_KI")) == 0){
+        paramPtr->pidGainAngVel.kI = val;
+    }
+    else if(memcmp(key, "GAIN_ANG_VEL_KD", strlen("GAIN_ANG_VEL_KD")) == 0){
+        paramPtr->pidGainAngVel.kD = val;
+    }
 
     if (isLast) {
         paramPtr->writeAll();
@@ -112,12 +118,18 @@ void MonitorGateway::sendInfoData() {
     sendMessage(paramPtr->machineName);
     sendMessage(",VERSION:");
     sendMessage(paramPtr->version);
-
     sendMessage(",GAIN_VEL_KP:");
     sendFloat(paramPtr->pidGainVel.kP);
     sendMessage(",GAIN_VEL_KI:");
     sendFloat(paramPtr->pidGainVel.kI);
     sendMessage(",GAIN_VEL_KD:");
     sendFloat(paramPtr->pidGainVel.kD);
+    sendMessage(",GAIN_ANG_VEL_KP:");
+    sendFloat(paramPtr->pidGainAngVel.kP);
+    sendMessage(",GAIN_ANG_VEL_KI:");
+    sendFloat(paramPtr->pidGainAngVel.kI);
+    sendMessage(",GAIN_ANG_VEL_KD:");
+    sendFloat(paramPtr->pidGainAngVel.kD);
+
     sendMessage("\r\n");
 }

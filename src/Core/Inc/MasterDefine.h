@@ -13,7 +13,7 @@
 #define WHEEL_DIAMETER 14.3f
 #define DELTA_T 0.001
 #define DATAFLASH_START_ADDR  0x0800F400
-#define RX_BUFFER_SIZE 128
+#define RX_BUFFER_SIZE 256
 #define TX_BUFFER_SIZE 128
 
 struct Axis

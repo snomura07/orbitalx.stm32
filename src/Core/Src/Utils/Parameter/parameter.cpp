@@ -7,6 +7,9 @@ Parameter::~Parameter() {}
 
 void Parameter::readAll() {
     float readData[2];
+    readStringBlock(MACHINE_NAME_1, machineName, sizeof(machineName));
+    readStringBlock(MACHINE_INFO_1, version, sizeof(version));
+
     readFloatBlock(PID_GAIN_VEL_ADDR_1, readData);
     pidGainVel.kP = readData[0];
     pidGainVel.kI = readData[1];
@@ -14,15 +17,19 @@ void Parameter::readAll() {
     readFloatBlock(PID_GAIN_VEL_ADDR_2, readData);
     pidGainVel.kD = readData[0];
 
-    readStringBlock(MACHINE_NAME_1, machineName, sizeof(machineName));
+    readFloatBlock(PID_GAIN_ANG_VEL_ADDR_1, readData);
+    pidGainAngVel.kP = readData[0];
+    pidGainAngVel.kI = readData[1];
 
-    readStringBlock(MACHINE_INFO_1, version, sizeof(version));
+    readFloatBlock(PID_GAIN_ANG_VEL_ADDR_2, readData);
+    pidGainAngVel.kD = readData[0];
 }
 
 void Parameter::writeAll() {
     writeMachineName(machineName);
-    writePidGainVel(pidGainVel.kP, pidGainVel.kI, pidGainVel.kD);
     writeVersion(version);
+    writePidGainVel(pidGainVel.kP, pidGainVel.kI, pidGainVel.kD);
+    writePidGainAngVel(pidGainAngVel.kP, pidGainAngVel.kI, pidGainAngVel.kD);
 }
 
 void Parameter::writeMachineName(const char* name) {
@@ -42,6 +49,17 @@ void Parameter::writePidGainVel(float kp, float ki, float kd) {
     writeData[0] = kd;
     writeData[1] = 0;
     writeFloatBlock(PID_GAIN_VEL_ADDR_2, writeData);
+}
+
+void Parameter::writePidGainAngVel(float kp, float ki, float kd) {
+    float writeData[2];
+    writeData[0] = kp;
+    writeData[1] = ki;
+    writeFloatBlock(PID_GAIN_ANG_VEL_ADDR_1, writeData);
+
+    writeData[0] = kd;
+    writeData[1] = 0;
+    writeFloatBlock(PID_GAIN_ANG_VEL_ADDR_2, writeData);
 }
 
 void Parameter::readIntBlock(uint32_t address, int16_t* outData) {
