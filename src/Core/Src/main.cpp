@@ -46,7 +46,6 @@
 #include <RunCore/run_core.h>
 #include <MonitorGateway/monitor_gateway.h>
 #include <Debug/Menu/menu.h>
-#include <Debug/ParameterManager/parameter_manager.h>
 
 // Dynamics
 #include <DynamicsHub/dynamics_hub.h>
@@ -110,7 +109,6 @@ FailSafe failSafe;
 Logger logger;
 DataFlash dataFlash;
 Debug::Menu debugMenu;
-Debug::ParameterManager paramManager;
 MonitorGateway monitorGateway;
 /* USER CODE END PV */
 
@@ -228,9 +226,6 @@ int main(void)
                       objHub.wallSensPtr,
                       &runCore);
 
-  paramManager.setUsartPtr(objHub.usartPtr);
-  paramManager.setParamPtr(objHub.paramPtr);
-
   monitorGateway.setUsartPtr(objHub.usartPtr);
   monitorGateway.setParamPtr(objHub.paramPtr);
 
@@ -275,17 +270,7 @@ int main(void)
 
   // objHub.paramPtr->writeMachineName("OrbitalX");
   // objHub.paramPtr->writePidGainVel(0.11, 0.006, -0.2);
-  // objHub.paramPtr->writeVersion("2.1.0");
-  // objHub.usartPtr->sendFloat(objHub.paramPtr->pidGainVel.kP);
-  // objHub.usartPtr->sendString(", ");
-  // objHub.usartPtr->sendFloat(objHub.paramPtr->pidGainVel.kI);
-  // objHub.usartPtr->sendString(", ");
-  // objHub.usartPtr->sendFloat(objHub.paramPtr->pidGainVel.kD);
-  // objHub.usartPtr->sendString(", ");
-  objHub.usartPtr->sendString(objHub.paramPtr->machineName);
-  objHub.usartPtr->sendString(", ver:");
-  objHub.usartPtr->sendString(objHub.paramPtr->version);
-  objHub.usartPtr->sendString("\r\n");
+  // objHub.paramPtr->writeVersion("2.2.0");
 
   while (1)
   {
@@ -935,13 +920,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
       if(monitorGateway.receiveCheck()){
 
       }
-
-      // if(paramManager.comCheck()){
-
-      // }
-
-      // logger.setLog1((int16_t)dynHub.encDistancePtr->mm);
-      // logger.setLog2((int16_t)dynHub.velocityPtr->mmps.y);
 
       // objHub.usartPtr->sendString("[adc]@");
       // objHub.usartPtr->sendUint16t(objHub.rEncPtr->currRaw);

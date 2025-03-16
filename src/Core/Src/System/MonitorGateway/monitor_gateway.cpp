@@ -20,31 +20,36 @@ void MonitorGateway::parseFromString() {
     int size = UtilInterface::getRxBufferSize();
     UtilInterface::copyRxBuffer(rxBuffer, size);
 
-    if (memcmp(rxBuffer, "[debug]@", 8) == 0) {
+    if (memcmp(rxBuffer, "[debug]@", strlen("[debug]@")) == 0) {
         sendInfoData();
     }
-    else if (memcmp(rxBuffer, "[adc]@", 6) == 0) {
+    else if (memcmp(rxBuffer, "[adc]@", strlen("[adc]@")) == 0) {
         sendMessage("get: [adc]@ \r\n");
     }
-    else if (memcmp(rxBuffer, "[info]@", 7) == 0) {
+    else if (memcmp(rxBuffer, "[info]@", strlen("[info]@")) == 0) {
         parseInfoData();
     }
 }
 
 void MonitorGateway::parseInfoData() {
     char* ptr = (char*)rxBuffer + 7;  // "[info]@" をスキップ
+    char* lastParam = nullptr;
+
     while (*ptr) {
         char* comma = strchr(ptr, ',');  // カンマの検索
-        if (comma) *comma = '\0';        // カンマ除去
+        if (comma) {
+            *comma = '\0';          // カンマを '\0' に置換
+            lastParam = comma + 1;
+        }
 
-        updateParam(ptr);
+        updateParam(ptr, (comma == nullptr));  //最後のパラメータのときだけtrueを渡す
 
         if (!comma) break;
         ptr = comma + 1;
     }
 }
 
-void MonitorGateway::updateParam(const char* keyValue) {
+void MonitorGateway::updateParam(const char* keyValue, bool isLast) {
     char* separator = strchr(keyValue, ':');
     if (!separator) return;
 
@@ -53,27 +58,29 @@ void MonitorGateway::updateParam(const char* keyValue) {
     const char* value = separator + 1;
 
     float val = Custom::strToFloat(value);
-    if(strcmp(key, "MACHINE_NAME") == 0) {
+    if(memcmp(key, "MACHINE_NAME", strlen("MACHINE_NAME")) == 0) {
         strncpy(paramPtr->machineName, value, sizeof(paramPtr->machineName) - 1);
         paramPtr->machineName[sizeof(paramPtr->machineName) - 1] = '\0';
     }
-    else if(strcmp(key, "VERSION") == 0) {
+    else if(memcmp(key, "VERSION", strlen("VERSION")) == 0) {
         strncpy(paramPtr->version, value, sizeof(paramPtr->version) - 1);
         paramPtr->version[sizeof(paramPtr->version) - 1] = '\0';
     }
-    else if(strcmp(key, "GAIN_VEL_KP") == 0){
+    else if(memcmp(key, "GAIN_VEL_KP", strlen("GAIN_VEL_KP")) == 0){
         paramPtr->pidGainVel.kP = val;
     }
-    else if(strcmp(key, "GAIN_VEL_KI") == 0){
+    else if(memcmp(key, "GAIN_VEL_KI", strlen("GAIN_VEL_KI")) == 0){
         paramPtr->pidGainVel.kI = val;
     }
-    else if(strcmp(key, "GAIN_VEL_KD") == 0){
+    else if(memcmp(key, "GAIN_VEL_KD", strlen("GAIN_VEL_KD")) == 0){
         paramPtr->pidGainVel.kD = val;
     }
 
-    paramPtr->writeAll();
+    if (isLast) {
+        paramPtr->writeAll();
+        sendMessage("dataflash write complete!");
+    }
 }
-
 
 void MonitorGateway::addGraphData(char *label, float data) {
     int integerPart    = (int)data; // 整数部分

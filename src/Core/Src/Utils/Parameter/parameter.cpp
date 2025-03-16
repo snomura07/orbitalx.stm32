@@ -21,8 +21,8 @@ void Parameter::readAll() {
 
 void Parameter::writeAll() {
     writeMachineName(machineName);
-    writeVersion(version);
     writePidGainVel(pidGainVel.kP, pidGainVel.kI, pidGainVel.kD);
+    writeVersion(version);
 }
 
 void Parameter::writeMachineName(const char* name) {

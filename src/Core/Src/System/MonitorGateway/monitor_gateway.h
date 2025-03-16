@@ -16,7 +16,7 @@ public:
 private:
     void parseFromString();
     void parseInfoData();
-    void updateParam(const char* keyValue);
+    void updateParam(const char* keyValue, bool isLast);
 
     float customStrToF(const char* str);
 
