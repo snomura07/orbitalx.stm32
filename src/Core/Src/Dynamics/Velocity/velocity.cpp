@@ -5,6 +5,8 @@ Velocity::Velocity(Accel *accel_, EncoderDistance *encDistance_) :
     encDistance(encDistance_),
     lastTime(0),
     dt(0.0),
+    vEncLp(0.0),
+    vFused(0.0),
     lastDistance(0.0)
 {
     reset();
@@ -17,14 +19,22 @@ void Velocity::update() {
     uint32_t now = HAL_GetTick();
     dt = (float)(now - lastTime) / 1000.0f;
 
-    // mmps.x += accel->mmpss.x * dt;
-    // mmps.y += accel->mmpss.y * dt;
-    // mmps.z += accel->mmpss.z * dt;
+    // calc velocity from encoder distance
+    float vEncRaw = (encDistance->mm - lastDistance) / dt;
+    // vEncLp        = 0.7*vEncLp + 0.3*vEncRaw;
+    vEncLp        = vEncRaw;
 
-    float vc     = (encDistance->mm - lastDistance) / dt;
-    mmps.y       = 0.95*mmps.y + 0.05*vc;
-    lastDistance = encDistance->mm;
-    lastTime     = now;
+    // calc velocity from accelY(mm/ss -> mm/s)
+    // float vPred = vFused + accel->mmpss.y*dt;
+    float vPred = accel->mmpss.y;
+
+    // fusion
+    // vFused = 0.3*vPred + 0.7*vEncLp;
+    vFused = vPred;
+    mmps.y = vFused;
+
+    lastDistance  = encDistance->mm;
+    lastTime      = now;
 }
 
 void Velocity::reset() {
@@ -35,10 +45,11 @@ void Velocity::dump() {
     sendMessage("Velocity: ");
     sendFloat(mmps.y);
     sendMessage(", ");
-    sendMessage("encDis: ");
-    sendFloat(encDistance->mm);
+    sendFloat(vEncLp);
     sendMessage(", ");
-    sendFloat(lastDistance);
+    sendFloat(vFused);
+    sendMessage(", ");
+    sendFloat(encDistance->mm);
     sendMessage(", ");
     sendFloat(dt);
     sendMessage("\r\n");

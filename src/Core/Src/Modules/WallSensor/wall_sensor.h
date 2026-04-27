@@ -15,6 +15,7 @@ public:
     WallSensor(Adc *adc_, Iled *ied_);
     ~WallSensor();
     void update();
+    uint16_t rFrontDetected();
     void dump();
 
 private:

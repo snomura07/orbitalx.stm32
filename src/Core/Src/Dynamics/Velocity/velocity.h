@@ -23,6 +23,8 @@ private:
     EncoderDistance *encDistance;
     uint32_t lastTime;
     float dt;
+    float vEncLp;
+    float vFused;
     float lastDistance;
 };
 

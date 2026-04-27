@@ -20,6 +20,10 @@ void WallSensor::update(){
     lSide  = adc->adcBuff[LEFT_SIDE_WSENS_CH];
 }
 
+uint16_t WallSensor::rFrontDetected() {
+    return rFront>1200 ? 1 : 0;
+}
+
 void WallSensor::dump(){
     sendMessage("rFront:");
     sendInt(rFront);
