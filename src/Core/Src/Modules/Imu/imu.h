@@ -21,6 +21,7 @@ public:
     ~Imu();
     bool init();
     void update();
+    void setZeroPoint();
     void calcZeroPoint(int32_t samples);
     void dump();
     void handleDMAComplete();

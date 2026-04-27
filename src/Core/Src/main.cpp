@@ -34,6 +34,7 @@
 #include <TimerCount/timer_count.h>
 #include <Adc/adc.h>
 #include <Parameter/parameter.h>
+#include <Zupt/zupt.h>
 
 // System
 #include <Startup/startup.h>
@@ -110,6 +111,7 @@ Logger logger;
 DataFlash dataFlash;
 Debug::Menu debugMenu;
 MonitorGateway monitorGateway;
+Zupt zupt;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -226,9 +228,13 @@ int main(void)
                       objHub.wallSensPtr,
                       &runCore);
 
+  zupt.init(dynHub.encDistancePtr,
+            objHub.imuPtr,
+            objHub.ledRedPtr);
+  zupt.setUsartPtr(objHub.usartPtr);
+
   monitorGateway.setUsartPtr(objHub.usartPtr);
   monitorGateway.setParamPtr(objHub.paramPtr);
-
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
@@ -257,7 +263,6 @@ int main(void)
   HAL_Delay(20);
 
   startup.run();
-  objHub.ledBlueFrontPtr->on();
   objHub.ledBlueBackPtr->on();
   /* USER CODE END 2 */
 
@@ -291,11 +296,12 @@ int main(void)
     // objHub.usartPtr->sendString("leftCount:");
     // objHub.usartPtr->sendUint16t(objHub.lEncPtr->counter);
     // objHub.usartPtr->sendString(",");
-    // objHub.usartPtr->sendString("vel:");
-    // objHub.usartPtr->sendUint16t(dynHub.velocityPtr->mmps.y);
+    // objHub.usartPtr->sendString("dis:");
+    // objHub.usartPtr->sendUint16t(dynHub.encDistancePtr->mm);
     // objHub.usartPtr->sendString("\r\n");
 
     // dynHub.dump();
+    // objHub.imuPtr->dump();
     HAL_Delay(10);
 
     /* USER CODE END WHILE */
@@ -532,7 +538,7 @@ static void MX_TIM1_Init(void)
   htim1.Instance = TIM1;
   htim1.Init.Prescaler = 239;
   htim1.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim1.Init.Period = 999;
+  htim1.Init.Period = 499;
   htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim1.Init.RepetitionCounter = 0;
   htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
@@ -895,10 +901,12 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
       objHub.imuPtr             ->update();
 
       dynHub.encDistancePtr     ->update();
-      dynHub.angularVelocityPtr ->update();
-      dynHub.anglePtr           ->update();
+      // dynHub.angularVelocityPtr ->update();
+      // dynHub.anglePtr           ->update();
       dynHub.accelPtr           ->update();
-      dynHub.distancePtr        ->update();
+      dynHub.velocityPtr        ->update();
+      // dynHub.distancePtr        ->update();
+      zupt.update();
     }
 
     // TIM15 callback -> 1call/s
@@ -908,11 +916,16 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
     // TIM6 callback -> 1call per 10ms
     if (htim->Instance == TIM6) {
-      dynHub.velocityPtr->update();
-      motorController.update();
-        // objHub.rEncPtr ->update();
-        // objHub.lEncPtr ->update();
-        // objHub.wallSensPtr->update();
+      // motorController.update();
+
+      if(objHub.wallSensPtr->rFront > 1200){
+        objHub.ledDarkGreenPtr->on();
+      } else {
+        objHub.ledDarkGreenPtr->off();
+      }
+
+      // dynHub.velocityPtr->dump();
+      zupt.dump();
     }
 
     // TIM7 callback -> 1call per 10ms

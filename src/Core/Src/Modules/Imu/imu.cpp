@@ -62,6 +62,15 @@ void Imu::update() {
     gyroCorrected.z  = gyroRaw.z  - gyroOffset.z;
 }
 
+void Imu::setZeroPoint(){
+    accelOffset.x = accelRaw.x;
+    accelOffset.y = accelRaw.y;
+    accelOffset.z = accelRaw.z;
+    gyroOffset.x  = gyroRaw.x;
+    gyroOffset.y  = gyroRaw.y;
+    gyroOffset.z  = gyroRaw.z;
+}
+
 void Imu::calcZeroPoint(int32_t samples) {
     AxisLong accelSum = {0, 0, 0};
     AxisLong gyroSum  = {0, 0, 0};

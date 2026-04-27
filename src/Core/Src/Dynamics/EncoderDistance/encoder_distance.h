@@ -8,6 +8,7 @@
 class EncoderDistance : public UtilInterface{
 public:
     float mm;
+    float deltaMm;
     float rDis;
     float lDis;
 
@@ -24,6 +25,10 @@ private:
     Encoder *leftEncoder;
     float rightCount2Dis;
     float leftCount2Dis;
+
+    static constexpr uint8_t PAST_MS = 20;
+    float preDis[PAST_MS];
+    uint16_t latestIndex;
 };
 
 #endif
