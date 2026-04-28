@@ -16,18 +16,20 @@ void Zupt::init(EncoderDistance *encoderDistance_, Imu *imu_, Led *redLed_){
 // 1ms周期でupdateされる前提の処理
 void Zupt::update(){
 
+    bool stillGyro = abs(imu->gyroRaw.z)<150;
+    bool stillEnc  = encoderDistance->deltaMm < 5;
+
     //evaluate gyro z
-    // int16_t cGyroZ = abs(imu->gyroCorrected.z);
-    // if(cGyroZ < 100){
-    //     zuptCnt++;
-    // }
-    // else{
-    //     zuptCnt = 0;
-    //     status  = StatusEnum::MOVED;
-    // }
+    if(stillGyro){
+        zuptCnt++;
+    }
+    else{
+        zuptCnt = 0;
+        status  = StatusEnum::MOVED;
+    }
 
     //evaluate encoder dis
-    if(encoderDistance->deltaMm < 5){
+    if(stillEnc){
         zuptCnt++;
     }
     else{
@@ -38,7 +40,7 @@ void Zupt::update(){
     //status check
     if(zuptCnt > 200){
         status  = StatusEnum::STOPPED;
-        zuptCnt = 0;
+        zuptCnt = 201;
         imu->setZeroPoint();
     }
 
@@ -58,7 +60,7 @@ bool Zupt::isStopped(){
 void Zupt::dump(){
     sendMessage("[ZUPT] ");
     sendMessage("gyroZ: ");
-    sendInt(imu->gyroCorrected.z);
+    sendInt(imu->gyroRaw.z);
     sendMessage(", accelY: ");
     sendInt(imu->accelCorrected.y);
     sendMessage(", zuptCnt: ");
