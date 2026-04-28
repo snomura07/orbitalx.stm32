@@ -6,8 +6,7 @@ Velocity::Velocity(Accel *accel_, EncoderDistance *encDistance_) :
     lastTime(0),
     dt(0.0),
     vEncLp(0.0),
-    vFused(0.0),
-    lastDistance(0.0)
+    vFused(0.0)
 {
     reset();
 }
@@ -20,21 +19,18 @@ void Velocity::update() {
     dt = (float)(now - lastTime) / 1000.0f;
 
     // calc velocity from encoder distance
-    float vEncRaw = (encDistance->mm - lastDistance) / dt;
-    // vEncLp        = 0.7*vEncLp + 0.3*vEncRaw;
-    vEncLp        = vEncRaw;
+    float vEncRaw = encDistance->deltaMm / 0.02;
+    vEncLp        = 0.7*vEncLp + 0.3*vEncRaw;
 
     // calc velocity from accelY(mm/ss -> mm/s)
-    // float vPred = vFused + accel->mmpss.y*dt;
-    float vPred = accel->mmpss.y;
+    float vPred = vFused + accel->mmpss.y*dt;
 
     // fusion
-    // vFused = 0.3*vPred + 0.7*vEncLp;
-    vFused = vPred;
-    mmps.y = vFused;
+    vFused = 0.6*vPred + 0.4*vEncLp;
+    // vFused   = vPred;
 
-    lastDistance  = encDistance->mm;
-    lastTime      = now;
+    mmps.y   = vFused;
+    lastTime = now;
 }
 
 void Velocity::reset() {
@@ -42,15 +38,14 @@ void Velocity::reset() {
 }
 
 void Velocity::dump() {
-    sendMessage("Velocity: ");
+    sendMessage("[adc]@");
+    sendMessage("mmps:");
     sendFloat(mmps.y);
-    sendMessage(", ");
+    sendMessage(",");
+    sendMessage("vEncLp:");
     sendFloat(vEncLp);
     sendMessage(", ");
+    sendMessage("vFused:");
     sendFloat(vFused);
-    sendMessage(", ");
-    sendFloat(encDistance->mm);
-    sendMessage(", ");
-    sendFloat(dt);
     sendMessage("\r\n");
 }

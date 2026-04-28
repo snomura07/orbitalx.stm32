@@ -38,9 +38,9 @@ void Zupt::update(){
     }
 
     //status check
-    if(zuptCnt > 200){
+    if(zuptCnt > 500){
         status  = StatusEnum::STOPPED;
-        zuptCnt = 201;
+        zuptCnt = 501;
         imu->setZeroPoint();
     }
 

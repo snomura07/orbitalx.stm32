@@ -924,8 +924,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
         objHub.ledDarkGreenPtr->off();
       }
 
-      // dynHub.velocityPtr->dump();
-      zupt.dump();
+      dynHub.velocityPtr->dump();
     }
 
     // TIM7 callback -> 1call per 10ms

@@ -25,7 +25,6 @@ private:
     float dt;
     float vEncLp;
     float vFused;
-    float lastDistance;
 };
 
 #endif
