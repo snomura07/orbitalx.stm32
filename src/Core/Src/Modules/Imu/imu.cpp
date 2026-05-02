@@ -36,8 +36,8 @@ bool Imu::init() {
     writeRegister(ICM20648::ACCEL_CONFIG, &addr, 1);
     HAL_Delay(10);
 
-    // ジャイロ: ±2,000°/s
-    addr = 0x06;
+    // ジャイロ: （±2000dps + DLPF有効）
+    addr = 0x2f;
     writeRegister(ICM20648::GYRO_CONFIG, &addr, 1);
     HAL_Delay(100);
 

@@ -272,6 +272,7 @@ int main(void)
   dynHub.velocityPtr->reset();
   dynHub.distancePtr->reset();
   // actionLauncher.select();
+  motorController.activate();
 
   // objHub.paramPtr->writeMachineName("OrbitalX");
   // objHub.paramPtr->writePidGainVel(0.11, 0.006, -0.2);
@@ -300,8 +301,6 @@ int main(void)
     // objHub.usartPtr->sendUint16t(dynHub.encDistancePtr->mm);
     // objHub.usartPtr->sendString("\r\n");
 
-    // dynHub.dump();
-    // objHub.imuPtr->dump();
     HAL_Delay(10);
 
     /* USER CODE END WHILE */
@@ -901,12 +900,13 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
       objHub.imuPtr             ->update();
 
       dynHub.encDistancePtr     ->update();
-      // dynHub.angularVelocityPtr ->update();
+      dynHub.angularVelocityPtr ->update();
       // dynHub.anglePtr           ->update();
       dynHub.accelPtr           ->update();
       dynHub.velocityPtr        ->update();
       // dynHub.distancePtr        ->update();
       zupt.update();
+      motorController.update();
     }
 
     // TIM15 callback -> 1call/s
@@ -916,15 +916,13 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
     // TIM6 callback -> 1call per 10ms
     if (htim->Instance == TIM6) {
-      // motorController.update();
-
       if(objHub.wallSensPtr->rFront > 1200){
         objHub.ledDarkGreenPtr->on();
       } else {
         objHub.ledDarkGreenPtr->off();
       }
 
-      dynHub.velocityPtr->dump();
+      motorController.dump();
     }
 
     // TIM7 callback -> 1call per 10ms

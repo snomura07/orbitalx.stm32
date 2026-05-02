@@ -26,6 +26,7 @@ public:
     void update();
     void activate();
     void deActivate();
+    void dump();
 
 private:
     void updateCurrDesiredVelocity();
@@ -49,6 +50,8 @@ private:
     float currDesiredVelocity;          // mm/s
     float currDesiredAngularVelocity;   // deg/s
     bool isActive;
+
+    uint16_t desiredVelCnt;
 };
 
 #endif
