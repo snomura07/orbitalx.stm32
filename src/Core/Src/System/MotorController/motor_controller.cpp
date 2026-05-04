@@ -9,8 +9,7 @@ MotorController::MotorController():
     currDesiredVelocity(0.0),
     currDesiredAngularVelocity(0.0),
     preDesiredVelocity(0.0),
-    preDesiredAngularVelocity(0.0),
-    desiredVelCnt(0)
+    preDesiredAngularVelocity(0.0)
 {
     pidVel    = {0.0, 0.0, 0.0};
     pidAngVel = {0.0, 0.0, 0.0};
@@ -44,33 +43,35 @@ void MotorController::setAngularAccel(float wa) {
 
 void MotorController::update() {
 
-    desiredVelCnt++;
-    setAccel(1000.0);
+    // desiredVelCnt++;
+    // setAccel(1000.0);
 
-    if(desiredVelCnt < 2000){
-        currDesiredVelocity += accel*DELTA_T;
-        if(currDesiredVelocity > 300.0) {
-            currDesiredVelocity = 300.0;
-        }
-    }
-    else if(desiredVelCnt >= 2000 && desiredVelCnt < 4000){
-        currDesiredVelocity -= accel*DELTA_T;
-        if(currDesiredVelocity < 0.0) {
-            currDesiredVelocity = 0.0;
-        }
-    }
-    else if(desiredVelCnt >= 4000){
-        desiredVelCnt = 0;
-    }
+    // if(desiredVelCnt < 2000){
+    //     currDesiredVelocity += accel*DELTA_T;
+    //     if(currDesiredVelocity > 300.0) {
+    //         currDesiredVelocity = 300.0;
+    //     }
+    // }
+    // else if(desiredVelCnt >= 2000 && desiredVelCnt < 4000){
+    //     currDesiredVelocity -= accel*DELTA_T;
+    //     if(currDesiredVelocity < 0.0) {
+    //         currDesiredVelocity = 0.0;
+    //     }
+    // }
+    // else if(desiredVelCnt >= 4000){
+    //     desiredVelCnt = 0;
+    // }
 
-    // updateCurrDesiredVelocity();
-    // updateCurrDesiredAngularVelocity();
+    updateCurrDesiredVelocity();
+    updateCurrDesiredAngularVelocity();
 
     float uV = updateVelocityPID();
     float uW = updateAngularVelocityPID();
 
-    float uR = 100.0f - uV - uW;
-    float uL = 100.0f - uV + uW;
+    // float uR = 100.0f - uV - uW;
+    // float uL = 100.0f - uV + uW;
+    float uR = 100.0f;
+    float uL = 100.0f;
     rMot->setDuty(uR);
     lMot->setDuty(uL);
 }
@@ -114,8 +115,13 @@ float MotorController::updateVelocityPID() {
     pidVel.preErr  = pidVel.err;
     pidVel.err     = (currVel->mmps.y - currDesiredVelocity);
     pidVel.errSum += pidVel.err;
+    float u        = 0.8*pidVel.err + 0.003*pidVel.errSum + 0.1*pidVel.preErr;
 
-    return (0.5*pidVel.err + 0.003*pidVel.errSum + 0.1*pidVel.preErr);
+    setLog1((int16_t)currDesiredVelocity);
+    setLog2((int16_t)currVel->mmps.y);
+    setLog3((int16_t)u);
+
+    return u;
 }
 
 float MotorController::updateAngularVelocityPID() {
@@ -146,7 +152,7 @@ void MotorController::dump() {
     sendFloat(currDesiredVelocity);
     sendMessage(",vel:");
     sendFloat(currVel->mmps.y);
-    sendMessage(",angVel:");
+    sendMessage(",gyro:");
     sendFloat(currAngVel->dps.z);
     sendMessage("\r\n");
 }

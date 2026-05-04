@@ -4,11 +4,13 @@
 #include <memory>
 #include <Usart/usart.h>
 #include <Parameter/parameter.h>
+#include <Logger/logger.h>
 
 class UtilInterface {
 protected:
     Usart *usartPtr;
     Parameter *paramPtr;
+    Logger *loggerPtr;
 
 public:
     UtilInterface();
@@ -16,6 +18,7 @@ public:
 
     virtual void setUsartPtr(Usart *usart);
     virtual void setParamPtr(Parameter *param);
+    virtual void setLoggerPtr(Logger *logger);
 
 protected:
     void sendMessage(const char* msg);
@@ -30,6 +33,9 @@ protected:
     char receiveChar();
     char receiveCharNonBlocking();
 
+    void setLog1(int16_t val);
+    void setLog2(int16_t val);
+    void setLog3(int16_t val);
 };
 
 #endif

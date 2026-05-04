@@ -3,9 +3,8 @@
 
 #include <memory>
 #include <Log/log.h>
-#include <UtilInterface/util_interface.h>
 
-class Logger : public UtilInterface{
+class Logger {
 public:
     Logger();
     ~Logger();
@@ -13,9 +12,12 @@ public:
     void setLog1(int16_t val);
     void setLog2(int16_t val);
     void setLog3(int16_t val);
+    int16_t getLog1(uint16_t pickNo);
+    int16_t getLog2(uint16_t pickNo);
+    int16_t getLog3(uint16_t pickNo);
     void activate();
     void deActivate();
-    void dump();
+    int16_t getLogSize();
 
 private:
     Log log1;

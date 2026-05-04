@@ -29,17 +29,17 @@ bool Imu::init() {
     // バンク切り替え
     uint8_t bank = 0x20;
     writeRegister(ICM20648::REG_BANK_SEL, &bank, 1);
-    HAL_Delay(10);
+    HAL_Delay(50);
 
     // 加速度: ±16g, 11.5Hz-DLPF
     addr = 0x2F;
     writeRegister(ICM20648::ACCEL_CONFIG, &addr, 1);
-    HAL_Delay(10);
+    HAL_Delay(50);
 
     // ジャイロ: （±2000dps + DLPF有効）
-    addr = 0x2f;
+    addr = 0x3f;
     writeRegister(ICM20648::GYRO_CONFIG, &addr, 1);
-    HAL_Delay(100);
+    HAL_Delay(50);
 
     // バンク戻す
     bank = 0x00;

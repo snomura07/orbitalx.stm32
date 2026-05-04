@@ -10,7 +10,7 @@ void RunCore::init(MotorController *motorController_, EncoderDistance *currDis_)
 
 void RunCore::moveForward(float dis) {
     motorController->setDesiredVelocity(300.0);
-    motorController->setAccel(6000.0);
+    motorController->setAccel(4000.0);
     motorController->setDesiredAngularVelocity(0.0);
     motorController->setAngularAccel(6000.0);
     motorController->activate();
@@ -18,5 +18,7 @@ void RunCore::moveForward(float dis) {
     // while(currDis->mm < dis);
     HAL_Delay(800);
     motorController->setDesiredVelocity(0.0);
+
+    HAL_Delay(500);
     motorController->deActivate();
 }

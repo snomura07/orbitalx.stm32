@@ -50,8 +50,6 @@ private:
     float currDesiredVelocity;          // mm/s
     float currDesiredAngularVelocity;   // deg/s
     bool isActive;
-
-    uint16_t desiredVelCnt;
 };
 
 #endif

@@ -23,10 +23,10 @@ void Velocity::update() {
     vEncLp        = 0.7*vEncLp + 0.3*vEncRaw;
 
     // calc velocity from accelY(mm/ss -> mm/s)
-    float vPred = vFused + accel->mmpss.y*dt;
+    float vPred = vFused + accel->mmpss.y*0.001;
 
     // fusion
-    vFused = 0.6*vPred + 0.4*vEncLp;
+    vFused = 0.1*vPred + 0.9*vEncLp;
     // vFused   = vPred;
 
     mmps.y   = vFused;

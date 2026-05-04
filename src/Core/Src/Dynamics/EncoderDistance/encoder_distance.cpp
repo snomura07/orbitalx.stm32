@@ -22,12 +22,10 @@ void EncoderDistance::init(){}
 
 // 1msごとに処理されることを前提とする
 void EncoderDistance::update() {
-    rDis = (float)rightEncoder->counter * rightCount2Dis;
-    lDis = (float)leftEncoder->counter  * leftCount2Dis;
-    mm   = (rDis+lDis)/2.0;
-
-    float preDis10ms = preDis[latestIndex];
-    deltaMm          = mm - preDis10ms;
+    rDis    = (float)rightEncoder->counter * rightCount2Dis;
+    lDis    = (float)leftEncoder->counter  * leftCount2Dis;
+    mm      = (rDis+lDis)/2.0;
+    deltaMm = mm - preDis[latestIndex];
 
     latestIndex++;
     if(latestIndex == PAST_MS){

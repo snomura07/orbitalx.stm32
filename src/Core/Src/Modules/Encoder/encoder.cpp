@@ -14,13 +14,13 @@ Encoder::Encoder(Adc *adc_, ModeEnum mode_):
 {
     memset(buff, 0, sizeof(buff));
     if(mode == RIGHT){
-        THRE_UP   = 3600;
-        THRE_DOWN = 3200;
+        THRE_UP   = 3000;
+        THRE_DOWN = 2920;
         staticThreshold = 50;
     }
     else {
-        THRE_UP   = 2050;
-        THRE_DOWN = 1950;
+        THRE_UP   = 1890;
+        THRE_DOWN = 1690;
         staticThreshold = 50;
     }
 }

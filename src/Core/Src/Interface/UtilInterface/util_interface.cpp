@@ -12,6 +12,10 @@ void UtilInterface::setParamPtr(Parameter *param) {
     paramPtr = param;
 }
 
+void UtilInterface::setLoggerPtr(Logger *logger) {
+    loggerPtr = logger;
+}
+
 void UtilInterface::sendMessage(const char* msg) {
     usartPtr->sendString(msg);
 }
@@ -55,4 +59,16 @@ char UtilInterface::receiveCharNonBlocking(){
     char data = 0;
     data = usartPtr->receiveCharNonBlocking();
     return data;
+}
+
+void UtilInterface::setLog1(int16_t val) {
+    loggerPtr->setLog1(val);
+}
+
+void UtilInterface::setLog2(int16_t val) {
+    loggerPtr->setLog2(val);
+}
+
+void UtilInterface::setLog3(int16_t val) {
+    loggerPtr->setLog3(val);
 }
