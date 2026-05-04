@@ -3,8 +3,6 @@
 Velocity::Velocity(Accel *accel_, EncoderDistance *encDistance_) :
     accel(accel_),
     encDistance(encDistance_),
-    lastTime(0),
-    dt(0.0),
     vEncLp(0.0),
     vFused(0.0)
 {
@@ -15,11 +13,8 @@ Velocity::~Velocity(){}
 void Velocity::init(){}
 
 void Velocity::update() {
-    uint32_t now = HAL_GetTick();
-    dt = (float)(now - lastTime) / 1000.0f;
-
     // calc velocity from encoder distance
-    float vEncRaw = encDistance->deltaMm / 0.02;
+    float vEncRaw = encDistance->deltaMm / 0.5;
     vEncLp        = 0.7*vEncLp + 0.3*vEncRaw;
 
     // calc velocity from accelY(mm/ss -> mm/s)
@@ -30,7 +25,6 @@ void Velocity::update() {
     // vFused   = vPred;
 
     mmps.y   = vFused;
-    lastTime = now;
 }
 
 void Velocity::reset() {

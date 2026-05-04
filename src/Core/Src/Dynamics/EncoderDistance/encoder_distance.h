@@ -26,7 +26,7 @@ private:
     float rightCount2Dis;
     float leftCount2Dis;
 
-    static constexpr uint8_t PAST_MS = 20;
+    static constexpr uint8_t PAST_MS = 500;
     float preDis[PAST_MS];
     uint16_t latestIndex;
 };

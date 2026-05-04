@@ -8,8 +8,8 @@
 #define LED_ON  0
 #define LED_OFF 1
 #define PI 3.14f
-#define RIGHT_ENC_PPR  64
-#define LEFT_ENC_PPR  64
+#define RIGHT_ENC_PPR  12.8
+#define LEFT_ENC_PPR  12.8
 #define WHEEL_DIAMETER 14.3f
 #define DELTA_T 0.001
 #define DATAFLASH_START_ADDR  0x0800F400
