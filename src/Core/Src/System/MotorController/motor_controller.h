@@ -4,6 +4,7 @@
 #include <Motor/motor.h>
 #include <Velocity/velocity.h>
 #include <AngularVelocity/angular_velocity.h>
+#include <Battery/battery.h>
 
 #include <UtilInterface/util_interface.h>
 
@@ -18,12 +19,13 @@ public:
 public:
     MotorController();
     ~MotorController();
-    void init(Motor *rMot_, Motor *lMot_, Velocity *vel_, AngularVelocity *currAngVel_);
+    void init(Motor *rMot_, Motor *lMot_, Velocity *vel_, AngularVelocity *currAngVel_, Battery *batt_);
     void setDesiredVelocity(float vd);
     void setDesiredAngularVelocity(float wd);
     void setAccel(float a);
     void setAngularAccel(float wa);
     void update();
+    float calcFF();
     void activate();
     void deActivate();
     void dump();
@@ -39,6 +41,7 @@ private:
     Motor *lMot;
     Velocity *currVel;
     AngularVelocity *currAngVel;
+    Battery *batt;
     PidElem pidVel;
     PidElem pidAngVel;
     float desiredVelocity;

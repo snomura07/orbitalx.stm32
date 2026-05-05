@@ -20,9 +20,14 @@ public:
 private:
     Adc *adc;
     uint16_t raw;
+    uint16_t mVoltRaw;
+    uint32_t mVoltRawSum;
 
-    static constexpr uint8_t BUFF_SIZE = 16;
+
+    static constexpr uint8_t BUFF_SIZE = 100;
     uint16_t mVoltBuff[BUFF_SIZE];
+    uint16_t latestIndex;
+
 };
 
 #endif
