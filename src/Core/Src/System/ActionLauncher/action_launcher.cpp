@@ -15,7 +15,7 @@ void ActionLauncher::init(Imu *imu_, LedController *ledController_, WallSensor *
 void ActionLauncher::select() {
     bool loopFlag = true;
     actionIndex   = 0;
-    ledController->on(actionIndex);
+    ledController->turnOnLevel(actionIndex);
 
     while(loopFlag){
         int16_t gyroX = imu->gyroCorrected.x;
@@ -25,7 +25,7 @@ void ActionLauncher::select() {
             if(actionIndex >= EnumSize){
                 actionIndex = 0;
             }
-            ledController->on(actionIndex);
+            ledController->turnOnLevel(actionIndex);
             HAL_Delay(500);
         }
 
@@ -47,22 +47,22 @@ void ActionLauncher::launch() {
     switch (actionIndex)
     {
         case SearchRun:
-            while(1){ledController->on(0);}
+            while(1){ledController->turnOnLevel(0);}
             break;
         case FastRun:
-            while(1){ledController->on(1);}
+            while(1){ledController->turnOnLevel(1);}
             break;
         case Test1:
             runCore->moveForward(200.0);
             break;
         case Test2:
-            while(1){ledController->on(3);}
+            while(1){ledController->turnOnLevel(3);}
             break;
         case Test3:
-            while(1){ledController->on(4);}
+            while(1){ledController->turnOnLevel(4);}
             break;
         case Test4:
-            while(1){ledController->on(5);}
+            while(1){ledController->turnOnLevel(5);}
             break;
     }
 }

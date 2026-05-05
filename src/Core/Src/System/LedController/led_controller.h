@@ -5,16 +5,20 @@
 
 class LedController {
 public:
+    using LedEnum = Led::ModeEnum;
+
+public:
     LedController();
     ~LedController();
-    void init(Led *led0_, Led *led1_, Led *led2_, Led *led3_, Led *led4_, Led *led5_);
-    void on(int8_t num); //in:0 ~ 5
+    void init(Led *blueFront_, Led *blueBack_, Led *orange_, Led *green_, Led *red_, Led *darkGreen_);
+    void turnOn(LedEnum no);
+    void turnOff(LedEnum no);
+    void turnOnLevel(int8_t num);
     void allOff();
     void allOn();
     void launchBlink();
 
 private:
-    static constexpr uint8_t LED_SIZE = 6;
     Led *ledArr[6];
     bool blinkToggle;
 };

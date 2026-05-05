@@ -5,36 +5,49 @@ LedController::LedController():
 {}
 LedController::~LedController(){}
 
-void LedController::init(Led *led0_, Led *led1_, Led *led2_, Led *led3_, Led *led4_, Led *led5_) {
-    ledArr[0] = led0_;
-    ledArr[1] = led1_;
-    ledArr[2] = led2_;
-    ledArr[3] = led3_;
-    ledArr[4] = led4_;
-    ledArr[5] = led5_;
+void LedController::init( Led *blueFront_,
+                          Led *blueBack_,
+                          Led *orange_,
+                          Led *green_,
+                          Led *red_,
+                          Led *darkGreen_) {
+    ledArr[LedEnum::ORANGE] = orange_;
+    ledArr[LedEnum::GREEN] = green_;
+    ledArr[LedEnum::BLUE_FRONT] = blueFront_;
+    ledArr[LedEnum::BLUE_BACK] = blueBack_;
+    ledArr[LedEnum::RED] = red_;
+    ledArr[LedEnum::DARK_GREEN] = darkGreen_;
 }
 
-void LedController::on(int8_t num){
-    if(num<0 || num>LED_SIZE) return;
+void LedController::turnOn(LedEnum no) {
+    ledArr[no]->on();
+}
 
-    for(int i=0; i<LED_SIZE; i++){
-        if(i == num){
-            ledArr[i]->on();
-        }
-        else{
-            ledArr[i]->off();
-        }
-    }
+void LedController::turnOff(LedEnum no) {
+    ledArr[no]->off();
+}
+
+void LedController::turnOnLevel(int8_t num){
+    // if(num<0 || num>LED_SIZE) return;
+
+    // for(int i=0; i<LED_SIZE; i++){
+    //     if(i == num){
+    //         ledArr[i]->on();
+    //     }
+    //     else{
+    //         ledArr[i]->off();
+    //     }
+    // }
 }
 
 void LedController::allOff(){
-    for(int i=0; i<LED_SIZE; i++){
+    for(int i=0; i<LedEnum::SIZE; i++){
         ledArr[i]->off();
     }
 }
 
 void LedController::allOn(){
-    for(int i=0; i<LED_SIZE; i++){
+    for(int i=0; i<LedEnum::SIZE; i++){
         ledArr[i]->on();
     }
 }
@@ -43,8 +56,8 @@ void LedController::launchBlink(){
     if(blinkToggle){
         blinkToggle = !blinkToggle;
         allOff();
-        ledArr[1]->on();
-        ledArr[2]->on();
+        ledArr[LedEnum::DARK_GREEN]->on();
+        ledArr[LedEnum::RED]->on();
         HAL_Delay(80);
     }
     else {
