@@ -204,21 +204,24 @@ int main(void)
   failSafe.timer6  = &timer6;
 
   ledController.init(objHub.ledBlueFrontPtr,
-                     objHub.ledDarkGreenPtr,
-                     objHub.ledRedPtr,
-                     objHub.ledGreenPtr,
+                     objHub.ledBlueBackPtr,
                      objHub.ledOrangePtr,
-                     objHub.ledBlueBackPtr );
+                     objHub.ledGreenPtr,
+                     objHub.ledRedPtr,
+                     objHub.ledDarkGreenPtr );
 
   motorController.init(objHub.rMotPtr,
                        objHub.lMotPtr,
                        dynHub.velocityPtr,
-                       dynHub.angularVelocityPtr);
+                       dynHub.angularVelocityPtr,
+                       objHub.battPtr);
   motorController.setUsartPtr(objHub.usartPtr);
   motorController.setLoggerPtr(&logger);
 
   runCore.init(&motorController,
+               &ledController,
                dynHub.encDistancePtr);
+  runCore.setUsartPtr(objHub.usartPtr);
 
   actionLauncher.init(objHub.imuPtr,
                       &ledController,
@@ -272,8 +275,7 @@ int main(void)
   dynHub.velocityPtr->reset();
   dynHub.distancePtr->reset();
   // actionLauncher.select();
-
-  runCore.moveForward(100.0);
+  runCore.moveForward(80.0);
 
   // for(int i=0; i<logger.getLogSize(); i++) {
   //     objHub.usartPtr->sendString("[adc]@");
@@ -910,12 +912,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
     // TIM6 callback -> 1call per 10ms
     if (htim->Instance == TIM6) {
-      if(objHub.wallSensPtr->lSide > 1200){
-        objHub.ledDarkGreenPtr->on();
-      } else {
-        objHub.ledDarkGreenPtr->off();
-      }
-
       // motorController.dump();
     }
 
@@ -925,15 +921,23 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
       }
 
-      objHub.usartPtr->sendString("[adc]@");
-      objHub.usartPtr->sendUint16t(objHub.rEncPtr->currRaw);
-      objHub.usartPtr->sendString(",");
-      objHub.usartPtr->sendUint16t(objHub.lEncPtr->currRaw);
-      objHub.usartPtr->sendString(",");
-      objHub.usartPtr->sendUint16t(objHub.rEncPtr->counter);
-      objHub.usartPtr->sendString(",");
-      objHub.usartPtr->sendUint16t(objHub.lEncPtr->counter);
-      objHub.usartPtr->sendString("\r\n");
+      // objHub.usartPtr->sendString("[adc]@");
+      // objHub.usartPtr->sendUint16t(objHub.rEncPtr->currRaw);
+      // objHub.usartPtr->sendString(",");
+      // objHub.usartPtr->sendUint16t(objHub.lEncPtr->currRaw);
+      // objHub.usartPtr->sendString(",");
+      // objHub.usartPtr->sendUint16t(objHub.rEncPtr->counter);
+      // objHub.usartPtr->sendString(",");
+      // objHub.usartPtr->sendUint16t(objHub.lEncPtr->counter);
+
+      // objHub.usartPtr->sendString("vel:");
+      // objHub.usartPtr->sendFloat(dynHub.velocityPtr->mmps.y);
+      // objHub.usartPtr->sendString(",dis:");
+      // objHub.usartPtr->sendFloat(dynHub.encDistancePtr->mm);
+
+      // objHub.usartPtr->sendString("batt:");
+      // objHub.usartPtr->sendUint16t(objHub.battPtr->mVolt);
+      // objHub.usartPtr->sendString("\r\n");
       // failSafe.update();
     }
 }
