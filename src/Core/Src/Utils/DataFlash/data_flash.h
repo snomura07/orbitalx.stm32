@@ -24,7 +24,7 @@ private:
     bool isAddressValid(uint32_t address, size_t size) const;
 
 private:
-    uint32_t lastErasedPage;
+    static constexpr uint32_t FlashBaseAddress = 0x08000000U;
 };
 
 #endif // DATAFLASH_H
