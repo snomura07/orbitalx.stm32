@@ -19,6 +19,18 @@ public:
     void dump();
 
 private:
+    enum class SamplePhase : uint8_t {
+        SET_OFF = 0,
+        SAMPLE_OFF_SET_ON,
+        SAMPLE_ON_COMPUTE
+    };
+
+    uint16_t rFrontOff;
+    uint16_t rSideOff;
+    uint16_t lFrontOff;
+    uint16_t lSideOff;
+    SamplePhase phase;
+
     Adc *adc;
     Iled *iled;
 };
