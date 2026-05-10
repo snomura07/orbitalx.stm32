@@ -1,9 +1,10 @@
 #ifndef PARAMETER_H
 #define PARAMETER_H
 #include <DataFlash/data_flash.h>
+#include <Usart/usart.h>
 #include "parameter_address.h"
 
-class Parameter{
+class Parameter {
 public:
     struct PidGain {
         float kP;
@@ -12,14 +13,16 @@ public:
     };
 
 public:
-    Parameter(DataFlash *dataFlash_);
+    Parameter();
     ~Parameter();
+    void setUtilPtr(DataFlash *dataFlash_, Usart *usart_);
     void readAll();
     void writeAll();
     void writeMachineName(const char* name);
     void writeVersion(const char*  ver);
     void writePidGainVel(float kp, float ki, float kd);
     void writePidGainAngVel(float kp, float ki, float kd);
+    void dump();
 
 private:
     void readIntBlock(uint32_t address, int16_t* outData);
@@ -37,6 +40,7 @@ public:
 
 private:
     DataFlash *dataFlash;
+    Usart *usart;
 };
 
 #endif

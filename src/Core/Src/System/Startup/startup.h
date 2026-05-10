@@ -18,6 +18,7 @@ private:
     void checkImu();
     void checkEncoder();
     void checkTimer();
+    void dumpParameters();
 
 public:
     ObjectHub *objHub;

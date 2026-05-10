@@ -19,6 +19,4 @@ void ObjectHub::initDependencies(){
     wallSensPtr->setUsartPtr(usartPtr);
     mapPtr->setUsartPtr(usartPtr);
     timerCntPtr->setUsartPtr(usartPtr);
-
-
 }

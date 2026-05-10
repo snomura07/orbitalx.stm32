@@ -1,9 +1,12 @@
 #include "parameter.h"
 
-Parameter::Parameter(DataFlash *dataFlash_):
-    dataFlash(dataFlash_)
-{}
+Parameter::Parameter(){}
 Parameter::~Parameter() {}
+
+void Parameter::setUtilPtr(DataFlash *dataFlash_, Usart *usart_) {
+    dataFlash = dataFlash_;
+    usart     = usart_;
+}
 
 void Parameter::readAll() {
     float readData[2];
@@ -131,4 +134,30 @@ void Parameter::writeStringBlock(uint32_t address, const char* str, size_t maxLe
     }
 
     dataFlash->writeData(address, data, wordLength);
+}
+
+void Parameter::dump() {
+    usart->sendString("Machine Name: ");
+    usart->sendString(machineName);
+    usart->sendString("\r\n");
+
+    usart->sendString("Version: ");
+    usart->sendString(version);
+    usart->sendString("\r\n");
+
+    usart->sendString("pidVel [kP,kI,kD]: ");
+    usart->sendFloat(pidGainVel.kP);
+    usart->sendString(", ");
+    usart->sendFloat(pidGainVel.kI);
+    usart->sendString(", ");
+    usart->sendFloat(pidGainVel.kD);
+    usart->sendString("\r\n");
+
+    usart->sendString("pidAngVel [kP,kI,kD]: ");
+    usart->sendFloat(pidGainAngVel.kP);
+    usart->sendString(", ");
+    usart->sendFloat(pidGainAngVel.kI);
+    usart->sendString(", ");
+    usart->sendFloat(pidGainAngVel.kD);
+    usart->sendString("\r\n");
 }

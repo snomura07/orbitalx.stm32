@@ -10,6 +10,7 @@ void Startup::run(){
     checkImu();
     checkEncoder();
     checkTimer();
+    dumpParameters();
 }
 
 void Startup::checkMe(){
@@ -72,4 +73,9 @@ void Startup::checkTimer(){
     sendMessage("timer7 [1call/10ms]: ");
     sendMessage(timer7->isStarted()==true?"started":"stoped");
     sendMessage("\r\n\r\n");
+}
+
+void Startup::dumpParameters() {
+    sendMessage("▼Parameters \r\n");
+    paramPtr->dump();
 }

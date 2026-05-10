@@ -33,7 +33,6 @@
 #include <Iled/i_led.h>
 #include <TimerCount/timer_count.h>
 #include <Adc/adc.h>
-#include <Parameter/parameter.h>
 #include <Zupt/zupt.h>
 
 // System
@@ -59,6 +58,7 @@
 
 //Utils
 #include <Usart/usart.h>
+#include <Parameter/parameter.h>
 #include <DataFlash/data_flash.h>
 
 /* USER CODE END Includes */
@@ -108,10 +108,12 @@ MotorController motorController;
 RunCore runCore;
 FailSafe failSafe;
 Logger logger;
-DataFlash dataFlash;
-Debug::Menu debugMenu;
 MonitorGateway monitorGateway;
 Zupt zupt;
+
+DataFlash dataFlash;
+Parameter param;
+Debug::Menu debugMenu;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -177,10 +179,11 @@ int main(void)
   objHub.mapPtr             = new Map();
   objHub.timerCntPtr        = new TimerCount();
   objHub.usartPtr           = new Usart(huart1);
-  objHub.dataFlashPtr       = new DataFlash();
-  objHub.paramPtr           = new Parameter(objHub.dataFlashPtr);
   objHub.initDependencies();
-  objHub.paramPtr->readAll();
+
+  // utils
+  param.setUtilPtr(&dataFlash, objHub.usartPtr);
+  param.readAll();
 
   // Dynamics
   dynHub.usartPtr           = objHub.usartPtr;
@@ -198,7 +201,7 @@ int main(void)
   startup.timer6  = &timer6;
   startup.timer7  = &timer7;
   startup.setUsartPtr(objHub.usartPtr);
-  startup.setParamPtr(objHub.paramPtr);
+  startup.setParamPtr(&param);
 
   failSafe.objHub  = &objHub;
   failSafe.timer6  = &timer6;
@@ -234,7 +237,7 @@ int main(void)
   zupt.setUsartPtr(objHub.usartPtr);
 
   monitorGateway.setUsartPtr(objHub.usartPtr);
-  monitorGateway.setParamPtr(objHub.paramPtr);
+  monitorGateway.setParamPtr(&param);
 
   logger.activate();
 
@@ -275,7 +278,7 @@ int main(void)
   dynHub.velocityPtr->reset();
   dynHub.distancePtr->reset();
   // actionLauncher.select();
-  runCore.moveForward(80.0);
+  // runCore.moveForward(80.0);
 
   // for(int i=0; i<logger.getLogSize(); i++) {
   //     objHub.usartPtr->sendString("[adc]@");
@@ -918,7 +921,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
     // TIM7 callback -> 1call per 10ms
     if (htim->Instance == TIM7) {
       if(monitorGateway.receiveCheck()){
-
+        ledController.turnOn(LedController::LedEnum::GREEN);
       }
 
       // objHub.usartPtr->sendString("[adc]@");
