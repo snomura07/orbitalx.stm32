@@ -9,23 +9,28 @@ void Parameter::setUtilPtr(DataFlash *dataFlash_, Usart *usart_) {
 }
 
 void Parameter::readAll() {
-    float readData[2];
+    float readDataf[2];
+
     readStringBlock(MACHINE_NAME_1, machineName, sizeof(machineName));
     readStringBlock(MACHINE_INFO_1, version, sizeof(version));
 
-    readFloatBlock(PID_GAIN_VEL_ADDR_1, readData);
-    pidGainVel.kP = readData[0];
-    pidGainVel.kI = readData[1];
+    readFloatBlock(PID_GAIN_VEL_ADDR_1, readDataf);
+    pidGainVel.kP = readDataf[0];
+    pidGainVel.kI = readDataf[1];
 
-    readFloatBlock(PID_GAIN_VEL_ADDR_2, readData);
-    pidGainVel.kD = readData[0];
+    readFloatBlock(PID_GAIN_VEL_ADDR_2, readDataf);
+    pidGainVel.kD = readDataf[0];
 
-    readFloatBlock(PID_GAIN_ANG_VEL_ADDR_1, readData);
-    pidGainAngVel.kP = readData[0];
-    pidGainAngVel.kI = readData[1];
+    readFloatBlock(PID_GAIN_ANG_VEL_ADDR_1, readDataf);
+    pidGainAngVel.kP = readDataf[0];
+    pidGainAngVel.kI = readDataf[1];
 
-    readFloatBlock(PID_GAIN_ANG_VEL_ADDR_2, readData);
-    pidGainAngVel.kD = readData[0];
+    readFloatBlock(PID_GAIN_ANG_VEL_ADDR_2, readDataf);
+    pidGainAngVel.kD = readDataf[0];
+
+    readIntBlock(WALL_SENSOR_REF_RIGHT_ADDR, reinterpret_cast<int16_t*>(wallSensorRefRight));
+
+    readIntBlock(WALL_SENSOR_REF_LEFT_ADDR , reinterpret_cast<int16_t*>(wallSensorRefLeft));
 }
 
 void Parameter::writeAll() {
@@ -63,6 +68,16 @@ void Parameter::writePidGainAngVel(float kp, float ki, float kd) {
     writeData[0] = kd;
     writeData[1] = 0;
     writeFloatBlock(PID_GAIN_ANG_VEL_ADDR_2, writeData);
+}
+
+void Parameter::writeWallSensorRefRight(uint16_t rfront, uint16_t lfront, uint16_t rside, uint16_t lside) {
+    uint16_t writeData[4] = {rfront, lfront, rside, lside};
+    writeIntBlock(WALL_SENSOR_REF_RIGHT_ADDR, reinterpret_cast<int16_t*>(writeData));
+}
+
+void Parameter::writeWallSensorRefLeft(uint16_t rfront, uint16_t lfront, uint16_t rside, uint16_t lside) {
+    uint16_t writeData[4] = {rfront, lfront, rside, lside};
+    writeIntBlock(WALL_SENSOR_REF_LEFT_ADDR, reinterpret_cast<int16_t*>(writeData));
 }
 
 void Parameter::readIntBlock(uint32_t address, int16_t* outData) {
@@ -160,4 +175,19 @@ void Parameter::dump() {
     usart->sendString(", ");
     usart->sendFloat(pidGainAngVel.kD);
     usart->sendString("\r\n");
+
+    usart->sendString("Wall Sensor Ref Right [rF, lF, rS, lS]: ");
+    for (size_t i = 0; i < 4; i++) {
+        usart->sendUint16t(wallSensorRefRight[i]);
+        if (i < 3) usart->sendString(", ");
+    }
+    usart->sendString("\r\n");
+
+    usart->sendString("Wall Sensor Ref Left [rF, lF, rS, lS]: ");
+    for (size_t i = 0; i < 4; i++) {
+        usart->sendUint16t(wallSensorRefLeft[i]);
+        if (i < 3) usart->sendString(", ");
+    }
+    usart->sendString("\r\n");
+
 }

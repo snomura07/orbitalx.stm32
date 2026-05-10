@@ -41,14 +41,14 @@
 | 29 | 0x0800F43A | +0x003A | PID_ANG_VEL_2         | kd_l                    | - |
 | 30 | 0x0800F43C | +0x003C | PID_ANG_VEL_2         | reserve1                | - |
 | 31 | 0x0800F43E | +0x003E | PID_ANG_VEL_2         | reserve2                | - |
-| 32 | 0x0800F440 | +0x0040 |  |  |  |
-| 33 | 0x0800F442 | +0x0042 |  |  |  |
-| 34 | 0x0800F444 | +0x0044 |  |  |  |
-| 35 | 0x0800F446 | +0x0046 |  |  |  |
-| 36 | 0x0800F448 | +0x0048 |  |  |  |
-| 37 | 0x0800F44A | +0x004A |  |  |  |
-| 38 | 0x0800F44C | +0x004C |  |  |  |
-| 39 | 0x0800F44E | +0x004E |  |  |  |
+| 32 | 0x0800F440 | +0x0040 | WALL_SENSOR_REF_RIGHT | rfront                  | - |
+| 33 | 0x0800F442 | +0x0042 | WALL_SENSOR_REF_RIGHT | lfront                  | - |
+| 34 | 0x0800F444 | +0x0044 | WALL_SENSOR_REF_RIGHT | rside                   | - |
+| 35 | 0x0800F446 | +0x0046 | WALL_SENSOR_REF_RIGHT | lside                   | - |
+| 36 | 0x0800F448 | +0x0048 | WALL_SENSOR_REF_LEFT  | rfront                  | - |
+| 37 | 0x0800F44A | +0x004A | WALL_SENSOR_REF_LEFT  | lfront                  | - |
+| 38 | 0x0800F44C | +0x004C | WALL_SENSOR_REF_LEFT  | rside                   | - |
+| 39 | 0x0800F44E | +0x004E | WALL_SENSOR_REF_LEFT  | lside                   | - |
 | 40 | 0x0800F450 | +0x0050 |  |  |  |
 | 41 | 0x0800F452 | +0x0052 |  |  |  |
 | 42 | 0x0800F454 | +0x0054 |  |  |  |

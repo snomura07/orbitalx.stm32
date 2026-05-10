@@ -22,6 +22,8 @@ public:
     void writeVersion(const char*  ver);
     void writePidGainVel(float kp, float ki, float kd);
     void writePidGainAngVel(float kp, float ki, float kd);
+    void writeWallSensorRefRight(uint16_t rfront, uint16_t lfront, uint16_t rside, uint16_t lside);
+    void writeWallSensorRefLeft(uint16_t rfront, uint16_t lfront, uint16_t rside, uint16_t lside);
     void dump();
 
 private:
@@ -37,6 +39,8 @@ public:
     PidGain pidGainAngVel;
     char machineName[16];
     char version[16];
+    uint16_t wallSensorRefRight[4]; // rfront, lfront, rside, lside
+    uint16_t wallSensorRefLeft[4];  // rfront, lfront,
 
 private:
     DataFlash *dataFlash;

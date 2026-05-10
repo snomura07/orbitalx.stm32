@@ -46,6 +46,7 @@
 #include <RunCore/run_core.h>
 #include <MonitorGateway/monitor_gateway.h>
 #include <Debug/Menu/menu.h>
+#include <Calibration/calibration.h>
 
 // Dynamics
 #include <DynamicsHub/dynamics_hub.h>
@@ -110,6 +111,7 @@ FailSafe failSafe;
 Logger logger;
 MonitorGateway monitorGateway;
 Zupt zupt;
+Calibration calibration;
 
 DataFlash dataFlash;
 Parameter param;
@@ -239,6 +241,9 @@ int main(void)
   monitorGateway.setUsartPtr(objHub.usartPtr);
   monitorGateway.setParamPtr(&param);
 
+  calibration.init(objHub.wallSensPtr, &ledController);
+  calibration.setParamPtr(&param);
+
   logger.activate();
 
   /* USER CODE END SysInit */
@@ -280,22 +285,6 @@ int main(void)
   // actionLauncher.select();
   // runCore.moveForward(80.0);
 
-  // for(int i=0; i<logger.getLogSize(); i++) {
-  //     objHub.usartPtr->sendString("[adc]@");
-  //     objHub.usartPtr->sendString("log1:");
-  //     objHub.usartPtr->sendInt16t(logger.getLog1(i));
-  //     objHub.usartPtr->sendString(",log2:");
-  //     objHub.usartPtr->sendInt16t(logger.getLog2(i));
-  //     objHub.usartPtr->sendString(",log3:");
-  //     objHub.usartPtr->sendInt16t(logger.getLog3(i));
-  //     objHub.usartPtr->sendString("\r\n");
-  //     HAL_Delay(1);
-  // }
-
-
-  // objHub.paramPtr->writeMachineName("OrbitalX");
-  // objHub.paramPtr->writePidGainVel(0.11, 0.006, -0.2);
-  // objHub.paramPtr->writeVersion("2.2.0");
 
   while (1)
   {
