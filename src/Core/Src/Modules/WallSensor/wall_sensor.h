@@ -6,10 +6,17 @@
 
 class WallSensor : public UtilInterface{
 public:
-    uint16_t rFront;
-    uint16_t rSide;
-    uint16_t lFront;
-    uint16_t lSide;
+ struct pos
+ {
+     uint16_t rFront;
+     uint16_t rSide;
+     uint16_t lFront;
+     uint16_t lSide;
+ };
+
+public:
+    pos rawData;
+    pos normData;
 
 public:
     WallSensor(Adc *adc_, Iled *ied_);
@@ -25,10 +32,7 @@ private:
         SAMPLE_ON_COMPUTE
     };
 
-    uint16_t rFrontOff;
-    uint16_t rSideOff;
-    uint16_t lFrontOff;
-    uint16_t lSideOff;
+    pos rawDataOff;
     SamplePhase phase;
 
     Adc *adc;

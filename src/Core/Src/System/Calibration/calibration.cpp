@@ -13,10 +13,10 @@ void Calibration::calibrateWallSensorRightSide(){
     led->allOff();
     HAL_Delay(1000);
     led->turnOn(LedController::LedEnum::ORANGE);
-    paramPtr->writeWallSensorRefRight(wallSensor->rFront,
-                                      wallSensor->lFront,
-                                      wallSensor->rSide,
-                                      wallSensor->lSide);
+    paramPtr->writeWallSensorRefRight(wallSensor->rawData.rFront,
+                                      wallSensor->rawData.lFront,
+                                      wallSensor->rawData.rSide,
+                                      wallSensor->rawData.lSide);
     HAL_Delay(200);
     led->turnOff(LedController::LedEnum::ORANGE);
 }
@@ -25,10 +25,10 @@ void Calibration::calibrateWallSensorLeftSide(){
     led->allOff();
     HAL_Delay(1000);
     led->turnOn(LedController::LedEnum::ORANGE);
-    paramPtr->writeWallSensorRefLeft(wallSensor->rFront,
-                                     wallSensor->lFront,
-                                      wallSensor->rSide,
-                                      wallSensor->lSide);
+    paramPtr->writeWallSensorRefLeft(wallSensor->rawData.rFront,
+                                     wallSensor->rawData.lFront,
+                                     wallSensor->rawData.rSide,
+                                     wallSensor->rawData.lSide);
     HAL_Delay(200);
     led->turnOff(LedController::LedEnum::ORANGE);
 }

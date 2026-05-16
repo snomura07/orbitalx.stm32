@@ -14,6 +14,7 @@
 #include <Usart/usart.h>
 #include <Adc/adc.h>
 
+#include <Parameter/parameter.h>
 class ObjectHub {
 public:
     ObjectHub();
@@ -40,6 +41,8 @@ public:
     TimerCount *timerCntPtr;
     Usart *usartPtr;
     Adc *adcPtr;
+
+    Parameter *paramPtr;
 };
 
 #endif

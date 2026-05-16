@@ -71,7 +71,7 @@ void ActionLauncher::standbyStay() {
     bool loopFlag = true;
     while(loopFlag){
         ledController->launchBlink();
-        if(wallSensor->rFront > 3500){
+        if(wallSensor->rawData.rFront > 3500){
             loopFlag = false;
             ledController->allOff();
             ledController->allOn();

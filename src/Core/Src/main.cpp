@@ -181,6 +181,7 @@ int main(void)
   objHub.mapPtr             = new Map();
   objHub.timerCntPtr        = new TimerCount();
   objHub.usartPtr           = new Usart(huart1);
+  objHub.paramPtr           = &param;
   objHub.initDependencies();
 
   // utils
