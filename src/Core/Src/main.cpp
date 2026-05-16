@@ -136,6 +136,56 @@ static void MX_TIM7_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+void timer1Callback() {
+  objHub.timerCntPtr        ->update();
+  objHub.wallSensPtr        ->update();
+  objHub.rEncPtr            ->update();
+  objHub.lEncPtr            ->update();
+  objHub.adcPtr             ->resetEncDataCount();
+  objHub.battPtr            ->update();
+  objHub.imuPtr             ->update();
+
+  dynHub.encDistancePtr     ->update();
+  dynHub.angularVelocityPtr ->update();
+  // dynHub.anglePtr           ->update();
+  dynHub.accelPtr           ->update();
+  dynHub.velocityPtr        ->update();
+  // dynHub.distancePtr        ->update();
+  zupt.update();
+  motorController.update();
+}
+
+
+// TIM6 callback -> 1call per 10ms
+void timer6Callback() {
+  // motorController.dump();
+}
+
+// TIM7 callback -> 1call per 10ms
+void timer7Callback() {
+  if(monitorGateway.receiveCheck()){
+    ledController.turnOn(LedController::LedEnum::GREEN);
+  }
+
+  // objHub.usartPtr->sendString("[adc]@");
+  // objHub.usartPtr->sendUint16t(objHub.rEncPtr->currRaw);
+  // objHub.usartPtr->sendString(",");
+  // objHub.usartPtr->sendUint16t(objHub.lEncPtr->currRaw);
+  // objHub.usartPtr->sendString(",");
+  // objHub.usartPtr->sendUint16t(objHub.rEncPtr->counter);
+  // objHub.usartPtr->sendString(",");
+  // objHub.usartPtr->sendUint16t(objHub.lEncPtr->counter);
+
+  // objHub.usartPtr->sendString("vel:");
+  // objHub.usartPtr->sendFloat(dynHub.velocityPtr->mmps.y);
+  // objHub.usartPtr->sendString(",dis:");
+  // objHub.usartPtr->sendFloat(dynHub.encDistancePtr->mm);
+
+  // objHub.usartPtr->sendString("batt:");
+  // objHub.usartPtr->sendUint16t(objHub.battPtr->mVolt);
+  // objHub.usartPtr->sendString("\r\n");
+  // failSafe.update();
+}
 
 /* USER CODE END 0 */
 
@@ -289,6 +339,8 @@ int main(void)
 
   while (1)
   {
+    objHub.wallSensPtr->dump();
+
 
     HAL_Delay(10);
 
@@ -880,61 +932,19 @@ static void MX_GPIO_Init(void)
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
     // TIM1 callback -> 1call per 1ms
     if (htim->Instance == TIM1) {
-      objHub.timerCntPtr        ->update();
-      objHub.wallSensPtr        ->update();
-      objHub.rEncPtr            ->update();
-      objHub.lEncPtr            ->update();
-      objHub.adcPtr             ->resetEncDataCount();
-      objHub.battPtr            ->update();
-      objHub.imuPtr             ->update();
-
-      dynHub.encDistancePtr     ->update();
-      dynHub.angularVelocityPtr ->update();
-      // dynHub.anglePtr           ->update();
-      dynHub.accelPtr           ->update();
-      dynHub.velocityPtr        ->update();
-      // dynHub.distancePtr        ->update();
-      zupt.update();
-      motorController.update();
-    }
-
-    // TIM15 callback -> 1call/s
-    if (htim->Instance == TIM15) {
-      // objHub.ledGreenPtr->toggle();
+      timer1Callback();
     }
 
     // TIM6 callback -> 1call per 10ms
     if (htim->Instance == TIM6) {
-      // motorController.dump();
+      timer6Callback();
     }
 
     // TIM7 callback -> 1call per 10ms
     if (htim->Instance == TIM7) {
-      if(monitorGateway.receiveCheck()){
-        ledController.turnOn(LedController::LedEnum::GREEN);
-      }
-
-      // objHub.usartPtr->sendString("[adc]@");
-      // objHub.usartPtr->sendUint16t(objHub.rEncPtr->currRaw);
-      // objHub.usartPtr->sendString(",");
-      // objHub.usartPtr->sendUint16t(objHub.lEncPtr->currRaw);
-      // objHub.usartPtr->sendString(",");
-      // objHub.usartPtr->sendUint16t(objHub.rEncPtr->counter);
-      // objHub.usartPtr->sendString(",");
-      // objHub.usartPtr->sendUint16t(objHub.lEncPtr->counter);
-
-      // objHub.usartPtr->sendString("vel:");
-      // objHub.usartPtr->sendFloat(dynHub.velocityPtr->mmps.y);
-      // objHub.usartPtr->sendString(",dis:");
-      // objHub.usartPtr->sendFloat(dynHub.encDistancePtr->mm);
-
-      // objHub.usartPtr->sendString("batt:");
-      // objHub.usartPtr->sendUint16t(objHub.battPtr->mVolt);
-      // objHub.usartPtr->sendString("\r\n");
-      // failSafe.update();
+      timer7Callback();
     }
 }
-
 /* USER CODE END 4 */
 
 /**
