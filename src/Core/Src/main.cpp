@@ -42,7 +42,11 @@
 #include <Logger/logger.h>
 #include <LedController/led_controller.h>
 #include <ActionLauncher/action_launcher.h>
-#include <MotorController/motor_controller.h>
+#include <MotorController/ControlEngine/control_engine.h>
+#include <MotorController/FeedbackController/feedback_controller.h>
+#include <MotorController/FeedforwardController/feedforward_controller.h>
+#include <MotorController/Composer/composer.h>
+#include <MotorController/MotorDriver/motor_driver.h>
 #include <RunCore/run_core.h>
 #include <MonitorGateway/monitor_gateway.h>
 #include <Debug/Menu/menu.h>
@@ -105,14 +109,18 @@ TimerController timer6(htim6);   // 1call/10ms for objHub update
 TimerController timer7(htim7);   // 1call/10ms for fail safe
 LedController ledController;
 ActionLauncher actionLauncher;
-MotorController motorController;
+MotorController::ControlEngine motCtlControlEngine;
+MotorController::DesiredVelGenerator motCtlDVelGenerator;
+MotorController::FeedbackController motCtlFbController;
+MotorController::FeedforwardController motCtlFfController;
+MotorController::Composer motCtlComposer;
+MotorController::MotorDriver motCtlMotorDriver;
 RunCore runCore;
 FailSafe failSafe;
 Logger logger;
 MonitorGateway monitorGateway;
 Zupt zupt;
 Calibration calibration;
-
 DataFlash dataFlash;
 Parameter param;
 Debug::Menu debugMenu;
@@ -136,6 +144,8 @@ static void MX_TIM7_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+// TIM1 callback -> 1call per 1ms
 void timer1Callback() {
   objHub.timerCntPtr        ->update();
   objHub.wallSensPtr        ->update();
@@ -147,18 +157,14 @@ void timer1Callback() {
 
   dynHub.encDistancePtr     ->update();
   dynHub.angularVelocityPtr ->update();
-  // dynHub.anglePtr           ->update();
   dynHub.accelPtr           ->update();
   dynHub.velocityPtr        ->update();
-  // dynHub.distancePtr        ->update();
   zupt.update();
-  motorController.update();
+  motCtlControlEngine.update();
 }
-
 
 // TIM6 callback -> 1call per 10ms
 void timer6Callback() {
-  // motorController.dump();
 }
 
 // TIM7 callback -> 1call per 10ms
@@ -167,24 +173,8 @@ void timer7Callback() {
     ledController.turnOn(LedController::LedEnum::GREEN);
   }
 
-  // objHub.usartPtr->sendString("[adc]@");
-  // objHub.usartPtr->sendUint16t(objHub.rEncPtr->currRaw);
-  // objHub.usartPtr->sendString(",");
-  // objHub.usartPtr->sendUint16t(objHub.lEncPtr->currRaw);
-  // objHub.usartPtr->sendString(",");
-  // objHub.usartPtr->sendUint16t(objHub.rEncPtr->counter);
-  // objHub.usartPtr->sendString(",");
-  // objHub.usartPtr->sendUint16t(objHub.lEncPtr->counter);
-
-  // objHub.usartPtr->sendString("vel:");
-  // objHub.usartPtr->sendFloat(dynHub.velocityPtr->mmps.y);
-  // objHub.usartPtr->sendString(",dis:");
-  // objHub.usartPtr->sendFloat(dynHub.encDistancePtr->mm);
-
-  // objHub.usartPtr->sendString("batt:");
-  // objHub.usartPtr->sendUint16t(objHub.battPtr->mVolt);
-  // objHub.usartPtr->sendString("\r\n");
-  // failSafe.update();
+  // dynHub.velocityPtr->dump();
+  motCtlControlEngine.dump();
 }
 
 /* USER CODE END 0 */
@@ -266,16 +256,26 @@ int main(void)
                      objHub.ledRedPtr,
                      objHub.ledDarkGreenPtr );
 
-  motorController.init(objHub.rMotPtr,
-                       objHub.lMotPtr,
-                       dynHub.velocityPtr,
-                       dynHub.angularVelocityPtr,
-                       objHub.battPtr);
-  motorController.setUsartPtr(objHub.usartPtr);
-  motorController.setLoggerPtr(&logger);
+  motCtlControlEngine.init( &motCtlDVelGenerator,
+                            &motCtlFbController,
+                            &motCtlFfController,
+                            &motCtlComposer,
+                            &motCtlMotorDriver);
+  motCtlControlEngine.setUsartPtr(objHub.usartPtr);
 
-  runCore.init(&motorController,
-               &ledController,
+  motCtlFbController.init( &motCtlDVelGenerator,
+                            dynHub.velocityPtr,
+                            dynHub.angularVelocityPtr,
+                            objHub.wallSensPtr);
+
+  motCtlFfController.init(&motCtlDVelGenerator);
+
+  motCtlComposer.init( objHub.battPtr);
+
+  motCtlMotorDriver.init( objHub.rMotPtr,
+                          objHub.lMotPtr);
+
+  runCore.init(&ledController,
                dynHub.encDistancePtr);
   runCore.setUsartPtr(objHub.usartPtr);
 
@@ -333,15 +333,21 @@ int main(void)
   dynHub.anglePtr->reset();
   dynHub.velocityPtr->reset();
   dynHub.distancePtr->reset();
+
   // actionLauncher.select();
   // runCore.moveForward(80.0);
 
+  ledController.turnOn(LedController::LedEnum::ORANGE);
+  motCtlControlEngine.setTarget(3000.0, 300.0);
+  motCtlControlEngine.activate();
+  HAL_Delay(500);
+  motCtlControlEngine.setTarget(3000.0, 0.0);
+  HAL_Delay(500);
+  motCtlControlEngine.deactivate();
+  ledController.turnOff(LedController::LedEnum::ORANGE);
 
   while (1)
   {
-    objHub.wallSensPtr->dump();
-
-
     HAL_Delay(10);
 
     /* USER CODE END WHILE */

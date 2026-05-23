@@ -15,6 +15,7 @@
 #define DATAFLASH_START_ADDR  0x0800F400
 #define RX_BUFFER_SIZE 256
 #define TX_BUFFER_SIZE 128
+#define DUTY_MAX 1199.0
 
 struct Axis
 {

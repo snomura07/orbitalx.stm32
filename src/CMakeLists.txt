@@ -68,7 +68,12 @@ add_executable(
     Core/Src/System/Logger/logger.cpp
     Core/Src/System/ActionLauncher/action_launcher.cpp
     Core/Src/System/LedController/led_controller.cpp
-    Core/Src/System/MotorController/motor_controller.cpp
+    Core/Src/System/MotorController/ControlEngine/control_engine.cpp
+    Core/Src/System/MotorController/DesiredVelGenerator/desired_vel_generator.cpp
+    Core/Src/System/MotorController/FeedbackController/feedback_controller.cpp
+    Core/Src/System/MotorController/FeedforwardController/feedforward_controller.cpp
+    Core/Src/System/MotorController/Composer/composer.cpp
+    Core/Src/System/MotorController/MotorDriver/motor_driver.cpp
     Core/Src/System/RunCore/run_core.cpp
     Core/Src/System/Debug/Menu/menu.cpp
     Core/Src/System/MonitorGateway/monitor_gateway.cpp

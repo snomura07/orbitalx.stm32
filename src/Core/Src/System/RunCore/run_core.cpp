@@ -3,20 +3,13 @@
 RunCore::RunCore(){}
 RunCore::~RunCore(){}
 
-void RunCore::init( MotorController *motorController_,
-                    LedController *ledController_,
+void RunCore::init( LedController *ledController_,
                     EncoderDistance *currDis_) {
-    motorController = motorController_;
     ledController   = ledController_;
     currDis         = currDis_;
 }
 
 void RunCore::moveForward(float dis) {
-    motorController->setDesiredVelocity(300.0);
-    motorController->setAccel(4000.0);
-    motorController->setDesiredAngularVelocity(0.0);
-    motorController->setAngularAccel(6000.0);
-    motorController->activate();
 
     while(1){
         sendFloat(currDis->mm);
@@ -29,9 +22,4 @@ void RunCore::moveForward(float dis) {
         }
     }
 
-    // HAL_Delay(800);
-    motorController->setDesiredVelocity(0.0);
-
-    HAL_Delay(500);
-    motorController->deActivate();
 }
