@@ -19,35 +19,47 @@ void Usart::sendString(const char *str){
 
 void Usart::sendInt16t(int16_t value){
     char buffer[10];
-    sprintf(buffer, "%d", value);
+    int32ToString(static_cast<int32_t>(value), buffer);
     sendString(buffer);
 }
 void Usart::sendUint16t(uint16_t value){
     char buffer[10];
-    sprintf(buffer, "%u", value);
+    uint32ToString(static_cast<uint32_t>(value), buffer);
     sendString(buffer);
 }
 
 void Usart::sendInt32t(int32_t value){
-    char buffer[11];
-    sprintf(buffer, "%ld", value);
+    char buffer[12];
+    int32ToString(value, buffer);
     sendString(buffer);
 }
 void Usart::sendUint32t(uint32_t value){
     char buffer[11];
-    sprintf(buffer, "%lu", value);
+    uint32ToString(value, buffer);
     sendString(buffer);
 }
 void Usart::sendFloat(float value){
-    int integerPart    = (int)value; // 整数部分
-    int fractionalPart = (int)((fabs(value) - abs(integerPart)) * 1000); // 小数点以下3桁
-
     char buffer[20];
-    if (value < 0) {
-        sprintf(buffer, "-%d.%03d", abs(integerPart), fractionalPart);
-    } else {
-        sprintf(buffer, "%d.%03d", integerPart, fractionalPart);
+    uint32_t index = 0;
+
+    if (value < 0.0f) {
+        buffer[index++] = '-';
     }
+
+    float absValue = fabsf(value);
+    uint32_t integerPart = static_cast<uint32_t>(absValue);
+    float fractional = (absValue - static_cast<float>(integerPart)) * 1000.0f;
+    uint32_t fractionalPart = static_cast<uint32_t>(fractional + 0.5f);
+
+    if (fractionalPart >= 1000U) {
+        integerPart++;
+        fractionalPart = 0U;
+    }
+
+    index += uint32ToString(integerPart, buffer + index);
+    buffer[index++] = '.';
+    appendFixed3Digits(fractionalPart, buffer + index);
+
     sendString(buffer);
 }
 
@@ -108,4 +120,39 @@ char Usart::receiveCharNonBlocking(){
         }
     }
     return '\0';
+}
+
+
+uint16_t Usart::uint32ToString(uint32_t value, char *buffer) {
+    char temp[10];
+    uint16_t digits = 0;
+
+    do {
+        temp[digits++] = static_cast<char>('0' + (value % 10U));
+        value /= 10U;
+    } while (value > 0U);
+
+    for (uint16_t i = 0; i < digits; i++) {
+        buffer[i] = temp[digits - 1U - i];
+    }
+    buffer[digits] = '\0';
+    return digits;
+}
+
+void Usart::int32ToString(int32_t value, char *buffer) {
+    if (value < 0) {
+        buffer[0] = '-';
+        uint32_t magnitude = static_cast<uint32_t>(-(value + 1)) + 1U;
+        uint32ToString(magnitude, buffer + 1);
+        return;
+    }
+
+    uint32ToString(static_cast<uint32_t>(value), buffer);
+}
+
+void Usart::appendFixed3Digits(uint32_t value, char *buffer) {
+    buffer[0] = static_cast<char>('0' + ((value / 100U) % 10U));
+    buffer[1] = static_cast<char>('0' + ((value / 10U) % 10U));
+    buffer[2] = static_cast<char>('0' + (value % 10U));
+    buffer[3] = '\0';
 }

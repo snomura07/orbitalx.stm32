@@ -34,6 +34,11 @@ public:
     char receiveCharNonBlocking();
 
 private:
+    uint16_t uint32ToString(uint32_t value, char *buffer);
+    void int32ToString(int32_t value, char *buffer);
+    void appendFixed3Digits(uint32_t value, char *buffer);
+
+private:
     UART_HandleTypeDef *huart;
 };
 
