@@ -75,6 +75,9 @@ add_executable(
     Core/Src/System/MotorController/Composer/composer.cpp
     Core/Src/System/MotorController/MotorDriver/motor_driver.cpp
     Core/Src/System/RunCore/run_core.cpp
+    Core/Src/System/RunControl/Engine/engine.cpp
+    Core/Src/System/RunControl/MotionSequence/motion_sequence.cpp
+    Core/Src/System/RunControl/MotionRunner/motion_runner.cpp
     Core/Src/System/Debug/Menu/menu.cpp
     Core/Src/System/MonitorGateway/monitor_gateway.cpp
     Core/Src/System/Zupt/zupt.cpp
